@@ -1,0 +1,33 @@
+/* Metadata app. Shared widgets live in xp.css. */
+.pmeta { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pmeta .fname { margin-left: auto; color: var(--muted); max-width: 40ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pmeta .content { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+.pmeta .content.dropping { outline: 2px dashed var(--select); outline-offset: -6px; }
+.pmeta .empty { margin: auto; max-width: 52ch; text-align: center; line-height: 1.5; }
+.pmeta .empty p { margin: 0 0 10px; }
+.pmeta .muted, .pmeta .note { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.pmeta #pdfmeta-results { display: flex; flex-direction: column; gap: 10px; }
+.pmeta .grid { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 6px 10px; align-items: center; }
+.pmeta .grid .xp-field { width: 100%; }
+.pmeta .check { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.pmeta .kv { width: 100%; border-collapse: collapse; }
+.pmeta .kv th { width: 180px; padding: 3px 12px 3px 0; text-align: left; font-weight: 400; color: var(--muted); }
+.pmeta .kv td { padding: 3px 0; overflow-wrap: anywhere; }
+.pmeta .kv td.unset { color: var(--muted); font-style: italic; }
+.pmeta .tablewrap { max-height: 180px; overflow: auto; border: 1px solid var(--field-border); background: #fff; }
+.pmeta .xp-table td { white-space: normal; overflow-wrap: anywhere; }
+.pmeta .plan { padding: 8px 10px; background: var(--info); border: 1px solid #000; line-height: 1.4; }
+.pmeta .plan.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.pmeta .big { min-height: 42px; font-weight: 700; width: 100%; }
+
+@media (max-width: 699px) {
+  .pmeta { flex: 0 0 auto; }
+  .pmeta .content { flex: 0 0 auto; overflow: visible; padding: 12px; }
+  .pmeta .toolbar .xp-btn { flex: 1 1 40%; min-height: 44px; }
+  .pmeta .toolbar .xp-btn.is-default { flex-basis: 100%; }
+  .pmeta .toolbar .sep { display: none; }
+  .pmeta .fname { margin-left: 0; flex-basis: 100%; }
+  .pmeta .grid { grid-template-columns: 1fr; }
+  .pmeta .kv th, .pmeta .kv td { display: block; width: auto; }
+  .pmeta .xp-field { font-size: 16px; min-height: 40px; }
+}

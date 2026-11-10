@@ -1,0 +1,54 @@
+# Automatic checks: build and tests, Go vulnerability check, and a vulnerability check of the vendored libraries.
+# Runs on every push and pull request, and once a week (new vulnerabilities are published after a release).
+# No secrets are used and the token is read-only. Every action is pinned to an exact commit and the runner image is fixed.
+name: checks
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: "17 5 * * 1"   # Mondays 05:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: build and tests
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: go vet
+        run: go vet ./...
+      - name: go test
+        run: go test ./...
+
+  govulncheck:
+    name: Go vulnerability check
+    runs-on: ubuntu-24.04
+    steps:
+      # Deliberately the latest stable Go (the action's default): the question is whether the code is affected by a known
+      # vulnerability with a Go that still gets security fixes, which is what users should build with.
+      - uses: golang/govulncheck-action@032d45514ae346b1db93c04b0c90b841c370344f # v1.1.0
+        with:
+          cache: false   # there is no go.sum to cache by (no Go dependencies)
+          go-package: ./...
+
+  vendored-libraries:
+    name: vulnerability check of vendored libraries
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The libraries under web/vendor are copied files, so no dependency tool can see them; sbom.cdx.json lists them with their
+      # package URLs and this scans that list against the open vulnerability database (osv.dev).
+      - uses: google/osv-scanner-action/osv-scanner-action@b1d267aea5211fa648d9d442fa64b90dbdcbdd36 # v2.7.0
+        with:
+          scan-args: |-
+            scan
+            source
+            --lockfile=./sbom.cdx.json

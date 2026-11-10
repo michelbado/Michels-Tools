@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5A8DF7"/><stop offset="0.5" stop-color="#2860E6"/><stop offset="1" stop-color="#1C4FD9"/></linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0705A"/><stop offset="1" stop-color="#C23A14"/></linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="8" fill="url(#bg)" stroke="#0831D9" stroke-width="1.5"/>
+  <path d="M11 7h16l8 8v22a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" fill="#FFFFFF" stroke="#0B3A91"/>
+  <path d="M27 7v8h8" fill="#DCE6FA" stroke="#0B3A91" stroke-linejoin="round"/>
+  <rect x="9" y="20" width="22" height="9" rx="1.5" fill="url(#red)"/>
+  <text x="20" y="27.6" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="7.4" fill="#fff" text-anchor="middle">PDF</text>
+  <circle cx="33" cy="33" r="8" fill="#FFFFFF" stroke="#0B3A91" stroke-width="1.6"/>
+  <circle cx="33" cy="29.6" r="1.3" fill="#2F6FDB"/>
+  <path d="M33 32.3v4.6" stroke="#2F6FDB" stroke-width="2.2" stroke-linecap="round"/>
+</svg>

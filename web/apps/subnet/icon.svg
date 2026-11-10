@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5A8DF7"/>
+      <stop offset="0.5" stop-color="#2860E6"/>
+      <stop offset="1" stop-color="#1C4FD9"/>
+    </linearGradient>
+    <linearGradient id="net" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5CC25C"/>
+      <stop offset="1" stop-color="#23702A"/>
+    </linearGradient>
+    <linearGradient id="host" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE27A"/>
+      <stop offset="1" stop-color="#F2B01E"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="8" fill="url(#bg)" stroke="#0831D9" stroke-width="1.5"/>
+  <rect x="7" y="8" width="34" height="11" rx="2" fill="#FFFFFF" stroke="#0B3A91"/>
+  <rect x="9" y="10" width="20" height="7" rx="1" fill="url(#net)"/>
+  <rect x="30" y="10" width="9" height="7" rx="1" fill="url(#host)"/>
+  <rect x="7" y="23" width="34" height="11" rx="2" fill="#FFFFFF" stroke="#0B3A91"/>
+  <rect x="9" y="25" width="20" height="7" rx="1" fill="url(#net)"/>
+  <rect x="30" y="25" width="9" height="7" rx="1" fill="url(#host)"/>
+  <path d="M10 40h28" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="1 5"/>
+</svg>

@@ -1,0 +1,76 @@
+<div class="sub">
+  <div class="content">
+    <fieldset>
+      <legend>Network</legend>
+      <div class="netrow">
+        <label class="fld" for="subnet-ip">
+          <b>IP address</b>
+          <input type="text" id="subnet-ip" class="xp-field" value="192.168.1.10" inputmode="decimal" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="192.168.1.10">
+        </label>
+        <label class="fld" for="subnet-mask">
+          <b>Subnet mask</b>
+          <select id="subnet-mask" class="xp-select"></select>
+        </label>
+      </div>
+      <div class="caption">
+        <span>Type an address and pick a mask. You can also paste 10.0.0.5/24 into the IP box.</span>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Result</legend>
+      <div class="grid">
+        <div class="item">
+          <span class="k">Network address</span>
+          <span class="v"><span class="val mono" id="subnet-net">-</span><button type="button" class="xp-btn small" data-copy="subnet-net">Copy</button></span>
+        </div>
+        <div class="item">
+          <span class="k">Broadcast address</span>
+          <span class="v"><span class="val mono" id="subnet-bc">-</span><button type="button" class="xp-btn small" data-copy="subnet-bc">Copy</button></span>
+        </div>
+        <div class="item">
+          <span class="k">Subnet mask</span>
+          <span class="v"><span class="val mono" id="subnet-maskout">-</span><button type="button" class="xp-btn small" data-copy="subnet-maskout">Copy</button></span>
+        </div>
+        <div class="item">
+          <span class="k">Wildcard mask</span>
+          <span class="v"><span class="val mono" id="subnet-wild">-</span><button type="button" class="xp-btn small" data-copy="subnet-wild">Copy</button></span>
+        </div>
+        <div class="item">
+          <span class="k">First usable address</span>
+          <span class="v"><span class="val mono" id="subnet-first">-</span><button type="button" class="xp-btn small" data-copy="subnet-first">Copy</button></span>
+        </div>
+        <div class="item">
+          <span class="k">Last usable address</span>
+          <span class="v"><span class="val mono" id="subnet-last">-</span><button type="button" class="xp-btn small" data-copy="subnet-last">Copy</button></span>
+        </div>
+        <div class="item">
+          <span class="k">Total addresses</span>
+          <span class="v"><span class="val mono" id="subnet-total">-</span></span>
+        </div>
+        <div class="item">
+          <span class="k">Usable hosts</span>
+          <span class="v"><span class="val mono" id="subnet-hosts">-</span></span>
+        </div>
+        <div class="item wide">
+          <span class="k">Address type</span>
+          <span class="v"><span class="val" id="subnet-type">-</span></span>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset class="listbox">
+      <legend>Usable addresses</legend>
+      <textarea id="subnet-list" class="xp-text" readonly spellcheck="false" aria-label="Usable addresses"></textarea>
+      <div class="caption">
+        <span id="subnet-listmeta">0 addresses</span>
+        <button type="button" class="xp-btn small" id="subnet-copylist" disabled>Copy list</button>
+      </div>
+    </fieldset>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="subnet-status">Ready</span>
+    <span class="cell wide">Prefix: <span id="subnet-prefix">/24</span></span>
+  </footer>
+</div>

@@ -1,0 +1,50 @@
+[Unit]
+Description=Michel's Tools web service
+After=network.target
+
+[Service]
+ExecStart=/opt/michels-tools/michels-tools -addr 127.0.0.1:8080 -max-mb 50 -queue 20 -retention-days 90 -real-ip-header X-Forwarded-For -rate-api 30 -rate-page 600 -ip-jobs 2 -rate-net-scale 50
+DynamicUser=yes
+
+# The program speaks plain HTTP only and listens on this machine alone: put a reverse proxy (Caddy, nginx) or a tunnel in
+# front of it for https. The visitor's real address is read from X-Forwarded-For, believed only when the connection comes
+# from -trusted-proxies (default: this machine). Behind Cloudflare use -real-ip-header CF-Connecting-IP; if the proxy is on
+# another machine add -trusted-proxies <its address>. See the README, section Installation.
+#
+# Per-visitor limits: 30 aggregations/min, 600 other requests/min, 2 aggregations at once
+# (0 turns one off). Visitors are told apart by their real address, so people behind one
+# office address share a budget; raise the numbers if that bites. -rate-net-scale is how many
+# times one visitor's budget a whole IPv6 /48 network may use together.
+#
+# Visit log (analytics): /var/lib/michels-tools, readable only by root and this service.
+# Daily files visits-YYYY-MM-DD.jsonl, deleted automatically after -retention-days.
+StateDirectory=michels-tools
+StateDirectoryMode=0700
+Restart=always
+RestartSec=2
+
+# Memory: a runaway request restarts only this service, never the whole host. The ceiling is a PERCENTAGE of the
+# machine's RAM, so the same file suits a 1 GB box (about 700 MB) and a 64 GB server (about 45 GB). The program reads
+# that limit at startup and sizes itself: it keeps below 80% of it (-mem-percent) and runs about one aggregation per
+# 200 MB at the same time, 1 to 16 (-jobs; set a number to override). Change the percentage with:
+#   systemctl edit michels-tools      (add:  [Service]  then  MemoryMax=50%  )
+# Switch tools off with a tools.conf next to the program (see deploy/tools.conf.example), then restart the service.
+MemoryMax=70%
+
+# Hardening
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+LockPersonality=yes
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

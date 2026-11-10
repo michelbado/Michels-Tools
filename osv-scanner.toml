@@ -1,0 +1,8 @@
+# Settings for the vulnerability scan of sbom.cdx.json (see .github/workflows/ci.yml).
+# The Go standard library is checked by govulncheck against the Go version that really builds the program;
+# the SBOM only records the minor version from go.mod (1.24), which the scanner would read as 1.24.0 and wrongly flag.
+[[PackageOverrides]]
+name = "stdlib"
+ecosystem = "Go"
+ignore = true
+reason = "Checked by govulncheck, which knows the real Go version."

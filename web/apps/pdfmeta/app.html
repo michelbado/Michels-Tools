@@ -1,0 +1,71 @@
+<div class="pmeta">
+  <div class="toolbar" role="toolbar" aria-label="Actions">
+    <button type="button" class="xp-btn is-default" id="pdfmeta-open">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3A3A3A" stroke-width="1.4"><path d="M3 1.5h7l3 3v10H3z" fill="#FFFFFF"/><path d="M5.5 7h5M5.5 9.5h5M5.5 12h3"/></svg>
+      Open PDF
+    </button>
+    <input type="file" id="pdfmeta-file" accept="application/pdf,.pdf" hidden>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="xp-btn" id="pdfmeta-wipe" disabled>Remove all metadata</button>
+    <button type="button" class="xp-btn" id="pdfmeta-clear">Clear</button>
+    <span class="fname" id="pdfmeta-name"></span>
+  </div>
+
+  <div class="content" id="pdfmeta-content">
+    <div class="empty" id="pdfmeta-empty">
+      <p><b>Open a PDF</b>, or drop one onto this window.</p>
+      <p>You can read, change or remove the details stored inside it: title, author, subject, keywords, the program that made it, its dates, hidden extra properties, and older saved versions of the file.</p>
+      <p class="muted">The file is changed inside your browser. It is not uploaded, and your original file is never touched: you download a new copy.</p>
+    </div>
+
+    <div id="pdfmeta-results" hidden>
+      <div class="infobar warnbar" id="pdfmeta-signedwarn" role="status" hidden>
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5L17 16H1z" fill="#FFD21F" stroke="#8A6D00" stroke-linejoin="round"/><path d="M9 6.5v4.5" stroke="#000" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="13.4" r="1" fill="#000"/></svg>
+        <span>This PDF has a digital signature. Saving a changed copy will break it: the new file will no longer be signed.</span>
+      </div>
+
+      <fieldset>
+        <legend>Description</legend>
+        <div class="grid">
+          <label for="pdfmeta-title">Title</label><input type="text" id="pdfmeta-title" class="xp-field" autocomplete="off" spellcheck="false">
+          <label for="pdfmeta-author">Author</label><input type="text" id="pdfmeta-author" class="xp-field" autocomplete="off" spellcheck="false">
+          <label for="pdfmeta-subject">Subject</label><input type="text" id="pdfmeta-subject" class="xp-field" autocomplete="off" spellcheck="false">
+          <label for="pdfmeta-keywords">Keywords</label><input type="text" id="pdfmeta-keywords" class="xp-field" autocomplete="off" spellcheck="false">
+          <label for="pdfmeta-creator">Created with (program)</label><input type="text" id="pdfmeta-creator" class="xp-field" autocomplete="off" spellcheck="false">
+          <label for="pdfmeta-producer">Converted by (program)</label><input type="text" id="pdfmeta-producer" class="xp-field" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="note">An empty box means the detail is removed from the file.</div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Dates</legend>
+        <table class="kv"><tbody id="pdfmeta-dates"></tbody></table>
+        <label class="check"><input type="checkbox" id="pdfmeta-touch" checked> Set "Changed" to the current time when saving</label>
+      </fieldset>
+
+      <fieldset id="pdfmeta-customset" hidden>
+        <legend>Extra properties</legend>
+        <div class="tablewrap"><table class="xp-table"><thead><tr><th scope="col">Remove</th><th scope="col">Name</th><th scope="col">Value</th></tr></thead><tbody id="pdfmeta-custom"></tbody></table></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Hidden extras</legend>
+        <div id="pdfmeta-xmpbox" hidden>
+          <label class="check"><input type="checkbox" id="pdfmeta-dropxmp"> Remove the hidden XMP data block</label>
+          <div class="note" id="pdfmeta-xmpnote"></div>
+        </div>
+        <div class="note" id="pdfmeta-noxmp">This file has no hidden XMP data block.</div>
+        <div class="note" id="pdfmeta-revnote"></div>
+      </fieldset>
+
+      <div class="plan" id="pdfmeta-plan" role="status">Change anything above, then save.</div>
+      <button type="button" class="xp-btn is-default big" id="pdfmeta-save" disabled>Save a new copy and download</button>
+      <div class="note">Saving writes the whole file again, so older saved versions of the document (the ones kept when a PDF is edited and saved again) and unused leftovers are always dropped. Links, bookmarks and form fields stay.</div>
+    </div>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="pdfmeta-status">Ready</span>
+    <span class="cell wide">Pages: <span id="pdfmeta-npages">0</span></span>
+  </footer>
+</div>

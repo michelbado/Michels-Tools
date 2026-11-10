@@ -1,0 +1,53 @@
+/* Merge PDFs app. Shared widgets live in xp.css. */
+
+.pmerge { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pmerge .content { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.pmerge .content.dropping { outline: 2px dashed var(--select); outline-offset: -6px; }
+.pmerge .listbox { flex: 1 1 auto; min-height: 150px; }
+.pmerge .note { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.pmerge .muted { color: var(--muted); }
+.pmerge .empty { color: var(--muted); text-align: center; padding: 28px 10px; line-height: 1.5; }
+
+.files { list-style: none; margin: 0; padding: 0; flex: 1 1 0; min-height: 0; overflow: auto; background: #fff; border: 1px solid var(--field-border); }
+.files:empty { display: none; }
+.files li {
+  display: grid;
+  grid-template-columns: 34px 48px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 6px 8px;
+  border-bottom: 1px solid #F0EEE4;
+}
+.files li:last-child { border-bottom: 0; }
+.files .num { text-align: right; color: var(--muted); }
+.files .thumb { width: 44px; height: 58px; display: flex; align-items: center; justify-content: center; background: #F4F3EE; box-shadow: 0 1px 3px rgba(0, 0, 0, .35); overflow: hidden; }
+.files .thumb canvas { max-width: 100%; max-height: 100%; }
+.files .info { min-width: 0; }
+.files .name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files .meta { color: var(--muted); font-size: 12px; }
+.files .meta .bad { color: #A32C0A; font-weight: 700; }
+.files .pagebox { display: flex; flex-direction: column; gap: 2px; width: 150px; }
+.files .pagebox label { font-size: 12px; color: var(--muted); }
+.files .pagebox .xp-field { width: 100%; min-height: 26px; padding: 2px 6px; }
+.files .btns { display: flex; gap: 4px; }
+.files .btns .xp-btn { min-width: 0; padding: 2px 8px; min-height: 28px; }
+
+.pmerge .outrow { display: flex; align-items: center; gap: 8px; }
+.pmerge .outrow .xp-field { width: 16rem; max-width: 100%; }
+.pmerge .plan { margin-top: 8px; padding: 8px 10px; background: var(--info); border: 1px solid #000; line-height: 1.4; min-height: 40px; }
+.pmerge .plan.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.pmerge .big { min-height: 42px; font-weight: 700; width: 100%; margin: 8px 0; }
+
+@media (max-width: 699px) {
+  .pmerge { flex: 0 0 auto; }
+  .pmerge .content { flex: 0 0 auto; overflow: visible; padding: 12px; }
+  .files { max-height: 60vh; }
+  .files li { grid-template-columns: 24px 44px minmax(0, 1fr); }
+  .files .pagebox { grid-column: 2 / -1; width: auto; }
+  .files .btns { grid-column: 2 / -1; }
+  .files .btns .xp-btn { min-height: 40px; flex: 1; }
+  .pmerge .toolbar .xp-btn { flex: 1 1 40%; min-height: 44px; }
+  .pmerge .toolbar .xp-btn.is-default { flex-basis: 100%; }
+  .pmerge .toolbar .sep { display: none; }
+  .pmerge .xp-field { font-size: 16px; min-height: 40px; }
+}

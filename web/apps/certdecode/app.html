@@ -1,0 +1,20 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Certificate or certificate request</legend>
+      <textarea class="xp-text tk-in" id="certdecode-in" rows="7" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="-----BEGIN CERTIFICATE-----&#10;...&#10;-----END CERTIFICATE-----"></textarea>
+      <div class="tk-row">
+        <label class="tk-fld" for="certdecode-file"><b>Or open a file (.pem .crt .cer .der .csr)</b>
+          <input type="file" id="certdecode-file" class="xp-field" accept=".pem,.crt,.cer,.der,.csr,.txt"></label>
+        <label class="tk-fld" for="certdecode-host"><b>Check this host name (optional)</b>
+          <input type="text" id="certdecode-host" class="xp-field" placeholder="www.example.com" spellcheck="false" autocomplete="off" autocapitalize="off"></label>
+        <button type="button" class="xp-btn" id="certdecode-copy" disabled>Copy as text</button>
+      </div>
+      <p class="tk-muted">Paste one certificate, a whole chain (server certificate first), or a CSR. Everything is read in your browser; nothing is sent anywhere. Never paste a private key: it is refused.</p>
+    </fieldset>
+    <div class="tk-summary" id="certdecode-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="certdecode-notes" hidden></ul>
+    <div id="certdecode-out"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="certdecode-status">Ready</span></footer>
+</div>

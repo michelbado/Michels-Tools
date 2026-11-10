@@ -1,0 +1,70 @@
+<div class="chk">
+  <div class="tabs" role="tablist" aria-label="IP Checker sections">
+    <button type="button" role="tab" class="tab on" id="checker-tab-check" aria-selected="true" aria-controls="checker-panel-check">Check IPs</button>
+    <button type="button" role="tab" class="tab" id="checker-tab-range" aria-selected="false" aria-controls="checker-panel-range" tabindex="-1">Range converter</button>
+  </div>
+
+  <div class="panel" role="tabpanel" id="checker-panel-check" aria-labelledby="checker-tab-check">
+    <div class="two">
+      <fieldset>
+        <legend>Subnets to check against</legend>
+        <label for="checker-subnets">Paste your list: subnets or addresses, in any text.</label>
+        <textarea id="checker-subnets" class="xp-text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="10.0.0.0/8&#10;172.16.0.0/12&#10;192.168.1.0/24"></textarea>
+        <div class="caption"><span id="checker-subcount">0 subnets</span></div>
+      </fieldset>
+      <fieldset>
+        <legend>Addresses or subnets to look up</legend>
+        <label for="checker-items">One or many. A subnet is covered only when it fits completely inside one of yours.</label>
+        <textarea id="checker-items" class="xp-text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="10.1.2.3&#10;8.8.8.8&#10;192.168.1.128/25"></textarea>
+        <div class="caption"><span id="checker-itemcount">0 entries</span></div>
+      </fieldset>
+    </div>
+    <fieldset class="res">
+      <legend>Result</legend>
+      <div class="tablewrap" tabindex="0" aria-label="Lookup results">
+        <table class="xp-table">
+          <thead><tr><th>Entry</th><th>Result</th><th>Covered by</th></tr></thead>
+          <tbody id="checker-body"></tbody>
+        </table>
+      </div>
+      <div class="caption">
+        <span id="checker-summary">Paste a list of subnets and the addresses to look up.</span>
+        <span class="btns">
+          <button type="button" class="xp-btn small" id="checker-copyuncovered" disabled>Copy not covered</button>
+          <button type="button" class="xp-btn small" id="checker-copyresults" disabled>Copy results</button>
+        </span>
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="panel" role="tabpanel" id="checker-panel-range" aria-labelledby="checker-tab-range" hidden>
+    <div class="opts">
+      <div class="modes" role="radiogroup" aria-label="Conversion">
+        <label><input type="radio" name="checker-conv" value="r2c" class="xp-check" checked><span>Range to CIDR</span></label>
+        <label><input type="radio" name="checker-conv" value="c2r" class="xp-check"><span>CIDR to range</span></label>
+      </div>
+      <label class="merge" id="checker-mergewrap"><input type="checkbox" id="checker-merge" class="xp-check" checked><span>Merge overlapping and touching ranges</span></label>
+    </div>
+    <div class="two">
+      <fieldset>
+        <legend>Input</legend>
+        <label for="checker-rin" id="checker-rinlabel">Ranges like 10.0.0.5 - 10.0.0.200, one per line or in any text. Single addresses and subnets work too.</label>
+        <textarea id="checker-rin" class="xp-text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="10.0.0.5 - 10.0.0.200&#10;192.168.1.0 to 192.168.3.255"></textarea>
+        <div class="caption"><span id="checker-rincount">0 entries</span></div>
+      </fieldset>
+      <fieldset>
+        <legend>Output</legend>
+        <label for="checker-rout" id="checker-routlabel">The fewest CIDR blocks that cover the ranges exactly.</label>
+        <textarea id="checker-rout" class="xp-text" readonly spellcheck="false"></textarea>
+        <div class="caption">
+          <span id="checker-routcount">0 lines</span>
+          <button type="button" class="xp-btn small" id="checker-rcopy" disabled>Copy</button>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="checker-status">Ready</span>
+  </footer>
+</div>

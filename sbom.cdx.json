@@ -1,0 +1,811 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "component": {
+      "type": "application",
+      "bom-ref": "michels-tools",
+      "name": "Michel's Tools",
+      "licenses": [
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ]
+    },
+    "properties": [
+      {
+        "name": "michels-tools:about",
+        "value": "The only inventory of third-party material in this repository. web/vendor/README.md explains how each file was obtained; sbom_test.go checks every hash and licence file here against the real files."
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/pdfjs-dist@6.5.438",
+      "name": "pdfjs-dist",
+      "version": "6.5.438",
+      "purl": "pkg:npm/pdfjs-dist@6.5.438",
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/pdfjs-dist/-/pdfjs-dist-6.5.438.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/pdfjs-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/pdf-lib@1.17.1",
+      "name": "pdf-lib",
+      "version": "1.17.1",
+      "purl": "pkg:npm/pdf-lib@1.17.1",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/pdf-lib/-/pdf-lib-1.17.1.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/pdf-lib-LICENSE.md"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/pako@1.0.11",
+      "name": "pako",
+      "version": "1.0.11",
+      "purl": "pkg:npm/pako@1.0.11",
+      "licenses": [
+        {
+          "expression": "MIT AND Zlib"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/pako-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/tslib@1.11.1",
+      "name": "tslib",
+      "version": "1.11.1",
+      "purl": "pkg:npm/tslib@1.11.1",
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/tslib/-/tslib-1.11.1.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/tslib-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/@pdf-lib/upng@1.0.1",
+      "name": "@pdf-lib/upng",
+      "version": "1.0.1",
+      "purl": "pkg:npm/%40pdf-lib/upng@1.0.1",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/@pdf-lib/upng/-/upng-1.0.1.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/pdf-lib-upng-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/@pdf-lib/standard-fonts@1.0.0",
+      "name": "@pdf-lib/standard-fonts",
+      "version": "1.0.0",
+      "purl": "pkg:npm/%40pdf-lib/standard-fonts@1.0.0",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/@pdf-lib/standard-fonts/-/standard-fonts-1.0.0.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/pdf-lib-standard-fonts-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/fflate@0.8.3",
+      "name": "fflate",
+      "version": "0.8.3",
+      "purl": "pkg:npm/fflate@0.8.3",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/fflate/-/fflate-0.8.3.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/fflate-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/pkijs@4.0.1",
+      "name": "pkijs",
+      "version": "4.0.1",
+      "purl": "pkg:npm/pkijs@4.0.1",
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/pkijs/-/pkijs-4.0.1.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/pkijs-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/asn1js@4.0.0",
+      "name": "asn1js",
+      "version": "4.0.0",
+      "purl": "pkg:npm/asn1js@4.0.0",
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/asn1js/-/asn1js-4.0.0.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/asn1js-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/bytestreamjs@3.0.0",
+      "name": "bytestreamjs",
+      "version": "3.0.0",
+      "purl": "pkg:npm/bytestreamjs@3.0.0",
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/bytestreamjs/-/bytestreamjs-3.0.0.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/bytestreamjs-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/@noble/hashes@2.4.0",
+      "name": "@noble/hashes",
+      "version": "2.4.0",
+      "purl": "pkg:npm/%40noble/hashes@2.4.0",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/@noble/hashes/-/hashes-2.4.0.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/noble-hashes-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/@peculiar/utils@4.1.0",
+      "name": "@peculiar/utils",
+      "version": "4.1.0",
+      "purl": "pkg:npm/%40peculiar/utils@4.1.0",
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/@peculiar/utils/-/utils-4.1.0.tgz"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "licenses/peculiar-utils-LICENSE"
+        }
+      ]
+    },
+    {
+      "type": "data",
+      "bom-ref": "font:liberation-sans",
+      "name": "Liberation Sans (fonts shipped inside pdfjs-dist 6.5.438)",
+      "licenses": [
+        {
+          "license": {
+            "name": "GPL-2.0 with font exception (Red Hat Liberation Fonts 1.x)"
+          }
+        }
+      ],
+      "description": "Four unmodified .ttf files, used by pdf.js only to draw PDF text that is not embedded in the PDF. Kept as separate data files, not linked into any code.",
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "pdfjs/standard_fonts/LICENSE_LIBERATION"
+        }
+      ]
+    },
+    {
+      "type": "data",
+      "bom-ref": "font:foxit",
+      "name": "Foxit standard fonts (shipped inside pdfjs-dist 6.5.438)",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "description": "Ten unmodified .pfb files (copyright The PDFium Authors), used by pdf.js for PDF text that is not embedded in the PDF.",
+      "properties": [
+        {
+          "name": "michels-tools:licenseFile",
+          "value": "pdfjs/standard_fonts/LICENSE_FOXIT"
+        }
+      ]
+    },
+    {
+      "type": "data",
+      "bom-ref": "data:ieee-oui",
+      "name": "IEEE Registration Authority OUI, MA-M and MA-S manufacturer lists",
+      "version": "downloaded 2026-11-09",
+      "licenses": [
+        {
+          "license": {
+            "name": "Public registry data of the IEEE Registration Authority (no licence file); only codes and organisation names are kept"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://standards-oui.ieee.org/oui/oui.csv"
+        },
+        {
+          "type": "distribution",
+          "url": "https://standards-oui.ieee.org/oui28/mam.csv"
+        },
+        {
+          "type": "distribution",
+          "url": "https://standards-oui.ieee.org/oui36/oui36.csv"
+        }
+      ],
+      "properties": []
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:golang/stdlib@1.24",
+      "name": "Go standard library",
+      "version": "1.24",
+      "purl": "pkg:golang/stdlib@1.24",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        }
+      ],
+      "description": "Compiled into the michels-tools program (the only code the server uses besides this repository; go.mod lists no other dependency). Not a file of this repository.",
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://go.dev/LICENSE"
+        }
+      ],
+      "properties": [
+        {
+          "name": "michels-tools:shippedIn",
+          "value": "binary"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:fflate.js",
+      "name": "fflate.js",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "462ef8041fc970e3615a20a9dd2b2e3047a073b2da729ef4f02b634bba8b7b83"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:oui.json",
+      "name": "oui.json",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c13683e7da0e066e1aa3e3a898d1b3956bedb3584db82a2ca6987d0517ecd045"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdf-lib.min.js",
+      "name": "pdf-lib.min.js",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0f9a5cad07941f0826586c94e089d89b918c46e5c17cf2d5a3c6f666e3bc694f"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/pdf.min.mjs",
+      "name": "pdfjs/pdf.min.mjs",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3a88402882cfa3e7e72c2c9b5149f52f0f88baf1c5b62aa11a41abdbc2072440"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/pdf.worker.min.mjs",
+      "name": "pdfjs/pdf.worker.min.mjs",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1e64c8240e54735ec5913b37acd5134747799cb8c6bb3777c70adbc01232d2aa"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitDingbats.pfb",
+      "name": "pdfjs/standard_fonts/FoxitDingbats.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "845c752392b6c914fb989c75a08b7792b88f542d2499042ef2889f8c814a16ed"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitFixed.pfb",
+      "name": "pdfjs/standard_fonts/FoxitFixed.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b6c8fe53f134b8b6d4578cd2d544df4cee9624c4efa8d51a560fb40ea296101b"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitFixedBold.pfb",
+      "name": "pdfjs/standard_fonts/FoxitFixedBold.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f1b7159702973f54fc86254ea38bcf3712b2a736eb3a0995751e9f4bb45ad603"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitFixedBoldItalic.pfb",
+      "name": "pdfjs/standard_fonts/FoxitFixedBoldItalic.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "8a000945843bd31add06aee63bf9fd41b7578b4f3242a4b7cd46349ad9d24d4d"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitFixedItalic.pfb",
+      "name": "pdfjs/standard_fonts/FoxitFixedItalic.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5007faf8320fa1fcc08b8894b356ad976f60b992ba29ee5272578bbdebaf3876"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitSerif.pfb",
+      "name": "pdfjs/standard_fonts/FoxitSerif.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "4f57d2b9d884af8f907bf22df6019b52d86cbf6214fdbd02b1ae05472a543f35"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitSerifBold.pfb",
+      "name": "pdfjs/standard_fonts/FoxitSerifBold.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0bdf4b04e964139818d51eda03d566ba999fc3ba2421b1c6c51f9dc969022e80"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitSerifBoldItalic.pfb",
+      "name": "pdfjs/standard_fonts/FoxitSerifBoldItalic.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a406cac82583bf98175cb62c87ed5e95c45fbb34eece63a10b0a13e793cb2e10"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitSerifItalic.pfb",
+      "name": "pdfjs/standard_fonts/FoxitSerifItalic.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "610ae0687198045c4db5d1a6650fd5e92536631706382eb8b72e38df578d0ae9"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/FoxitSymbol.pfb",
+      "name": "pdfjs/standard_fonts/FoxitSymbol.pfb",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "47967d055530e7357088a08403115425643ec2cdfd6201ba8af0fbd7116c1539"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/LICENSE_FOXIT",
+      "name": "pdfjs/standard_fonts/LICENSE_FOXIT",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b578cdd2345840ada550bd12519533812320d5f1d21cf4c1c7e1b1b0a31c98b7"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/LICENSE_LIBERATION",
+      "name": "pdfjs/standard_fonts/LICENSE_LIBERATION",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d2c4d5b3e115a519cb58eb691aa64538397e2611f9ebe801392cf9667997e7dc"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/LiberationSans-Bold.ttf",
+      "name": "pdfjs/standard_fonts/LiberationSans-Bold.ttf",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "361c61b82d575c5c35fd9157fda8b0194bcfcd0d88ea8521a4fb5dd53d33dddc"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/LiberationSans-BoldItalic.ttf",
+      "name": "pdfjs/standard_fonts/LiberationSans-BoldItalic.ttf",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a224075ac17495ad0a3af3bc0a419ac0704a8b3fd1095456201fb9b095fc281d"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/LiberationSans-Italic.ttf",
+      "name": "pdfjs/standard_fonts/LiberationSans-Italic.ttf",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "832b4406dbef23628800d3aaad21048534ac84d7e3ad955be83b8172ed8ef512"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pdfjs/standard_fonts/LiberationSans-Regular.ttf",
+      "name": "pdfjs/standard_fonts/LiberationSans-Regular.ttf",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f8ace1f892b2bd9dc1792ba7f097fa7588f84fed48321480e04de5390828221f"
+        }
+      ]
+    },
+    {
+      "type": "file",
+      "bom-ref": "file:pkijs.bundle.js",
+      "name": "pkijs.bundle.js",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "4fef9d510ee3f322a7b6b3d568896aaa3448854e43eaee672aff58595560953f"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "michels-tools",
+      "dependsOn": [
+        "file:pdf-lib.min.js",
+        "file:fflate.js",
+        "file:pkijs.bundle.js",
+        "file:oui.json",
+        "file:pdfjs/pdf.min.mjs",
+        "file:pdfjs/pdf.worker.min.mjs",
+        "pkg:golang/stdlib@1.24"
+      ]
+    },
+    {
+      "ref": "file:pdf-lib.min.js",
+      "dependsOn": [
+        "pkg:npm/pdf-lib@1.17.1",
+        "pkg:npm/pako@1.0.11",
+        "pkg:npm/tslib@1.11.1",
+        "pkg:npm/@pdf-lib/upng@1.0.1",
+        "pkg:npm/@pdf-lib/standard-fonts@1.0.0"
+      ]
+    },
+    {
+      "ref": "file:fflate.js",
+      "dependsOn": [
+        "pkg:npm/fflate@0.8.3"
+      ]
+    },
+    {
+      "ref": "file:pkijs.bundle.js",
+      "dependsOn": [
+        "pkg:npm/pkijs@4.0.1",
+        "pkg:npm/asn1js@4.0.0",
+        "pkg:npm/bytestreamjs@3.0.0",
+        "pkg:npm/@noble/hashes@2.4.0",
+        "pkg:npm/@peculiar/utils@4.1.0"
+      ]
+    },
+    {
+      "ref": "file:oui.json",
+      "dependsOn": [
+        "data:ieee-oui"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/pdf.min.mjs",
+      "dependsOn": [
+        "pkg:npm/pdfjs-dist@6.5.438"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/pdf.worker.min.mjs",
+      "dependsOn": [
+        "pkg:npm/pdfjs-dist@6.5.438"
+      ]
+    },
+    {
+      "ref": "pkg:npm/pdfjs-dist@6.5.438",
+      "dependsOn": [
+        "font:liberation-sans",
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitDingbats.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitFixed.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitFixedBold.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitFixedBoldItalic.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitFixedItalic.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitSerif.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitSerifBold.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitSerifBoldItalic.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitSerifItalic.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/FoxitSymbol.pfb",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/LICENSE_FOXIT",
+      "dependsOn": [
+        "font:foxit"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/LICENSE_LIBERATION",
+      "dependsOn": [
+        "font:liberation-sans"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/LiberationSans-Bold.ttf",
+      "dependsOn": [
+        "font:liberation-sans"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/LiberationSans-BoldItalic.ttf",
+      "dependsOn": [
+        "font:liberation-sans"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/LiberationSans-Italic.ttf",
+      "dependsOn": [
+        "font:liberation-sans"
+      ]
+    },
+    {
+      "ref": "file:pdfjs/standard_fonts/LiberationSans-Regular.ttf",
+      "dependsOn": [
+        "font:liberation-sans"
+      ]
+    }
+  ]
+}

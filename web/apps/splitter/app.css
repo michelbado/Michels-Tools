@@ -1,0 +1,51 @@
+/* Subnet Splitter app. Shared widgets live in xp.css. */
+
+.split { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.split .content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  gap: 14px 16px;
+}
+.split .left { display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+.split .left fieldset { flex: 0 0 auto; }
+.split .left fieldset + fieldset { flex: 1 1 auto; min-height: 0; }
+.split .results { min-height: 0; }
+
+.split .modes { display: flex; flex-direction: column; gap: 2px; }
+.split .modes label { display: flex; align-items: center; gap: 8px; min-height: 28px; cursor: pointer; }
+.split .opt { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; min-height: 0; }
+.split .opt .xp-select { align-self: flex-start; min-width: 10rem; }
+.split .opt .short { width: 7rem; }
+.split .opt .xp-text { height: 150px; min-height: 90px; resize: vertical; font-size: 13px; }
+.split .note { color: var(--muted); font-size: 12px; }
+
+/* list view */
+.split .tablewrap {
+  flex: 1 1 0;
+  min-height: 120px;
+  overflow: auto;
+  border: 1px solid var(--field-border);
+  background: #fff;
+}
+.split .tablewrap:focus { outline: none; border-color: var(--select); box-shadow: 0 0 0 1px var(--select); }
+
+.split .caption { flex-wrap: wrap; }
+.split .btns { display: inline-flex; gap: 6px; }
+
+@media (max-width: 699px) {
+  .split { flex: 0 0 auto; }
+  .split .content { flex: 0 0 auto; overflow: visible; padding: 12px; grid-template-columns: minmax(0, 1fr); }
+  .split .results .tablewrap { flex: none; height: 320px; }
+  .split .xp-field, .split .xp-select, .split .xp-text { font-size: 16px; }
+  .split .left .xp-field { width: 100%; }
+  .split .left .xp-field.short { width: 8rem; }
+  .split .xp-field, .split .xp-select { min-height: 44px; }
+  .split .opt .xp-select { align-self: stretch; }
+  .split .modes label { min-height: 40px; }
+  .split .xp-check { width: 20px; height: 20px; }
+  .split .xp-btn.small { min-height: 36px; padding: 2px 14px; }
+}

@@ -1,0 +1,119 @@
+<div class="pstamp">
+  <div class="toolbar" role="toolbar" aria-label="Actions">
+    <button type="button" class="xp-btn is-default" id="pdfstamp-open">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3A3A3A" stroke-width="1.4"><path d="M3 1.5h7l3 3v10H3z" fill="#FFFFFF"/><path d="M5.5 7h5M5.5 9.5h5M5.5 12h3"/></svg>
+      Open PDF
+    </button>
+    <input type="file" id="pdfstamp-file" accept="application/pdf,.pdf" hidden>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="xp-btn" id="pdfstamp-undo" disabled>Undo</button>
+    <button type="button" class="xp-btn" id="pdfstamp-download" disabled>Download PDF</button>
+    <button type="button" class="xp-btn" id="pdfstamp-clear">Clear</button>
+    <span class="fname" id="pdfstamp-name"></span>
+  </div>
+
+  <div class="content" id="pdfstamp-content">
+    <div class="left">
+      <div class="infobar" role="note">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8" fill="#2F6FDB" stroke="#0B3A91"/><circle cx="9" cy="5.2" r="1.2" fill="#FFFFFF"/><path d="M9 8v5.2" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>This places a <b>picture</b> on the page. It is <b>not a digital signature</b>: it proves nothing about who signed, and anyone can copy it. For a legally binding signature use a signing service or a certificate-based signature in a PDF program.</span>
+      </div>
+      <div class="infobar warnbar" id="pdfstamp-signedwarn" role="status" hidden>
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5L17 16H1z" fill="#FFD21F" stroke="#8A6D00" stroke-linejoin="round"/><path d="M9 6.5v4.5" stroke="#000" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="13.4" r="1" fill="#000"/></svg>
+        <span>This PDF already has a digital signature. Adding anything changes the file, so that signature will show as <b>changed</b> afterwards.</span>
+      </div>
+
+      <fieldset>
+        <legend>1. Your signature or image</legend>
+        <div class="modes" role="radiogroup" aria-label="How to make it">
+          <label><input type="radio" name="pdfstamp-src" value="draw" class="xp-check" checked><span>Draw</span></label>
+          <label><input type="radio" name="pdfstamp-src" value="type" class="xp-check"><span>Type</span></label>
+          <label><input type="radio" name="pdfstamp-src" value="image" class="xp-check"><span>Picture file</span></label>
+        </div>
+
+        <div id="pdfstamp-p-draw">
+          <canvas id="pdfstamp-pad" class="pad" width="900" height="360" aria-label="Drawing area: draw your signature with the mouse, a finger or a pen"></canvas>
+          <div class="row">
+            <span class="swatches" role="radiogroup" aria-label="Pen colour">
+              <label title="Black"><input type="radio" name="pdfstamp-pen" value="#111111" checked><span class="sw sw-black"></span></label>
+              <label title="Blue"><input type="radio" name="pdfstamp-pen" value="#1B3FA0"><span class="sw sw-blue"></span></label>
+              <label title="Red"><input type="radio" name="pdfstamp-pen" value="#B3261E"><span class="sw sw-red"></span></label>
+            </span>
+            <label class="inl">Pen <select id="pdfstamp-width" class="xp-select"><option value="5">Thin</option><option value="8" selected>Medium</option><option value="12">Thick</option></select></label>
+            <button type="button" class="xp-btn small" id="pdfstamp-padclear">Erase</button>
+          </div>
+        </div>
+
+        <div id="pdfstamp-p-type" hidden>
+          <label for="pdfstamp-text">Your name</label>
+          <input type="text" id="pdfstamp-text" class="xp-field wide" maxlength="60" spellcheck="false" autocomplete="off" placeholder="Jane Doe">
+          <div class="row">
+            <label class="inl">Style <select id="pdfstamp-font" class="xp-select"></select></label>
+            <label class="inl">Colour <select id="pdfstamp-tcolor" class="xp-select"><option value="#111111">Black</option><option value="#1B3FA0" selected>Blue</option><option value="#B3261E">Red</option></select></label>
+          </div>
+          <div class="note">Handwriting styles use fonts that are on your device, so they look a little different on each computer.</div>
+        </div>
+
+        <div id="pdfstamp-p-image" hidden>
+          <button type="button" class="xp-btn" id="pdfstamp-pickimg">Choose picture...</button>
+          <input type="file" id="pdfstamp-imgfile" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+          <span class="note" id="pdfstamp-imgname"></span>
+          <label class="inl chk"><input type="checkbox" id="pdfstamp-white" class="xp-check" checked><span>Make the white background transparent</span></label>
+          <div class="note">PNG, JPG, WebP or GIF, up to 15 MB. A photo of a signature on white paper works well.</div>
+        </div>
+
+        <div class="preview">
+          <canvas id="pdfstamp-prev" width="10" height="10" aria-label="Preview of what will be added"></canvas>
+          <span class="note" id="pdfstamp-prevnote">Draw your signature above.</span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Size</legend>
+        <div class="row">
+          <input type="range" id="pdfstamp-size" min="3" max="100" value="30" aria-label="Width as a percentage of the page width" disabled>
+          <span id="pdfstamp-sizeval" class="sizeval">30%</span>
+        </div>
+        <div class="note">Drag the image on the page to move it. Drag its corner to resize. Arrow keys nudge it, + and - resize it.</div>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. Add it to</legend>
+        <div class="modes" role="radiogroup" aria-label="Which pages">
+          <label><input type="radio" name="pdfstamp-to" value="current" class="xp-check" checked><span>This page</span></label>
+          <label><input type="radio" name="pdfstamp-to" value="all" class="xp-check"><span>Every page</span></label>
+          <label><input type="radio" name="pdfstamp-to" value="first" class="xp-check"><span>First page only</span></label>
+          <label><input type="radio" name="pdfstamp-to" value="last" class="xp-check"><span>Last page only</span></label>
+          <label><input type="radio" name="pdfstamp-to" value="custom" class="xp-check"><span>These pages</span></label>
+        </div>
+        <input type="text" id="pdfstamp-pages" class="xp-field wide" spellcheck="false" autocomplete="off" placeholder="1,3,5-8" aria-label="Page numbers" hidden>
+        <div class="plan" id="pdfstamp-plan" role="status">Open a PDF to begin.</div>
+        <button type="button" class="xp-btn is-default big" id="pdfstamp-go" disabled>Add to PDF</button>
+        <div class="note">The image is placed in the same spot on every page you choose. You can add more than one image, then use Download PDF.</div>
+      </fieldset>
+    </div>
+
+    <div class="right">
+      <div class="pager">
+        <button type="button" class="xp-btn small" id="pdfstamp-prev1" disabled>&lt; Previous</button>
+        <label class="inl">Page <input type="text" id="pdfstamp-pageno" class="xp-field short" value="1" inputmode="numeric" autocomplete="off" disabled> of <span id="pdfstamp-total">0</span></label>
+        <button type="button" class="xp-btn small" id="pdfstamp-next1" disabled>Next &gt;</button>
+      </div>
+      <div class="stage" id="pdfstamp-stage">
+        <div class="empty" id="pdfstamp-empty">Open a PDF, or drop one here. It is read inside your browser and is not uploaded.</div>
+        <div class="sheet" id="pdfstamp-sheet" hidden>
+          <canvas id="pdfstamp-page" aria-label="Page preview"></canvas>
+          <div class="ovl" id="pdfstamp-ovl" tabindex="0" role="img" aria-label="The image to add. Drag to move, arrow keys to nudge." hidden>
+            <canvas id="pdfstamp-ovlc"></canvas>
+            <span class="handle" id="pdfstamp-handle" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="pdfstamp-status">Ready</span>
+    <span class="cell wide">Added: <span id="pdfstamp-added">0</span></span>
+  </footer>
+</div>

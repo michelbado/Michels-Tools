@@ -1,0 +1,23 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>IPv6 address or prefix</legend>
+      <textarea class="xp-text tk-in" id="ipv6calc-in" rows="2" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="2001:db8:abcd:12::1/64">2001:db8:abcd:12::1/64</textarea>
+      <div class="tk-row">
+        <label class="tk-fld" for="ipv6calc-split"><b>Split into prefixes of length (optional)</b>
+          <input type="text" id="ipv6calc-split" class="xp-field" inputmode="numeric" maxlength="3" placeholder="e.g. 64" autocomplete="off"></label>
+        <button type="button" class="xp-btn" id="ipv6calc-copy" disabled>Copy as text</button>
+      </div>
+      <p class="tk-muted">Examples: 2001:db8::1, fe80::1%eth0, [::1], ::ffff:192.0.2.1, 2001:db8::/32. Everything is worked out in your browser; nothing is sent anywhere.</p>
+    </fieldset>
+    <div class="tk-summary" id="ipv6calc-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="ipv6calc-notes" hidden></ul>
+    <div id="ipv6calc-sections"></div>
+    <fieldset id="ipv6calc-splitbox" hidden>
+      <legend id="ipv6calc-splitlegend">Prefixes</legend>
+      <textarea class="xp-text tk-in" id="ipv6calc-splitlist" rows="10" readonly spellcheck="false"></textarea>
+      <p class="tk-foot" id="ipv6calc-splitfoot"></p>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="ipv6calc-status">Ready</span></footer>
+</div>

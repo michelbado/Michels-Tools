@@ -1,0 +1,231 @@
+/* Shared "Luna" widgets used by every app: buttons, fields, group boxes,
+   info bars, toolbars and status bars. Values follow the design spec. */
+
+:root {
+  --face: #ECE9D8;
+  --frame: #0055E5;
+  --group-label: #0046D5;
+  --group-border: #D0D0BF;
+  --bevel: #ACA899;
+  --field-border: #7F9DB9;
+  --select: #316AC5;
+  --btn-border: #003C74;
+  --hover-glow: #F9B83E;
+  --default-glow: #8FB0EE;
+  --info: #FFFFE1;
+  --muted: #4D4D4D;
+  --ui: Tahoma, Verdana, "Segoe UI", system-ui, sans-serif;
+  --mono: "Lucida Console", Consolas, "Courier New", monospace;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+.mono { font-family: var(--mono); }
+
+/* ---- buttons ---- */
+.xp-btn {
+  font: inherit;
+  color: #000;
+  min-height: 36px;
+  min-width: 88px;
+  padding: 4px 14px;
+  border: 1px solid var(--btn-border);
+  border-radius: 3px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F4F3EE 60%, #E3E0D6 100%);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.xp-btn:hover:not(:disabled) { box-shadow: inset 0 0 0 2px var(--hover-glow); }
+.xp-btn:active:not(:disabled) { background: linear-gradient(180deg, #DCD9CE 0%, #ECEAE2 100%); box-shadow: none; }
+.xp-btn:focus-visible { outline: 1px dotted #000; outline-offset: -5px; }
+.xp-btn.is-default { box-shadow: inset 0 0 0 2px var(--default-glow); }
+.xp-btn.is-default:hover:not(:disabled) { box-shadow: inset 0 0 0 2px var(--hover-glow); }
+.xp-btn:disabled {
+  border-color: #C9C7BA;
+  background: #F4F3EE;
+  color: #8A8875;
+  cursor: default;
+}
+.xp-btn:disabled svg { opacity: .45; }
+.xp-btn.small { min-height: 26px; min-width: 0; padding: 2px 10px; }
+
+/* ---- toolbar, status bar ---- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--bevel);
+  box-shadow: 0 1px 0 #fff;
+}
+.sep {
+  width: 1px;
+  height: 26px;
+  margin: 0 4px;
+  background: var(--bevel);
+  box-shadow: 1px 0 0 #fff;
+}
+.statusbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border-top: 1px solid var(--bevel);
+  background: var(--face);
+}
+.cell {
+  flex: 1 1 110px;
+  padding: 4px 8px;
+  border: 1px solid;
+  border-color: var(--bevel) #fff #fff var(--bevel);
+  white-space: nowrap;
+}
+.cell.msg { flex: 3 1 220px; white-space: normal; }
+.cell.wide { flex: 1 1 130px; }
+
+/* ---- group boxes, info bars ---- */
+fieldset {
+  margin: 0;
+  min-width: 0;
+  padding: 10px 12px 12px;
+  border: 1px solid var(--group-border);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+legend { padding: 0 4px; color: var(--group-label); }
+fieldset > label { line-height: 1.4; }
+
+.infobar {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 8px 10px;
+  background: var(--info);
+  border: 1px solid #000;
+  line-height: 1.4;
+}
+.infobar svg { flex: 0 0 auto; margin-top: 1px; }
+.warnbar .mono { word-break: break-all; }
+
+.caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 26px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.caption .hint { text-align: right; }
+
+/* ---- fields ---- */
+.xp-text {
+  display: block;
+  width: 100%;
+  min-height: 140px;
+  padding: 8px 10px;
+  border: 1px solid var(--field-border);
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  font: 13px/1.55 var(--mono);
+  white-space: pre;
+  overflow: auto;
+  tab-size: 4;
+}
+.xp-text::placeholder { color: #7a7a72; }
+.xp-text:disabled { background: #F4F3EE; color: #6b6a68; }
+.xp-text:focus { outline: none; border-color: var(--select); box-shadow: 0 0 0 1px var(--select); }
+.xp-text[readonly] { background: #FBFBF8; }
+
+.xp-field {
+  width: 12rem;
+  min-height: 30px;
+  padding: 3px 8px;
+  border: 1px solid var(--field-border);
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  font: inherit;
+}
+.xp-field:focus { outline: none; border-color: var(--select); box-shadow: 0 0 0 1px var(--select); }
+.xp-check { width: 16px; height: 16px; margin: 0; accent-color: #21A121; }
+
+/* ---- drop-down list ---- */
+.xp-select {
+  min-height: 30px;
+  padding: 3px 6px;
+  border: 1px solid var(--field-border);
+  border-radius: 0;
+  background: #fff;
+  color: #000;
+  font: inherit;
+  cursor: pointer;
+}
+.xp-select:focus { outline: none; border-color: var(--select); box-shadow: 0 0 0 1px var(--select); }
+.xp-field.invalid { border-color: #C23A14; box-shadow: 0 0 0 1px #C23A14; }
+
+/* ---- list view table ---- */
+.xp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.xp-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 5px 8px;
+  text-align: left;
+  font-weight: 400;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F4F3EE 60%, #E3E0D6 100%);
+  border-right: 1px solid #D6D2C2;
+  border-bottom: 1px solid #ACA899;
+}
+.xp-table td {
+  padding: 4px 8px;
+  white-space: nowrap;
+  border-bottom: 1px solid #F0EEE4;
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+.xp-table td.txt { font-family: var(--ui); font-size: 13px; }
+.xp-table td.num { text-align: right; }
+.xp-table tbody tr:hover td { background: #EAF1FC; }
+.xp-table tr.free td { color: #6b6a68; font-style: italic; background: #FAF9F2; }
+.xp-table tr.bad td { color: #C23A14; background: #FFF4F0; }
+
+/* ---- Tool kit: the layout shared by the small "paste something, read the result" tools (Certificate decoder, Email header analyser, IPv6 ...).
+   Markup: .tk > .tk-body (scrolls) + footer.statusbar.  Helpers in lib/tk.js. ---- */
+.tk { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.tk-body { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px 14px; }
+.tk-body fieldset { margin: 0 0 10px; border: 1px solid #919B9C; background: #fff; padding: 4px 10px 8px; }
+.tk-body legend { font-weight: 700; padding: 0 4px; }
+.tk-in { width: 100%; box-sizing: border-box; min-height: 120px; resize: vertical; font-family: Consolas, "Courier New", monospace; font-size: 12px; }
+.tk-row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: flex-end; margin-top: 6px; }
+.tk-fld { display: flex; flex-direction: column; gap: 3px; }
+.tk-fld .xp-field { width: 16rem; max-width: 100%; }
+.tk-muted { color: var(--muted); font-size: 12px; }
+.tk-summary { font-size: 16px; font-weight: 700; padding: 8px 12px; background: var(--info); border: 1px solid #000; line-height: 1.3; margin-bottom: 10px; overflow-wrap: anywhere; }
+.tk-summary:empty { display: none; }
+.tk-notes { margin: 0 0 10px; padding: 0; list-style: none; }
+.tk-notes li { padding: 6px 10px; margin-bottom: 4px; border: 1px solid #919B9C; background: #fff; line-height: 1.4; overflow-wrap: anywhere; }
+.tk-notes li.warn { background: #FFF6DC; border-color: #8A6D00; color: #5A4500; }
+.tk-notes li.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.tk-notes li.good { background: #EEF8EA; border-color: #3F7A2E; color: #1F4A12; }
+.tk-table { border-collapse: collapse; width: 100%; }
+.tk-table th { text-align: left; font-weight: 400; color: var(--muted); padding: 3px 12px 3px 0; vertical-align: top; width: 32%; }
+.tk-table td { padding: 3px 0; vertical-align: top; overflow-wrap: anywhere; }
+.tk-table td.tk-mono, .tk-mono { font-family: Consolas, "Courier New", monospace; font-size: 12px; }
+.tk-table td .tk-hint { display: block; color: var(--muted); font-size: 12px; font-family: inherit; }
+.tk-table td .xp-btn.small { margin-left: 8px; vertical-align: baseline; }
+.tk-foot { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
+.tk-list { width: 100%; border-collapse: collapse; }
+.tk-list th, .tk-list td { text-align: left; padding: 3px 8px; border-bottom: 1px solid #E3E1D5; vertical-align: top; overflow-wrap: anywhere; }
+.tk-list th { background: #ECE9D8; position: sticky; top: 0; }
+@media (max-width: 699px) { .tk-table th { width: 38%; } .tk-fld .xp-field { width: 100%; } }
+.tk-body h3 { font-size: 14px; margin: 14px 0 6px; }

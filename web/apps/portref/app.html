@@ -1,0 +1,18 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Find a port</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="portref-q"><b>Number, range or words</b>
+          <input type="text" id="portref-q" class="xp-field" placeholder="443, 8000-8100, ssh, database" spellcheck="false" autocomplete="off" autocapitalize="off"></label>
+        <label class="tk-fld" for="portref-proto"><b>Protocol</b>
+          <select id="portref-proto" class="xp-select"><option value="">TCP and UDP</option><option value="tcp">TCP only</option><option value="udp">UDP only</option></select></label>
+        <label class="tk-fld"><span><input type="checkbox" id="portref-risky"> <b>Only often-attacked ports</b></span></label>
+      </div>
+      <p class="tk-muted">A hand-written list of the ports people meet most, with what they are for. Not every port in existence: if a number is missing, it has no common use. Nothing you type leaves your browser.</p>
+    </fieldset>
+    <div class="tk-summary" id="portref-summary" role="status" aria-live="polite"></div>
+    <div id="portref-out"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="portref-status">Ready</span></footer>
+</div>

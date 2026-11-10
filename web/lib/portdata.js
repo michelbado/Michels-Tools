@@ -1,0 +1,182 @@
+/* A hand-written list of well-known and commonly seen network ports. [port or [from, to], protocol, name, plain description, flags]
+   Flags: c = the traffic is not encrypted; x = often attacked, should not be reachable from the internet; u = unofficial (common use, not an IANA assignment).
+   Sources: the IANA port registry and each product's own documentation. Not complete on purpose. Exports window.PortData. */
+(() => {
+  "use strict";
+  const P = [
+    [20, "tcp", "FTP data", "File transfer: the connection that carries the files (active mode).", "c"],
+    [21, "tcp", "FTP", "File transfer control: log-in and commands. Passwords travel in clear text.", "cx"],
+    [22, "tcp", "SSH", "Secure remote command line and file copy (SFTP, SCP).", ""],
+    [23, "tcp", "Telnet", "Old remote command line. Everything, including the password, is readable on the way.", "cx"],
+    [25, "tcp", "SMTP", "Mail delivery between mail servers.", ""],
+    [53, "tcp/udp", "DNS", "Turns names into addresses. UDP for normal questions, TCP for big answers and zone copies.", ""],
+    [67, "udp", "DHCP server", "Hands out IP addresses on a network.", ""],
+    [68, "udp", "DHCP client", "The device asking for an address.", ""],
+    [69, "udp", "TFTP", "Trivial file transfer, used to boot devices and load router configs. No log-in at all.", "cx"],
+    [80, "tcp", "HTTP", "Normal web pages, not encrypted.", "c"],
+    [88, "tcp/udp", "Kerberos", "Log-in tickets in Windows domains and other single sign-on.", ""],
+    [102, "tcp", "Siemens S7", "Industrial controllers (S7comm). Must never face the internet.", "cx"],
+    [110, "tcp", "POP3", "Downloading mail, not encrypted.", "c"],
+    [111, "tcp/udp", "RPC portmapper", "Directory for Unix RPC services such as NFS.", "x"],
+    [119, "tcp", "NNTP", "Usenet news.", "c"],
+    [123, "udp", "NTP", "Clock synchronisation.", ""],
+    [135, "tcp", "Microsoft RPC", "Windows service directory. A common way in for worms.", "x"],
+    [137, "udp", "NetBIOS name", "Old Windows name lookup on the local network.", "x"],
+    [138, "udp", "NetBIOS datagram", "Old Windows network messages.", "x"],
+    [139, "tcp", "NetBIOS session", "Old Windows file sharing (before SMB over 445).", "x"],
+    [143, "tcp", "IMAP", "Reading mail on the server, not encrypted unless STARTTLS is used.", "c"],
+    [161, "udp", "SNMP", "Monitoring of network devices. Versions 1 and 2c send the 'community' password in clear text.", "cx"],
+    [162, "udp", "SNMP traps", "Alerts sent by devices to the monitoring server.", ""],
+    [179, "tcp", "BGP", "Routers exchanging internet routes.", ""],
+    [389, "tcp/udp", "LDAP", "Directory (users, computers), such as Active Directory. Not encrypted unless upgraded.", "c"],
+    [427, "tcp/udp", "SLP", "Service discovery; has been abused for traffic amplification.", "x"],
+    [443, "tcp/udp", "HTTPS / HTTP3", "Encrypted web pages. UDP 443 carries QUIC (HTTP/3).", ""],
+    [445, "tcp", "SMB", "Windows file and printer sharing. Heavily attacked (ransomware, worms).", "x"],
+    [465, "tcp", "SMTPS", "Mail submission with encryption from the first byte.", ""],
+    [500, "udp", "IKE", "Sets up IPsec VPN tunnels.", ""],
+    [502, "tcp", "Modbus", "Industrial control, no log-in or encryption.", "cx"],
+    [514, "udp", "Syslog", "Log messages sent to a log server, not encrypted.", "c"],
+    [514, "tcp", "rsh", "Old remote shell with no real security.", "cx"],
+    [515, "tcp", "LPD", "Old network printing.", "c"],
+    [520, "udp", "RIP", "Old routing protocol.", ""],
+    [546, "udp", "DHCPv6 client", "A device asking for an IPv6 address or settings.", ""],
+    [547, "udp", "DHCPv6 server", "Hands out IPv6 settings.", ""],
+    [548, "tcp", "AFP", "Apple file sharing (older Macs).", ""],
+    [554, "tcp/udp", "RTSP", "Streaming control, often IP cameras.", "c"],
+    [587, "tcp", "SMTP submission", "Where mail programs send outgoing mail (usually with STARTTLS).", ""],
+    [593, "tcp", "RPC over HTTP", "Outlook and Exchange remote access.", ""],
+    [623, "udp", "IPMI", "Server management cards (iDRAC, iLO). Known weaknesses; keep off the internet.", "x"],
+    [631, "tcp/udp", "IPP / CUPS", "Network printing.", ""],
+    [636, "tcp", "LDAPS", "LDAP directory with encryption.", ""],
+    [873, "tcp", "rsync", "File copying and backups, usually not encrypted.", "c"],
+    [902, "tcp/udp", "VMware", "VMware ESXi management and console.", "x"],
+    [989, "tcp", "FTPS data", "File transfer with encryption.", ""],
+    [990, "tcp", "FTPS", "File transfer with encryption (implicit TLS).", ""],
+    [993, "tcp", "IMAPS", "Reading mail with encryption.", ""],
+    [995, "tcp", "POP3S", "Downloading mail with encryption.", ""],
+    [1080, "tcp", "SOCKS proxy", "A general proxy. Open ones are abused to hide traffic.", "x"],
+    [1099, "tcp", "Java RMI", "Java remote calls; exposed ones have been exploited.", "x"],
+    [1194, "udp", "OpenVPN", "VPN (also runs on TCP).", ""],
+    [1433, "tcp", "Microsoft SQL Server", "Database. Should only be reachable from the application servers.", "x"],
+    [1434, "udp", "SQL Server Browser", "Finds SQL Server instances; abused for amplification.", "x"],
+    [1521, "tcp", "Oracle database", "Database listener.", "x"],
+    [1701, "udp", "L2TP", "VPN tunnel, usually combined with IPsec.", ""],
+    [1720, "tcp", "H.323", "Older video and voice calls.", ""],
+    [1723, "tcp", "PPTP", "Old VPN with known weaknesses.", "x"],
+    [1812, "udp", "RADIUS", "Log-in checks for Wi-Fi, VPN and switches.", ""],
+    [1813, "udp", "RADIUS accounting", "Usage records for RADIUS log-ins.", ""],
+    [1883, "tcp", "MQTT", "Messages between sensors and servers (IoT), not encrypted.", "c"],
+    [1900, "udp", "SSDP / UPnP", "Devices announcing themselves on a network. Must not be reachable from the internet.", "x"],
+    [2000, "tcp", "Cisco SCCP", "Cisco IP phone signalling.", ""],
+    [2049, "tcp/udp", "NFS", "Unix network file sharing.", "x"],
+    [2082, "tcp", "cPanel", "Web hosting control panel (not encrypted).", "c"],
+    [2083, "tcp", "cPanel (TLS)", "Web hosting control panel.", ""],
+    [2181, "tcp", "ZooKeeper", "Coordination service for Kafka, Hadoop and others. No log-in by default.", "x"],
+    [2222, "tcp", "SSH (alternate)", "A common second port for SSH.", "u"],
+    [2375, "tcp", "Docker API", "Docker remote control WITHOUT encryption or log-in: whoever reaches it controls the host.", "cx"],
+    [2376, "tcp", "Docker API (TLS)", "Docker remote control with certificates.", ""],
+    [3000, "tcp", "Dev servers", "Node.js, Grafana and many development servers.", "u"],
+    [3128, "tcp", "Squid proxy", "A common web proxy.", ""],
+    [3260, "tcp", "iSCSI", "Network disks.", "x"],
+    [3283, "tcp/udp", "Apple Remote Desktop", "Remote control of Macs.", "x"],
+    [3306, "tcp", "MySQL / MariaDB", "Database. Should only be reachable from the application servers.", "x"],
+    [3389, "tcp/udp", "RDP", "Windows Remote Desktop. A top target for attacks and ransomware.", "x"],
+    [3478, "tcp/udp", "STUN / TURN", "Helps video calls cross NAT and firewalls.", ""],
+    [3690, "tcp", "Subversion", "SVN code repositories.", "c"],
+    [4369, "tcp", "Erlang EPMD", "Used by RabbitMQ, CouchDB and others; exposes cluster details.", "x"],
+    [4500, "udp", "IPsec NAT-T", "IPsec VPN through NAT.", ""],
+    [4786, "tcp", "Cisco Smart Install", "Switch set-up service with serious known flaws.", "x"],
+    [4789, "udp", "VXLAN", "Tunnels between virtual networks in data centres.", ""],
+    [5000, "tcp", "Dev servers / UPnP", "Flask, Docker registry, Synology and others.", "u"],
+    [5004, "udp", "RTP", "Voice and video streams.", ""],
+    [5060, "tcp/udp", "SIP", "Phone calls over IP, not encrypted.", "c"],
+    [5061, "tcp", "SIP (TLS)", "Phone calls over IP, encrypted.", ""],
+    [5222, "tcp", "XMPP client", "Chat (Jabber).", ""],
+    [5269, "tcp", "XMPP server", "Chat servers talking to each other.", ""],
+    [5353, "udp", "mDNS", "Finds printers, Apple devices and Chromecasts on the local network. Local only.", ""],
+    [5355, "udp", "LLMNR", "Windows local name lookup. Abused to steal log-in hashes.", "x"],
+    [5432, "tcp", "PostgreSQL", "Database. Should only be reachable from the application servers.", "x"],
+    [5555, "tcp", "Android ADB", "Android debugging over the network: full control of the device.", "cxu"],
+    [5601, "tcp", "Kibana", "Dashboards for Elasticsearch.", "x"],
+    [5671, "tcp", "AMQPS", "Message queue with encryption.", ""],
+    [5672, "tcp", "AMQP", "RabbitMQ message queue.", "x"],
+    [5900, "tcp", "VNC", "Remote screen control; often weakly protected.", "x"],
+    [5938, "tcp/udp", "TeamViewer", "Remote support program.", ""],
+    [5985, "tcp", "WinRM", "Windows remote management over HTTP.", "x"],
+    [5986, "tcp", "WinRM (TLS)", "Windows remote management, encrypted.", ""],
+    [[6000, 6063], "tcp", "X11", "Remote graphical windows on Unix. Not encrypted.", "cx"],
+    [6379, "tcp", "Redis", "In-memory database with no log-in by default. Often found open and abused.", "x"],
+    [6443, "tcp", "Kubernetes API", "Controls a Kubernetes cluster.", "x"],
+    [[6660, 6669], "tcp", "IRC", "Internet Relay Chat, not encrypted.", "c"],
+    [6697, "tcp", "IRC (TLS)", "Chat with encryption.", ""],
+    [[6881, 6889], "tcp/udp", "BitTorrent", "File sharing.", ""],
+    [7001, "tcp", "WebLogic", "Oracle application server; a frequent target.", "x"],
+    [8000, "tcp", "HTTP alternate", "Development and internal web servers.", "u"],
+    [8008, "tcp", "HTTP alternate", "Alternate web port.", "u"],
+    [8080, "tcp", "HTTP alternate / proxy", "Web servers, proxies and admin pages that avoid port 80.", "cu"],
+    [8081, "tcp", "HTTP alternate", "Alternate web port.", "u"],
+    [8086, "tcp", "InfluxDB", "Time-series database.", "x"],
+    [8200, "tcp", "HashiCorp Vault", "Secret storage.", ""],
+    [8291, "tcp", "MikroTik Winbox", "Router management; has had serious flaws.", "x"],
+    [8443, "tcp", "HTTPS alternate", "Encrypted web pages and admin consoles that avoid 443.", "u"],
+    [8500, "tcp", "Consul", "Service discovery and configuration.", "x"],
+    [8728, "tcp", "MikroTik API", "Router management API.", "x"],
+    [8883, "tcp", "MQTT (TLS)", "Sensor messages with encryption.", ""],
+    [8888, "tcp", "Jupyter / alternate web", "Notebooks and other web tools.", "xu"],
+    [9000, "tcp", "Various web tools", "Portainer, SonarQube, PHP-FPM and others.", "u"],
+    [9042, "tcp", "Cassandra", "Database.", "x"],
+    [9090, "tcp", "Prometheus / consoles", "Monitoring and admin pages.", "u"],
+    [9092, "tcp", "Kafka", "Message streaming.", "x"],
+    [9100, "tcp", "Raw printing / Node exporter", "Sends print jobs straight to a printer; also Prometheus node metrics.", "x"],
+    [9200, "tcp", "Elasticsearch", "Search database with an HTTP API; often found open with no log-in.", "x"],
+    [9300, "tcp", "Elasticsearch nodes", "Traffic between Elasticsearch servers.", "x"],
+    [9418, "tcp", "git", "The plain git protocol (read-only, not encrypted).", "c"],
+    [10000, "tcp", "Webmin", "Web-based server administration.", "x"],
+    [10050, "tcp", "Zabbix agent", "Monitoring agent.", ""],
+    [10051, "tcp", "Zabbix server", "Monitoring server.", ""],
+    [11211, "tcp/udp", "Memcached", "Cache with no log-in. Exposed UDP servers have been used for huge attacks.", "x"],
+    [15672, "tcp", "RabbitMQ management", "Web console of the message queue.", "x"],
+    [20000, "tcp", "DNP3", "Industrial control (power, water).", "cx"],
+    [25565, "tcp", "Minecraft (Java)", "Game server.", ""],
+    [19132, "udp", "Minecraft (Bedrock)", "Game server.", ""],
+    [27015, "udp", "Steam / Source games", "Game servers.", ""],
+    [27017, "tcp", "MongoDB", "Database; countless servers were found open with no log-in.", "x"],
+    [[30000, 32767], "tcp", "Kubernetes NodePort", "Range used to publish Kubernetes services on every node.", "u"],
+    [32400, "tcp", "Plex", "Media server.", ""],
+    [33434, "udp", "Traceroute", "The first port traceroute tries (it counts up from here).", ""],
+    [44818, "tcp/udp", "EtherNet/IP", "Industrial control (Rockwell).", "cx"],
+    [47808, "udp", "BACnet", "Building control (heating, lifts).", "cx"],
+    [51820, "udp", "WireGuard", "Modern VPN.", ""],
+    [[49152, 65535], "tcp/udp", "Dynamic / temporary", "Used briefly by programs when they connect out; not assigned to any service.", ""],
+  ];
+  const FLAGS = {
+    c: "Not encrypted: passwords and data can be read by anyone on the path.",
+    x: "Often attacked: should not be reachable from the internet.",
+    u: "Common use, but not an official assignment.",
+  };
+  const classOf = n => n <= 1023 ? "Well-known (system) port, 0-1023" : n <= 49151 ? "Registered port, 1024-49151" : "Dynamic (temporary) port, 49152-65535";
+  const covers = (e, n) => Array.isArray(e[0]) ? n >= e[0][0] && n <= e[0][1] : e[0] === n;
+  const label = e => Array.isArray(e[0]) ? e[0][0] + "-" + e[0][1] : String(e[0]);
+
+  // query: "443", "8000-8100", "443/udp", "ssh", "mail encrypted", "" (everything). opts: { proto: "", risky: false }
+  function search(query, opts) {
+    opts = opts || {};
+    const q = String(query == null ? "" : query).trim().toLowerCase();
+    let list = P.slice();
+    let num = null, range = null, proto = "";
+    let m;
+    if ((m = /^(\d{1,5})\s*(?:\/\s*(tcp|udp))?$/.exec(q))) { num = +m[1]; proto = m[2] || ""; }
+    else if ((m = /^(\d{1,5})\s*-\s*(\d{1,5})$/.exec(q))) { range = [Math.min(+m[1], +m[2]), Math.max(+m[1], +m[2])]; }
+    if (num != null && num > 65535) return { error: "Ports go from 0 to 65535.", rows: [] };
+    if (num != null) list = list.filter(e => covers(e, num));
+    else if (range) list = list.filter(e => (Array.isArray(e[0]) ? e[0][1] : e[0]) >= range[0] && (Array.isArray(e[0]) ? e[0][0] : e[0]) <= range[1]);
+    else if (q) { const words = q.split(/\s+/); list = list.filter(e => { const hay = (label(e) + " " + e[1] + " " + e[2] + " " + e[3] + " " + (e[4].includes("c") ? "unencrypted cleartext" : "encrypted") + (e[4].includes("x") ? " risky attacked" : "")).toLowerCase(); return words.every(w => hay.includes(w)); }); }
+    const p = opts.proto || proto;
+    if (p) list = list.filter(e => e[1].split("/").includes(p));
+    if (opts.risky) list = list.filter(e => e[4].includes("x"));
+    return { rows: list, num, range, classText: num != null ? classOf(num) : "" };
+  }
+  const api = { list: P, FLAGS, classOf, label, search };
+  if (typeof window !== "undefined") window.PortData = api;
+  if (typeof module !== "undefined") module.exports = api;
+})();

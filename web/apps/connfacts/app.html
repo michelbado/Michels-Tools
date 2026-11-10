@@ -1,0 +1,18 @@
+<div class="cf">
+  <div class="toolbar" role="toolbar" aria-label="Connection Facts controls">
+    <button type="button" class="xp-btn is-default" id="connfacts-refresh">Check again</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="xp-btn" id="connfacts-copy" disabled>Copy as text</button>
+    <button type="button" class="xp-btn" id="connfacts-save" disabled>Save text</button>
+  </div>
+  <div class="content" id="connfacts-content">
+    <div class="summary" id="connfacts-summary" role="status" aria-live="polite">Checking...</div>
+    <ul class="notes" id="connfacts-notes" hidden></ul>
+    <div id="connfacts-sections"></div>
+    <p class="muted">Everything on this screen is worked out in your browser from the requests it just made to this site (about 15 tiny requests). Nothing you type or any file is used, and nothing is stored on the server.</p>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="connfacts-status">Ready</span>
+    <span class="cell wide" id="connfacts-meta"></span>
+  </footer>
+</div>

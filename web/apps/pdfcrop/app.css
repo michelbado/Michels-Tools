@@ -1,0 +1,46 @@
+/* Crop / Resize Pages app. Shared widgets live in xp.css. */
+.pcrop { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pcrop .fname { margin-left: auto; color: var(--muted); max-width: 40ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcrop.dropping { outline: 2px dashed var(--select); outline-offset: -6px; }
+.pcrop .empty { margin: auto; max-width: 52ch; text-align: center; line-height: 1.5; padding: 24px 12px; }
+.pcrop .empty p { margin: 0 0 10px; }
+.pcrop .muted, .pcrop .note { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.pcrop .work { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 330px; }
+.pcrop .stage { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: #8C8F94; }
+.pcrop .nav { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: var(--face, #ECE9D8); border-bottom: 1px solid #ACA899; flex-wrap: wrap; }
+.pcrop .nav .xp-field { width: 4.5rem; min-height: 26px; padding: 2px 6px; }
+.pcrop .nav .size { margin-left: auto; }
+.pcrop .sheetwrap { flex: 1 1 auto; min-height: 0; overflow: auto; display: flex; align-items: center; justify-content: center; padding: 12px; }
+.pcrop .sheet { position: relative; flex: 0 0 auto; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .5); touch-action: none; user-select: none; }
+.pcrop .sheet canvas { display: block; }
+.pcrop .shade { position: absolute; background: rgba(0, 0, 0, .45); pointer-events: none; }
+.pcrop .box { position: absolute; outline: 1px dashed #fff; box-shadow: 0 0 0 1px #0A246A; cursor: move; }
+.pcrop .box.off { cursor: default; }
+.pcrop .hd { position: absolute; width: 12px; height: 12px; margin: -6px 0 0 -6px; background: #fff; border: 1px solid #0A246A; box-sizing: border-box; }
+.pcrop .box.off .hd { display: none; }
+.pcrop .hd[data-h="nw"] { left: 0; top: 0; cursor: nwse-resize; } .pcrop .hd[data-h="n"] { left: 50%; top: 0; cursor: ns-resize; } .pcrop .hd[data-h="ne"] { left: 100%; top: 0; cursor: nesw-resize; }
+.pcrop .hd[data-h="w"] { left: 0; top: 50%; cursor: ew-resize; } .pcrop .hd[data-h="e"] { left: 100%; top: 50%; cursor: ew-resize; }
+.pcrop .hd[data-h="sw"] { left: 0; top: 100%; cursor: nesw-resize; } .pcrop .hd[data-h="s"] { left: 50%; top: 100%; cursor: ns-resize; } .pcrop .hd[data-h="se"] { left: 100%; top: 100%; cursor: nwse-resize; }
+.pcrop .side { min-height: 0; overflow: auto; padding: 8px 10px; display: flex; flex-direction: column; gap: 8px; }
+.pcrop .opt { display: flex; align-items: flex-start; gap: 6px; margin: 3px 0; line-height: 1.3; }
+.pcrop .grid { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 5px 8px; align-items: center; margin: 6px 0; }
+.pcrop .grid .xp-field, .pcrop .grid .xp-select, .pcrop .side > fieldset > .xp-field, .pcrop .side > fieldset > .xp-select { width: 100%; }
+.pcrop #pdfcrop-ptext { margin-top: 6px; }
+.pcrop .plan { padding: 8px 10px; background: var(--info); border: 1px solid #000; line-height: 1.4; }
+.pcrop .plan.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.pcrop .big { min-height: 42px; font-weight: 700; }
+
+@media (max-width: 699px) {
+  .pcrop { flex: 0 0 auto; }
+  .pcrop .work { display: block; flex: 0 0 auto; }
+  .pcrop .stage { min-height: 360px; }
+  .pcrop .sheetwrap { padding: 8px; }
+  .pcrop .side { overflow: visible; padding: 10px; }
+  .pcrop .toolbar .xp-btn { flex: 1 1 40%; min-height: 44px; }
+  .pcrop .toolbar .xp-btn.is-default { flex-basis: 100%; }
+  .pcrop .toolbar .sep { display: none; }
+  .pcrop .fname { margin-left: 0; flex-basis: 100%; }
+  .pcrop .grid { grid-template-columns: 100px minmax(0, 1fr); }
+  .pcrop .xp-field, .pcrop .xp-select { font-size: 16px; min-height: 40px; }
+  .pcrop .hd { width: 22px; height: 22px; margin: -11px 0 0 -11px; }
+}

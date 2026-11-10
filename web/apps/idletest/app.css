@@ -1,0 +1,8 @@
+/* Idle-timeout finder. The shared look is in xp.css (.tk). */
+.tk-bar { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+.tk-barlabel { flex: 0 0 11rem; }
+.tk-track { flex: 1 1 auto; height: 14px; border: 1px solid #919B9C; background: #fff; }
+.tk-fill { height: 100%; width: 0; background: #3F8F2E; }
+.tk-fill.cut { background: #C23A14; }
+.tk-barnum { flex: 0 0 9rem; text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 699px) { .tk-barlabel { flex-basis: 7rem; } .tk-barnum { flex-basis: 6rem; } }

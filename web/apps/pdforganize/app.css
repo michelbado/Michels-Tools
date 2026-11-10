@@ -1,0 +1,62 @@
+/* Organize Pages app. Shared widgets live in xp.css. */
+
+.porg { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.porg .fname { margin-left: auto; color: var(--muted); max-width: 36ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.porg .content { flex: 1 1 auto; min-height: 0; overflow: hidden; padding: 10px 14px 8px; display: flex; flex-direction: column; gap: 8px; }
+.porg .content.dropping { outline: 2px dashed var(--select); outline-offset: -6px; }
+.porg .note { color: var(--muted); font-size: 12px; line-height: 1.4; }
+
+.porg .actions { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; }
+.porg .actions .grp { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.porg .actions .lbl { color: var(--muted); margin-right: 2px; }
+
+.porg .gridwrap { position: relative; flex: 1 1 0; min-height: 0; display: flex; }
+.porg .grid {
+  flex: 1 1 auto;
+  min-height: 140px;
+  overflow: auto;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  grid-auto-rows: max-content;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid var(--field-border);
+  user-select: none;
+}
+.porg .empty { grid-column: 1 / -1; margin: auto; padding: 30px 10px; text-align: center; color: var(--muted); }
+.pg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.pg:hover { background: #F2F6FD; }
+.pg:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+.pg .box { position: relative; background: #F4F3EE; box-shadow: 0 1px 4px rgba(0, 0, 0, .35); overflow: hidden; }
+.pg .box canvas { position: absolute; left: 50%; top: 50%; display: block; }
+.pg .box.blank { background: #fff; }
+.pg .no { font-size: 12px; }
+.pg .tag { font-size: 11px; color: var(--muted); min-height: 14px; }
+.pg[aria-selected="true"] { border-color: var(--select); background: #EAF1FC; }
+.pg[aria-selected="true"] .no { font-weight: 700; color: var(--select); }
+.pg.dragging { opacity: .45; }
+.porg .marker { position: absolute; width: 3px; background: #2F6FDB; box-shadow: 0 0 0 1px #fff; pointer-events: none; z-index: 5; }
+.ghost { position: fixed; z-index: 200000; pointer-events: none; padding: 4px 10px; background: #2F6FDB; color: #fff; border: 1px solid #0B3A91; border-radius: 3px; font-size: 12px; opacity: .92; }
+
+@media (max-width: 699px) {
+  .porg { flex: 0 0 auto; }
+  .porg .content { flex: 0 0 auto; overflow: visible; padding: 12px; }
+  .porg .gridwrap { flex: none; height: 56vh; }
+  .porg .toolbar .xp-btn { flex: 1 1 40%; min-height: 44px; }
+  .porg .toolbar .xp-btn.is-default { flex-basis: 100%; }
+  .porg .toolbar .sep { display: none; }
+  .porg .fname { margin-left: 0; flex-basis: 100%; }
+  .porg .actions .xp-btn.small { min-height: 38px; padding: 2px 10px; }
+  .porg .grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+}

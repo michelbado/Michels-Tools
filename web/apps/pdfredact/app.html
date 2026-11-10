@@ -1,0 +1,87 @@
+<div class="pred">
+  <div class="toolbar" role="toolbar" aria-label="Actions">
+    <button type="button" class="xp-btn is-default" id="pdfredact-open">Open PDF</button>
+    <input type="file" id="pdfredact-file" accept="application/pdf,.pdf" hidden>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="xp-btn" id="pdfredact-clear">Clear</button>
+    <span class="fname" id="pdfredact-name"></span>
+  </div>
+
+  <div class="empty" id="pdfredact-empty">
+    <p><b>Open a PDF</b>, or drop one onto this window.</p>
+    <p>Black out names, numbers, addresses or anything else you must not share. Draw boxes on the pages, or search for words and patterns (e-mail addresses, phone numbers, long numbers) and mark every place at once.</p>
+    <p>A page with a black box is turned into a picture, so the hidden text is really gone from the file. It cannot be copied, searched or recovered.</p>
+    <p class="muted">The file is changed inside your browser. It is not uploaded, and your original file is never touched: you download a new copy. Keep the original safe: a redacted copy cannot be undone.</p>
+  </div>
+
+  <div class="work" id="pdfredact-work" hidden>
+    <div class="stage" id="pdfredact-stage">
+      <div class="nav">
+        <button type="button" class="xp-btn small" id="pdfredact-prev" aria-label="Previous page">Previous</button>
+        <label for="pdfredact-pageno">Page</label>
+        <input type="number" id="pdfredact-pageno" class="xp-field" min="1" value="1">
+        <span class="muted">of <span id="pdfredact-total">0</span></span>
+        <button type="button" class="xp-btn small" id="pdfredact-next" aria-label="Next page">Next</button>
+        <span class="muted size" id="pdfredact-pagebox"></span>
+      </div>
+      <div class="sheetwrap" id="pdfredact-sheetwrap">
+        <div class="sheet" id="pdfredact-sheet" tabindex="0" aria-label="Page preview: drag to draw a box">
+          <canvas id="pdfredact-canvas" aria-label="Preview of the page"></canvas>
+          <div class="boxes" id="pdfredact-boxes"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <fieldset>
+        <legend>1. Draw boxes</legend>
+        <p class="muted">Drag on the page to draw a black box. Click a box to select it, then press Delete (or the button) to remove it.</p>
+        <div class="row">
+          <button type="button" class="xp-btn small" id="pdfredact-delsel" disabled>Remove selected box</button>
+          <button type="button" class="xp-btn small" id="pdfredact-delpage" disabled>Clear this page</button>
+        </div>
+        <label class="opt"><input type="checkbox" id="pdfredact-solid"> Show the boxes as solid black</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Find and mark text</legend>
+        <div class="find">
+          <input type="text" id="pdfredact-term" class="xp-field" placeholder="a word or phrase" spellcheck="false" autocomplete="off" aria-label="Text to find">
+          <button type="button" class="xp-btn small" id="pdfredact-mark">Mark every match</button>
+        </div>
+        <div class="row">
+          <button type="button" class="xp-btn small" data-preset="email">E-mail addresses</button>
+          <button type="button" class="xp-btn small" data-preset="phone">Phone numbers</button>
+          <button type="button" class="xp-btn small" data-preset="digits">Long numbers (IDs, cards, IBAN)</button>
+        </div>
+        <p class="muted">Each match is covered completely, together with the rest of the text line piece it sits in, to be safe. Check the boxes afterwards: only text the PDF really contains can be found (a scanned page has none; draw boxes there).</p>
+        <div class="found" id="pdfredact-found" role="status"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>3. Result</legend>
+        <label for="pdfredact-quality">Picture quality of the changed pages</label>
+        <select id="pdfredact-quality" class="xp-select">
+          <option value="150">Standard (150 dpi, smaller file)</option>
+          <option value="200">Sharp (200 dpi)</option>
+          <option value="300">Very sharp (300 dpi, large file)</option>
+        </select>
+        <label class="opt"><input type="checkbox" id="pdfredact-all"> Turn every page into a picture (also removes hidden text and comments on pages without boxes)</label>
+        <label class="opt"><input type="checkbox" id="pdfredact-keepinfo"> Keep the document properties (title, author, ...)</label>
+      </fieldset>
+
+      <div class="infobar warnbar" id="pdfredact-signedwarn" role="status" hidden>
+        <span>This PDF has a digital signature. The new copy will no longer be signed.</span>
+      </div>
+      <div class="plan" id="pdfredact-plan" role="status">Open a PDF to begin.</div>
+      <button type="button" class="xp-btn is-default big" id="pdfredact-go" disabled>Redact and download</button>
+      <div class="check" id="pdfredact-check" role="status" hidden></div>
+      <div class="note" id="pdfredact-note">Pages without boxes are copied unchanged, including their hidden text, comments, links and form fields. Bookmarks, attachments and the document properties are not carried over (unless you keep the properties).</div>
+    </div>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="pdfredact-status">Ready</span>
+    <span class="cell wide">Pages: <span id="pdfredact-npages">0</span> | Boxes: <span id="pdfredact-nboxes">0</span></span>
+  </footer>
+</div>

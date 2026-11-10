@@ -1,0 +1,78 @@
+<div class="agg">
+  <div class="toolbar" role="toolbar" aria-label="Actions">
+    <button type="button" class="xp-btn is-default" id="go">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h5l3 6-3 6H2" stroke="#1C5BD6" stroke-width="1.8"/><path d="M10 9h6M13.5 6.5L16 9l-2.5 2.5" stroke="#21A121" stroke-width="1.8"/></svg>
+      <b>Aggregate</b>
+    </button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="xp-btn" id="pick">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3A3A3A" stroke-width="1.4"><path d="M3 1.5h7l3 3v10H3z" fill="#FFFFFF"/><path d="M5.5 7h5M5.5 9.5h5M5.5 12h3"/></svg>
+      Load file
+    </button>
+    <button type="button" class="xp-btn" id="clear">
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#C23A14" stroke-width="1.8" stroke-linecap="round"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9"/></svg>
+      Clear
+    </button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="xp-btn" id="copy" disabled>
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3A3A3A" stroke-width="1.4"><rect x="5" y="5" width="9" height="10" fill="#FFFFFF"/><path d="M3 11V2h8"/></svg>
+      Copy
+    </button>
+    <button type="button" class="xp-btn" id="download" disabled>
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#3A3A3A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M4.8 7.2L8 10.4l3.2-3.2"/><path d="M2.5 13.5h11" stroke-width="1.8"/></svg>
+      Download
+    </button>
+    <input type="file" id="file" hidden>
+  </div>
+
+  <div class="content">
+    <div class="panes">
+      <fieldset>
+        <legend>Input</legend>
+        <label for="input">Paste anything that contains IPs or subnets: a list, a routing table, a log. Text is ignored.</label>
+        <textarea id="input" class="xp-text" spellcheck="false" autocomplete="off" autocapitalize="off"
+          placeholder="172.16.20.0/24 172.16.0.0/16&#10;172.16.2.3&#10;172.16.200.4/32&#10;&#10;Or paste a whole BGP table, firewall export, CSV, anything."></textarea>
+        <div class="caption">
+          <span id="inputMeta">0 lines</span>
+          <span class="hint">Big lists: use Load file.</span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Output</legend>
+        <label for="output">Aggregated result. Overlapping and adjacent networks are merged into the smallest set of prefixes.</label>
+        <textarea id="output" class="xp-text" readonly spellcheck="false"></textarea>
+        <div class="infobar warnbar" id="skipped" role="status" hidden>
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5L17 16H1z" fill="#FFD21F" stroke="#8A6D00" stroke-linejoin="round"/><path d="M9 6.5v4.5" stroke="#000" stroke-width="1.8" stroke-linecap="round"/><circle cx="9" cy="13.4" r="1" fill="#000"/></svg>
+          <span><b id="skippedCount"></b> <span class="mono" id="skippedList"></span></span>
+        </div>
+        <div class="caption">
+          <span id="outMeta">0 lines</span>
+          <span id="outNote"></span>
+        </div>
+      </fieldset>
+    </div>
+
+    <fieldset class="options">
+      <legend>Options</legend>
+      <div class="optrow">
+        <label class="fmt" for="format">
+          <b>Output format:</b>
+          <select id="format" class="xp-select"></select>
+        </label>
+        <label class="namefield" id="nameWrap" for="name" hidden>
+          <b>Name:</b>
+          <input type="text" id="name" class="xp-field" value="AGGREGATED" maxlength="30" spellcheck="false" autocomplete="off">
+        </label>
+      </div>
+    </fieldset>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="statusText">Ready</span>
+    <span class="cell">Found: <span id="sFound">0</span></span>
+    <span class="cell">Out: <span id="sOut">0</span></span>
+    <span class="cell">Skipped: <span id="sSkipped">0</span></span>
+    <span class="cell wide">Reduced: <span id="sReduced">0%</span></span>
+  </footer>
+</div>

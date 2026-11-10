@@ -1,0 +1,29 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>How long to wait</legend>
+      <div class="tk-row">
+        <label><input type="radio" name="idletest-len" id="idletest-len60" value="60"> 1 minute</label>
+        <label><input type="radio" name="idletest-len" id="idletest-len120" value="120" checked> 2 minutes (recommended)</label>
+        <label><input type="radio" name="idletest-len" id="idletest-len300" value="300"> 5 minutes</label>
+      </div>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="idletest-start">Start test</button>
+        <button type="button" class="xp-btn" id="idletest-stop" disabled>Stop</button>
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" class="xp-btn" id="idletest-copy" disabled>Copy as text</button>
+        <button type="button" class="xp-btn" id="idletest-save" disabled>Save text</button>
+      </div>
+      <p class="tk-muted">Between you and this site there may be a proxy, a CDN, a load balancer or a firewall. Each has a timer that cuts a connection that has been quiet for too long, and that breaks long downloads, reports that take a while to build and live connections. This test asks the server to keep two requests open without sending anything (one of them with a tiny heartbeat) and shows when something cuts them. Keep this window open and the computer awake. Nothing you type or any file is used.</p>
+    </fieldset>
+    <fieldset id="idletest-progress" hidden>
+      <legend>Waiting</legend>
+      <div class="tk-bar"><span class="tk-barlabel" id="idletest-labelq">Silent connection</span><div class="tk-track"><div class="tk-fill" id="idletest-fillq"></div></div><span class="tk-barnum" id="idletest-numq"></span></div>
+      <div class="tk-bar"><span class="tk-barlabel" id="idletest-labelb">With a heartbeat</span><div class="tk-track"><div class="tk-fill" id="idletest-fillb"></div></div><span class="tk-barnum" id="idletest-numb"></span></div>
+    </fieldset>
+    <div class="tk-summary" id="idletest-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="idletest-notes" hidden></ul>
+    <div id="idletest-sections"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="idletest-status">Ready</span></footer>
+</div>

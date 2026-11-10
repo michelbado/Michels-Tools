@@ -1,0 +1,5 @@
+/dist/
+/tools.conf
+/michels-tools
+*.log
+*.bundle

@@ -1,0 +1,50 @@
+/* Verify Signatures app. Shared widgets live in xp.css. */
+
+.pver { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pver .fname { margin-left: auto; color: var(--muted); max-width: 40ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pver .content { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.pver .content.dropping { outline: 2px dashed var(--select); outline-offset: -6px; }
+.pver .empty { margin: auto; max-width: 52ch; text-align: center; line-height: 1.5; }
+.pver .empty p { margin: 0 0 10px; }
+.pver .muted { color: var(--muted); }
+
+.pver .summary { padding: 8px 10px; background: #fff; border: 1px solid var(--field-border); font-weight: 700; }
+.pver .summary.ok { border-color: #2E8B2E; color: #1B6E1B; }
+.pver .summary.bad { border-color: #C23A14; color: #A32C0A; }
+.pver .summary.warn { border-color: #B8860B; color: #8A5A00; }
+#pdfverify-list { display: flex; flex-direction: column; gap: 12px; }
+
+.pver .sig { flex: 0 0 auto; }
+.pver .sig legend { display: flex; align-items: center; gap: 6px; }
+.pver .badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.pver .badge svg { flex: 0 0 auto; }
+.pver .badge.valid { color: #1B6E1B; }
+.pver .badge.bad { color: #A32C0A; }
+.pver .badge.warn { color: #8A5A00; }
+.pver .headline { margin: 0 0 6px; line-height: 1.45; font-weight: 700; }
+.pver .headline.valid { color: #1B6E1B; }
+.pver .headline.bad { color: #A32C0A; }
+.pver .headline.warn { color: #8A5A00; }
+
+.pver .kv { width: 100%; border-collapse: collapse; }
+.pver .kv th { width: 190px; padding: 3px 12px 3px 0; text-align: left; font-weight: 400; color: var(--muted); vertical-align: top; }
+.pver .kv td { padding: 3px 0; overflow-wrap: anywhere; }
+.pver .kv td .note { display: block; color: var(--muted); font-size: 12px; }
+.pver .kv td.warn { color: #A2480A; font-weight: 700; }
+.pver .kv td.bad { color: #A32C0A; font-weight: 700; }
+.pver .kv td.unset { color: var(--muted); font-style: italic; }
+.pver .kv td.mono { font-family: var(--mono); font-size: 12.5px; }
+.pver .kv td .chain { display: block; }
+.pver .notes { margin: 8px 0 0; padding-left: 18px; color: #5a4300; }
+.pver .notes li { margin: 2px 0; }
+
+@media (max-width: 699px) {
+  .pver { flex: 0 0 auto; }
+  .pver .content { flex: 0 0 auto; overflow: visible; padding: 12px; }
+  .pver .toolbar .xp-btn { flex: 1 1 40%; min-height: 44px; }
+  .pver .toolbar .xp-btn.is-default { flex-basis: 100%; }
+  .pver .toolbar .sep { display: none; }
+  .pver .fname { margin-left: 0; flex-basis: 100%; }
+  .kv th, .kv td { display: block; width: auto; }
+  .kv th { padding-top: 8px; }
+}

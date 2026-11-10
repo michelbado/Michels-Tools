@@ -1,0 +1,47 @@
+/* Extract Content app. Shared widgets live in xp.css. */
+.pext { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pext .fname { margin-left: auto; color: var(--muted); max-width: 40ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pext .empty { margin: auto; max-width: 52ch; text-align: center; line-height: 1.5; padding: 24px 12px; }
+.pext .empty p { margin: 0 0 10px; }
+.pext.dropping { outline: 2px dashed var(--select); outline-offset: -6px; }
+.pext .muted, .pext .note { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.pext #pdfextract-main { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pext .pagesrow { display: flex; align-items: center; gap: 8px; padding: 10px 12px 0; flex-wrap: wrap; }
+.pext .pagesrow .xp-field { width: 18rem; max-width: 100%; }
+.pext .tabs { display: flex; gap: 2px; padding: 8px 12px 0; }
+.pext .tab { font: inherit; color: #000; min-height: 30px; padding: 4px 18px; border: 1px solid #919B9C; border-bottom: 0; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, #FFFFFF 0%, #ECEBE5 100%); cursor: pointer; position: relative; top: 1px; }
+.pext .tab:hover:not(.on) { box-shadow: inset 0 2px 0 var(--hover-glow); }
+.pext .tab.on { background: #FCFCFE; font-weight: 700; z-index: 1; box-shadow: inset 0 2px 0 #FFC73C; }
+.pext .tab:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+.pext .panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 8px; border: 1px solid #919B9C; background: #FCFCFE; margin: 0 12px 8px; padding: 10px; overflow: auto; }
+.pext .panel[hidden] { display: none; }
+.pext .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.pext .check { display: inline-flex; align-items: center; gap: 6px; }
+.pext .plan { padding: 8px 10px; background: var(--info); border: 1px solid #000; line-height: 1.4; }
+.pext .plan.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.pext .textbox { flex: 1 1 auto; min-height: 180px; width: 100%; resize: none; font-family: var(--mono); font-size: 13px; line-height: 1.4; white-space: pre-wrap; }
+.pext .rows { list-style: none; margin: 0; padding: 0; flex: 1 1 auto; min-height: 120px; overflow: auto; background: #fff; border: 1px solid var(--field-border); }
+.pext .rows:empty { display: none; }
+.pext .rows li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 4px 10px; padding: 6px 8px; border-bottom: 1px solid #F0EEE4; }
+.pext .rows li.nothumb { grid-template-columns: minmax(0, 1fr) auto; }
+.pext .rows li:last-child { border-bottom: 0; }
+.pext .rows .thumb { width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: repeating-conic-gradient(#E8E8E8 0 25%, #fff 0 50%) 0 0 / 10px 10px; box-shadow: 0 1px 3px rgba(0, 0, 0, .35); overflow: hidden; }
+.pext .rows .thumb canvas { max-width: 100%; max-height: 100%; }
+.pext .rows .name { font-weight: 700; overflow-wrap: anywhere; }
+.pext .rows .meta { color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.pext .rows .xp-btn { min-width: 0; padding: 2px 10px; min-height: 28px; }
+
+@media (max-width: 699px) {
+  .pext { flex: 0 0 auto; }
+  .pext #pdfextract-main { flex: 0 0 auto; }
+  .pext .panel { flex: 0 0 auto; overflow: visible; margin: 0 8px 8px; }
+  .pext .toolbar .xp-btn, .pext .row .xp-btn { flex: 1 1 40%; min-height: 44px; }
+  .pext .toolbar .xp-btn.is-default, .pext .row .xp-btn.is-default { flex-basis: 100%; }
+  .pext .toolbar .sep { display: none; }
+  .pext .fname { margin-left: 0; flex-basis: 100%; }
+  .pext .rows li { grid-template-columns: 64px minmax(0, 1fr); }
+  .pext .rows li.nothumb { grid-template-columns: minmax(0, 1fr); }
+  .pext .rows .xp-btn { grid-column: 1 / -1; min-height: 40px; }
+  .pext .xp-field { font-size: 16px; }
+  .pext .pagesrow .xp-field { width: 100%; min-height: 40px; }
+}

@@ -1,0 +1,16 @@
+/* Connection Facts. Shared widgets live in xp.css. */
+.cf { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.cf .muted { color: var(--muted); font-size: 12px; }
+.cf .content { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px 14px; }
+.cf .summary { font-size: 17px; font-weight: 700; padding: 10px 12px; background: var(--info); border: 1px solid #000; line-height: 1.3; margin-bottom: 10px; }
+.cf .notes { margin: 0 0 10px; padding: 0; list-style: none; }
+.cf .notes li { padding: 6px 10px; margin-bottom: 4px; border: 1px solid #919B9C; background: #fff; line-height: 1.4; }
+.cf .notes li.warn { background: #FFF6DC; border-color: #8A6D00; color: #5A4500; }
+.cf .notes li.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.cf fieldset { margin: 0 0 10px; border: 1px solid #919B9C; background: #fff; padding: 4px 10px 8px; }
+.cf legend { font-weight: 700; padding: 0 4px; }
+.cf table { border-collapse: collapse; width: 100%; }
+.cf th { text-align: left; font-weight: 400; color: var(--muted); padding: 3px 12px 3px 0; vertical-align: top; width: 40%; }
+.cf td { padding: 3px 0; vertical-align: top; overflow-wrap: anywhere; }
+.cf td .hint { display: block; color: var(--muted); font-size: 12px; }
+.cf .foot { margin: 6px 0 0; color: var(--muted); font-size: 12px; }

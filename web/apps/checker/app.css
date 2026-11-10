@@ -1,0 +1,74 @@
+/* IP Checker app. Shared widgets live in xp.css. */
+
+.chk { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+
+/* tab control */
+.chk .tabs { display: flex; gap: 2px; padding: 8px 12px 0; }
+.chk .tab {
+  font: inherit;
+  color: #000;
+  min-height: 30px;
+  padding: 4px 18px;
+  border: 1px solid #919B9C;
+  border-bottom: 0;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #FFFFFF 0%, #ECEBE5 100%);
+  cursor: pointer;
+  position: relative;
+  top: 1px;
+}
+.chk .tab:hover:not(.on) { box-shadow: inset 0 2px 0 var(--hover-glow); }
+.chk .tab.on { background: #FCFCFE; font-weight: 700; z-index: 1; box-shadow: inset 0 2px 0 #FFC73C; }
+.chk .tab:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+
+.chk .panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 12px 12px;
+  padding: 14px;
+  overflow: auto;
+  border: 1px solid #919B9C;
+  background: #FCFCFE;
+}
+.chk .panel[hidden] { display: none; }
+
+.chk .two { flex: 1 1 0; min-height: 150px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.chk .two fieldset { min-height: 0; }
+.chk .two fieldset > label { min-height: 2.8em; }
+.chk .two .xp-text { flex: 1 1 0; min-height: 60px; resize: none; }
+.chk .res { flex: 1 1 0; min-height: 170px; }
+.chk .tablewrap {
+  flex: 1 1 0;
+  min-height: 80px;
+  overflow: auto;
+  border: 1px solid var(--field-border);
+  background: #fff;
+}
+.chk .tablewrap:focus { outline: none; border-color: var(--select); box-shadow: 0 0 0 1px var(--select); }
+.chk .caption { flex-wrap: wrap; }
+.chk .btns { display: inline-flex; gap: 6px; }
+
+.chk td.ok { color: #1B6E1B; font-family: var(--ui); font-size: 13px; }
+.chk td.partial { color: #8A5A00; font-family: var(--ui); font-size: 13px; }
+.chk td.no { color: #C23A14; font-family: var(--ui); font-size: 13px; }
+
+.chk .opts { display: flex; flex-wrap: wrap; gap: 8px 28px; align-items: center; }
+.chk .modes { display: flex; flex-wrap: wrap; gap: 4px 24px; }
+.chk .modes label, .chk .merge { display: inline-flex; align-items: center; gap: 8px; min-height: 28px; cursor: pointer; }
+
+@media (max-width: 699px) {
+  .chk { flex: 0 0 auto; }
+  .chk .panel { flex: 0 0 auto; overflow: visible; padding: 12px; margin: 0 8px 8px; }
+  .chk .two { grid-template-columns: minmax(0, 1fr); flex: none; }
+  .chk .two fieldset > label { min-height: 0; }
+  .chk .two .xp-text { flex: none; height: 160px; font-size: 16px; resize: vertical; }
+  .chk .res { flex: none; }
+  .chk .res .tablewrap { flex: none; height: 280px; }
+  .chk .tab { min-height: 40px; flex: 1; }
+  .chk .xp-check { width: 20px; height: 20px; }
+  .chk .modes label, .chk .merge { min-height: 40px; }
+  .chk .xp-btn.small { min-height: 36px; padding: 2px 14px; }
+}

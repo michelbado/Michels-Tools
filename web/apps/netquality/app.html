@@ -1,0 +1,79 @@
+<div class="nq">
+  <div class="toolbar" role="toolbar" aria-label="Test controls">
+    <button type="button" class="xp-btn is-default" id="netquality-start">Start test</button>
+    <button type="button" class="xp-btn" id="netquality-stop" disabled>Stop</button>
+    <button type="button" class="xp-btn mark" id="netquality-mark" disabled title="Press this the moment something freezes or lags for you (or press the M key)">I notice a problem now</button>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="xp-btn" id="netquality-copy" disabled>Copy report</button>
+    <button type="button" class="xp-btn" id="netquality-save" disabled>Save text report</button>
+    <button type="button" class="xp-btn" id="netquality-savehtml" disabled title="One file with the graphs and every indicator, to keep, print or send">Save HTML report</button>
+    <button type="button" class="xp-btn" id="netquality-clear" disabled>Clear</button>
+  </div>
+
+  <div class="opts" role="group" aria-label="Test options">
+    <label class="opt"><input type="radio" name="netquality-mode" value="quick" checked> Quick test (30 seconds)</label>
+    <label class="opt" id="netquality-monopt"><input type="radio" name="netquality-mode" value="monitor"> <span id="netquality-monlabel">Monitor (until I stop it, at most 10 minutes)</span> <span class="muted" id="netquality-monnote"></span></label>
+    <label class="opt" id="netquality-fineopt" hidden><input type="checkbox" id="netquality-fine" checked> Fine detail: a probe every 50 ms <span class="muted">(catches short hiccups of 50 ms; sends 4 times as many requests)</span></label>
+    <label class="opt"><input type="checkbox" id="netquality-load"> Also test while the line is busy <span class="muted">(downloads 8 MB and uploads 4 MB; quick test only)</span></label>
+  </div>
+
+  <div class="lockbar" id="netquality-lockbar" role="status">Monitoring is running. Everything is greyed out except <b>Stop</b> and <b>I notice a problem now</b>, and nobody else can start Monitor mode until you press Stop.</div>
+
+  <div class="content" id="netquality-content">
+    <div class="intro" id="netquality-intro">
+      <p><b>This is not a speed test.</b> It judges two things separately:</p>
+      <ul>
+        <li><b>Speed</b>: how long answers from Michel's Tools take. A far-away link can be slow and still perfect.</li>
+        <li><b>Quality</b>: how steady and complete the link is. Delays that jump around, answers that get lost, freezes and drop-outs are what ruin calls, video and page loads.</li>
+      </ul>
+      <p>About five small requests per second are sent to Michel's Tools (and, if a CDN such as Cloudflare or Bunny is in front, to the CDN's nearest data centre) while you keep this window open. Nothing you type or any file is used, and nothing is stored on the server.</p>
+      <p><b>Tip:</b> press <b>I notice a problem now</b> (or the <b>M</b> key) the moment something freezes for you. The report then tells you whether the network was really responsible at that moment.</p>
+      <p class="muted">What this can and cannot see: it measures at the web level, so lost packets cannot be counted directly. They show up as delay jumps and missing answers, which is what you feel.</p>
+    </div>
+
+    <div id="netquality-results" hidden>
+      <div class="verdict" id="netquality-verdict" role="status" aria-live="polite">Starting...</div>
+      <div class="progress" id="netquality-progress"></div>
+
+      <div class="cards">
+        <section class="card" aria-labelledby="netquality-speedh">
+          <h3 id="netquality-speedh">Speed <span class="what">how far away, how long answers take</span></h3>
+          <div class="big" id="netquality-speedlabel">-</div>
+          <div class="nums" id="netquality-speednums"></div>
+        </section>
+        <section class="card" aria-labelledby="netquality-qualh">
+          <h3 id="netquality-qualh">Quality <span class="what">how steady and complete</span></h3>
+          <div class="big" id="netquality-quallabel">-</div>
+          <div class="nums" id="netquality-qualnums"></div>
+          <div class="recent" id="netquality-recent"></div>
+        </section>
+      </div>
+
+      <fieldset class="graphbox">
+        <legend>Every probe, over time</legend>
+        <canvas id="netquality-graph" class="graph" aria-label="Delay of every probe over time"></canvas>
+        <div class="legend" aria-hidden="true">
+          <span><i class="dot ok"></i>normal</span><span><i class="dot spike"></i>slow</span><span><i class="dot lost"></i>no answer</span>
+          <span><i class="dot dev"></i>device busy (not counted)</span><span><i class="dot edge"></i>CDN edge</span><span><i class="flag"></i>your mark</span>
+        </div>
+        <canvas id="netquality-dir" class="dirgraph" aria-label="Extra delay on the way to the server and on the way back"></canvas>
+        <div class="legend" id="netquality-dirlegend" aria-hidden="true"><span><i class="dot up"></i>extra delay on the way TO Michel's Tools (above the line)</span><span><i class="dot down"></i>on the way BACK (below the line)</span></div>
+      </fieldset>
+
+      <fieldset class="finds">
+        <legend>What we found</legend>
+        <ul id="netquality-findings" class="findings"></ul>
+      </fieldset>
+
+      <details class="details">
+        <summary>Numbers</summary>
+        <table class="kv"><tbody id="netquality-table"></tbody></table>
+      </details>
+    </div>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="netquality-status">Ready</span>
+    <span class="cell wide" id="netquality-meta"></span>
+  </footer>
+</div>

@@ -1,0 +1,58 @@
+/* Watermark & Page Numbers app. Shared widgets live in xp.css. */
+
+.pwm { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pwm .fname { margin-left: auto; color: var(--muted); max-width: 36ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pwm .content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: minmax(310px, 400px) minmax(0, 1fr);
+  gap: 12px 14px;
+}
+.pwm .content.dropping { outline: 2px dashed var(--select); outline-offset: -6px; }
+.pwm .left { min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; }
+.pwm .left fieldset { flex: 0 0 auto; }
+.pwm .right { min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.pwm .note { color: var(--muted); font-size: 12px; line-height: 1.4; margin-top: 4px; }
+.pwm .note.center { text-align: center; min-height: 17px; margin: 0; }
+.pwm .row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 8px; }
+.pwm .row input[type=range] { flex: 1 1 120px; min-width: 100px; }
+.pwm .val { min-width: 4em; text-align: right; }
+.pwm .inl { display: inline-flex; align-items: center; gap: 6px; }
+.pwm .chk { margin-top: 8px; display: flex; }
+.pwm .xp-field.wide, .pwm .xp-select.wide { width: 100%; }
+.pwm .xp-field.short { width: 4rem; text-align: center; }
+.pwm .modes { display: flex; flex-wrap: wrap; gap: 2px 16px; margin: 6px 0; }
+.pwm .modes label { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; cursor: pointer; }
+.pwm label[for] + .xp-field, .pwm label[for] + .xp-select { margin-top: 2px; }
+.pwm .colorbox { width: 44px; height: 28px; padding: 1px 2px; border: 1px solid var(--field-border); background: #fff; cursor: pointer; }
+.pwm .hf { display: grid; grid-template-columns: 56px repeat(3, minmax(0, 1fr)); gap: 6px; align-items: center; }
+.pwm .hf .hfh { color: var(--muted); }
+.pwm .hf .xp-field { width: 100%; min-width: 0; }
+.pwm .plan { padding: 8px 10px; background: var(--info); border: 1px solid #000; line-height: 1.4; min-height: 40px; margin-top: 8px; }
+.pwm .plan.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.pwm .big { min-height: 42px; font-weight: 700; width: 100%; margin-top: 8px; }
+
+.pwm .pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; }
+.pwm .stage { position: relative; flex: 1 1 0; min-height: 0; overflow: auto; padding: 12px; background: #7C8DA6; border: 1px solid var(--field-border); display: flex; }
+.pwm .stage .empty { margin: auto; color: #fff; text-align: center; max-width: 36ch; line-height: 1.5; }
+.pwm .sheet { position: relative; margin: 0 auto auto; background: #fff; box-shadow: 0 2px 10px rgba(0, 0, 0, .5); flex: 0 0 auto; line-height: 0; }
+.pwm .sheet > canvas { display: block; }
+.pwm .sheet > canvas.ovl { position: absolute; left: 0; top: 0; pointer-events: none; }
+
+@media (max-width: 699px) {
+  .pwm { flex: 0 0 auto; }
+  .pwm .content { flex: 0 0 auto; overflow: visible; padding: 12px; grid-template-columns: minmax(0, 1fr); }
+  .pwm .left { overflow: visible; padding-right: 0; }
+  .pwm .stage { flex: none; height: 62vh; }
+  .pwm .toolbar .xp-btn { flex: 1 1 40%; min-height: 44px; }
+  .pwm .toolbar .xp-btn.is-default { flex-basis: 100%; }
+  .pwm .toolbar .sep { display: none; }
+  .pwm .fname { margin-left: 0; flex-basis: 100%; }
+  .pwm .xp-field, .pwm .xp-select { font-size: 16px; min-height: 40px; }
+  .pwm .xp-check { width: 20px; height: 20px; }
+  .pwm .modes label { min-height: 40px; }
+  .pwm .hf { grid-template-columns: 1fr; }
+}

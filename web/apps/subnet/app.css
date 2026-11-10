@@ -1,0 +1,61 @@
+/* Subnet Calculator app. Shared widgets live in xp.css. */
+
+.sub { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.sub .content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.sub fieldset { flex: 0 0 auto; }
+.sub .listbox { flex: 1 1 auto; min-height: 150px; }
+.sub .listbox .xp-text { flex: 1 1 0; min-height: 80px; resize: none; }
+
+.sub .netrow { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; }
+.sub .fld { display: flex; flex-direction: column; gap: 4px; }
+.sub .fld .xp-field { width: 15rem; }
+.sub .fld .xp-select { min-width: 17rem; }
+
+.sub .grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+}
+.sub .item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.sub .item.wide { grid-column: 1 / -1; }
+.sub .k { color: var(--muted); font-size: 12px; }
+.sub .v { display: flex; align-items: center; gap: 8px; min-height: 28px; min-width: 0; }
+.sub .val { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; font-size: 14px; }
+
+/* wide window: inputs and results on the left, the usable list in its own column on the right */
+@media (min-width: 700px) {
+  .sub .content {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 14px 16px;
+  }
+  .sub .content > fieldset:nth-child(1) { grid-column: 1; grid-row: 1; }
+  .sub .content > fieldset:nth-child(2) { grid-column: 1; grid-row: 2; }
+  .sub .content > .listbox { grid-column: 2; grid-row: 1 / span 2; min-height: 0; }
+  .sub .grid { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .sub .item { flex-direction: row; align-items: center; gap: 10px; }
+  .sub .k { flex: 0 0 122px; }
+  .sub .v { flex: 1 1 auto; }
+  .sub .fld .xp-field { width: 11rem; }
+  .sub .fld .xp-select { min-width: 12rem; }
+}
+
+@media (max-width: 699px) {
+  .sub { flex: 0 0 auto; }
+  .sub .content { flex: 0 0 auto; overflow: visible; padding: 12px; }
+  .sub .listbox { min-height: 0; }
+  .sub .listbox .xp-text { flex: none; height: 220px; font-size: 16px; resize: vertical; }
+  .sub .netrow { flex-direction: column; align-items: stretch; }
+  .sub .fld .xp-field, .sub .fld .xp-select { width: 100%; min-width: 0; min-height: 44px; font-size: 16px; }
+  .sub .grid { grid-template-columns: minmax(0, 1fr); }
+  .sub .xp-btn.small { min-height: 36px; padding: 2px 14px; }
+}

@@ -1,0 +1,13 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>MAC address(es)</legend>
+      <textarea class="xp-text tk-in" id="maclookup-in" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="00:1A:2B:3C:4D:5E">28:6F:B9:11:22:33</textarea>
+      <p class="tk-muted">One address per line, in any usual writing (00:1A:2B:3C:4D:5E, 00-1A-2B-3C-4D-5E, 001A.2B3C.4D5E, 001A2B3C4D5E), or only the first 3 bytes to look up a maker. Looked up in your browser against the IEEE list that ships with this site (<span id="maclookup-date">loading</span>). Nothing you type is sent anywhere.</p>
+    </fieldset>
+    <div class="tk-summary" id="maclookup-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="maclookup-notes" hidden></ul>
+    <div id="maclookup-sections"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="maclookup-status">Loading the manufacturer list...</span></footer>
+</div>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5A8DF7"/><stop offset="0.5" stop-color="#2860E6"/><stop offset="1" stop-color="#1C4FD9"/></linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0705A"/><stop offset="1" stop-color="#C23A14"/></linearGradient>
+    <linearGradient id="grn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5CC25C"/><stop offset="1" stop-color="#23702A"/></linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="8" fill="url(#bg)" stroke="#0831D9" stroke-width="1.5"/>
+  <path d="M11 7h16l8 8v22a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" fill="#FFFFFF" stroke="#0B3A91"/>
+  <path d="M27 7v8h8" fill="#DCE6FA" stroke="#0B3A91" stroke-linejoin="round"/>
+  <rect x="9" y="17" width="22" height="8" rx="1.5" fill="url(#red)"/>
+  <text x="20" y="23.4" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="6.6" fill="#fff" text-anchor="middle">PDF</text>
+  <path d="M13 31c3-5 5 3 8-1s3 2 6-1" fill="none" stroke="#5D6B99" stroke-width="1.6" stroke-linecap="round"/>
+  <circle cx="34" cy="34" r="9" fill="url(#grn)" stroke="#124A17" stroke-width="1.4"/>
+  <path d="M29.5 34.3l3.2 3.2 5.8-6.6" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

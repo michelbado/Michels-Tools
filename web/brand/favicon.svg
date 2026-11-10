@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"><defs>
+<linearGradient id="c-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4FA0FF"/><stop offset=".25" stop-color="#0A5CE8"/><stop offset="1" stop-color="#003BB5"/></linearGradient>
+<linearGradient id="c-o" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC84F"/><stop offset="1" stop-color="#D06A00"/></linearGradient>
+<linearGradient id="c-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8BE05E"/><stop offset="1" stop-color="#2A7E10"/></linearGradient>
+<linearGradient id="c-m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE98F"/><stop offset=".55" stop-color="#FFC21A"/><stop offset="1" stop-color="#D97C00"/></linearGradient>
+<radialGradient id="c-s"><stop offset="0" stop-color="#000" stop-opacity=".35"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+</defs>
+
+<g transform="rotate(-14 110 110)"><rect x="34" y="40" width="150" height="116" rx="12" fill="url(#c-o)" stroke="#6E3D00" stroke-width="6"/></g>
+<g transform="rotate(-5 120 120)"><rect x="46" y="58" width="156" height="120" rx="12" fill="url(#c-g)" stroke="#1A4F06" stroke-width="6"/></g>
+<g transform="rotate(4 140 150)">
+<rect x="56" y="80" width="170" height="138" rx="14" fill="url(#c-f)" stroke="#0A2C8A" stroke-width="6"/>
+
+<rect x="67" y="114" width="148" height="94" rx="3" fill="#fff"/>
+<text x="141" y="196" font-family="'Trebuchet MS', Tahoma, sans-serif" font-weight="700" font-style="italic" font-size="92" text-anchor="middle" fill="url(#c-m)" stroke="#6E3D00" stroke-width="5" paint-order="stroke">M</text>
+</g>
+</svg>

@@ -1,0 +1,59 @@
+<div class="split">
+  <div class="content">
+    <div class="left">
+      <fieldset>
+        <legend>Network to split</legend>
+        <label for="splitter-net">Address and prefix, for example 10.0.0.0/16</label>
+        <input type="text" id="splitter-net" class="xp-field" value="10.0.0.0/16" inputmode="decimal" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="10.0.0.0/16">
+      </fieldset>
+
+      <fieldset>
+        <legend>How to split</legend>
+        <div class="modes" role="radiogroup" aria-label="Split mode">
+          <label><input type="radio" name="splitter-mode" value="size" class="xp-check" checked><span>Into subnets of a chosen size</span></label>
+          <label><input type="radio" name="splitter-mode" value="count" class="xp-check"><span>Into a number of equal parts</span></label>
+          <label><input type="radio" name="splitter-mode" value="vlsm" class="xp-check"><span>By hosts needed (VLSM)</span></label>
+        </div>
+
+        <div class="opt" id="splitter-opt-size">
+          <label for="splitter-prefix"><b>Subnet size</b></label>
+          <select id="splitter-prefix" class="xp-select"></select>
+        </div>
+
+        <div class="opt" id="splitter-opt-count" hidden>
+          <label for="splitter-count"><b>Number of parts</b></label>
+          <input type="text" id="splitter-count" class="xp-field short" value="4" inputmode="numeric" spellcheck="false" autocomplete="off">
+          <span class="note">Not a power of two? It is rounded up to the next one.</span>
+        </div>
+
+        <div class="opt" id="splitter-opt-vlsm" hidden>
+          <label for="splitter-hosts"><b>Hosts needed, one subnet per line</b></label>
+          <textarea id="splitter-hosts" class="xp-text" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Sales 100&#10;Servers 50&#10;Guests 20&#10;30"></textarea>
+          <span class="note">Optional name first, then the number. The largest subnet is placed first.</span>
+        </div>
+      </fieldset>
+    </div>
+
+    <fieldset class="results">
+      <legend>Subnets</legend>
+      <div class="tablewrap" id="splitter-wrap" tabindex="0" aria-label="Resulting subnets">
+        <table class="xp-table" id="splitter-table">
+          <thead id="splitter-head"></thead>
+          <tbody id="splitter-body"></tbody>
+        </table>
+      </div>
+      <div class="caption">
+        <span id="splitter-summary">Enter a network to split.</span>
+        <span class="btns">
+          <button type="button" class="xp-btn small" id="splitter-copycidr" disabled>Copy subnets</button>
+          <button type="button" class="xp-btn small" id="splitter-copytable" disabled>Copy table</button>
+        </span>
+      </div>
+    </fieldset>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="splitter-status">Ready</span>
+    <span class="cell wide">Subnets: <span id="splitter-n">0</span></span>
+  </footer>
+</div>

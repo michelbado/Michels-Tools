@@ -1,0 +1,36 @@
+/* PDF Info app. Shared widgets live in xp.css. */
+
+.pinfo { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.pinfo .fname { margin-left: auto; color: var(--muted); max-width: 40ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pinfo .content { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+.pinfo .content.dropping { outline: 2px dashed var(--select); outline-offset: -6px; }
+.pinfo .empty { margin: auto; max-width: 52ch; text-align: center; color: var(--ink, #000); line-height: 1.5; }
+.pinfo .empty p { margin: 0 0 10px; }
+.pinfo .muted { color: var(--muted); }
+.pinfo fieldset { flex: 0 0 auto; }
+.pinfo .pwtext { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.pinfo .pwfield { display: inline-flex; align-items: center; gap: 6px; }
+.pinfo .pwfield .xp-field { width: 14rem; }
+
+.kv { width: 100%; border-collapse: collapse; }
+.kv th { width: 210px; padding: 3px 12px 3px 0; text-align: left; font-weight: 400; color: var(--muted); vertical-align: top; }
+.kv td { padding: 3px 0; overflow-wrap: anywhere; }
+.kv td .note { display: block; color: var(--muted); font-size: 12px; }
+.kv td.warn { color: #A2480A; font-weight: 700; }
+.kv td.unset { color: var(--muted); font-style: italic; }
+.kv td.mono { font-family: var(--mono); font-size: 12.5px; }
+
+.pinfo .tablewrap { max-height: 220px; overflow: auto; border: 1px solid var(--field-border); background: #fff; margin-top: 8px; }
+.pinfo .xp-table td { white-space: normal; overflow-wrap: anywhere; }
+
+@media (max-width: 699px) {
+  .pinfo { flex: 0 0 auto; }
+  .pinfo .content { flex: 0 0 auto; overflow: visible; padding: 12px; }
+  .pinfo .toolbar .xp-btn { flex: 1 1 40%; min-height: 44px; }
+  .pinfo .toolbar .xp-btn.is-default { flex-basis: 100%; }
+  .pinfo .toolbar .sep { display: none; }
+  .pinfo .fname { margin-left: 0; flex-basis: 100%; }
+  .kv th, .kv td { display: block; width: auto; }
+  .kv th { padding-top: 8px; }
+  .pinfo .pwfield .xp-field { width: 100%; font-size: 16px; min-height: 40px; }
+}

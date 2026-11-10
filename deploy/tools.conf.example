@@ -1,0 +1,58 @@
+# Michel's Tools: which tools to offer.
+#
+# Copy this file to  tools.conf  next to the program (or point to any file with  -tools-config /path/to/file),
+# then restart the service. One "name = true" or "name = false" per line; "#" starts a comment.
+# A tool you do not list is ON. If there is no tools.conf at all, everything is on.
+#
+# A tool that is off is gone completely: no icon, no menu entry, and its files and API answer "404 Not Found".
+# A folder whose tools are all off disappears too. If a folder says false, every tool inside it is off,
+# whatever the tool's own line says.
+# A misspelled name stops the program at startup with the line number, so a typo can never leave a tool on by accident.
+
+# ---- Folders (switch off a whole group) ----
+network = true
+pdf = true
+trouble = true
+
+# ---- Network Tools ----
+aggregator = true      # IP Aggregator (also switches off its server API, POST /api/aggregate)
+subnet = true          # Subnet Calculator
+splitter = true        # Subnet Splitter
+checker = true         # IP Checker
+ipv6calc = true        # IPv6 Calculator (addresses, prefixes, address types, splitting, reverse DNS names)
+ipconv = true          # IP & Number Converter (decimal, hex, binary, reverse DNS, unusual forms)
+maclookup = true       # MAC Lookup (manufacturer from the IEEE list, address formats, random-address check)
+portref = true         # Port Reference (what a port number is used for, which ones are risky)
+certdecode = true      # Certificate Decoder (certificates, chains and CSRs; read in the browser)
+mailhdr = true         # Email Header Analyser (route, delays, SPF/DKIM/DMARC, forged-sender hints)
+
+# ---- PDF Tools (all of these run in the visitor's browser; nothing is uploaded) ----
+pdfinfo = true         # PDF Info
+pdfverify = true       # Verify Signatures
+pdfmeta = true         # Metadata
+pdfstamp = true        # Add Image / Signature (not a digital signature)
+pdfwatermark = true    # Watermark & Page Numbers
+pdfpages = true        # Split / Extract Pages
+pdfmerge = true        # Merge PDFs
+pdforganize = true     # Organize Pages
+pdfcrop = true         # Crop / Resize Pages
+pdfredact = true       # Redact (black out parts of a PDF for good: pages with boxes become pictures)
+pdfimages = true       # Images / PDF Converter
+pdfextract = true      # Extract Content
+
+# ---- Troubleshooting ----
+netquality = true      # Connection Quality (speed AND stability of the link to this server)
+connfacts = true      # Connection Facts (what the site sees of the visitor: address, CDN, protocol, clock, time breakdown)
+idletest = true       # Idle-timeout finder (how long the path lets a quiet connection live; holds a request open on the server)
+pathread = true       # Ping & Traceroute Reader (paste the output of ping, tracert, traceroute, mtr, pathping; read in the browser)
+browsercaps = true     # Browser Capability Report (what this browser can do; read in the browser)
+
+# ---- Settings (tool.setting = value). The values below are the defaults. ----
+# Connection Quality has a Monitor mode: it keeps probing the link until the visitor presses Stop. It keeps one connection busy
+# for minutes, so you can limit it:
+netquality.monitor = true            # offer Monitor mode at all (false: only the 30-second quick test)
+netquality.monitor_exclusive = true  # only ONE visitor may monitor at a time; for everyone else the option is greyed out until they press Stop
+netquality.monitor_minutes = 10      # the longest a monitoring run may last, 1 to 60
+netquality.monitor_fine = true       # allow "fine detail" (20 probes a second instead of 5) in Monitor mode; it catches 50 ms hiccups but sends 4x the requests
+# The Idle-timeout finder asks the server to hold a request open without sending anything. It also keeps at most 4 such tests per visitor and 40 on the whole server:
+idletest.max_seconds = 300           # the longest a single held request may last, 30 to 600 (Cloudflare gives up after 100, many load balancers after 60)

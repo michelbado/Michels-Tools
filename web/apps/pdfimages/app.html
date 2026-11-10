@@ -1,0 +1,102 @@
+<div class="pconv">
+  <div class="tabs" role="tablist" aria-label="Converter sections">
+    <button type="button" role="tab" class="tab on" id="pdfimages-tab-topdf" aria-selected="true" aria-controls="pdfimages-panel-topdf">Pictures to PDF</button>
+    <button type="button" role="tab" class="tab" id="pdfimages-tab-topics" aria-selected="false" aria-controls="pdfimages-panel-topics" tabindex="-1">PDF to pictures</button>
+  </div>
+
+  <div class="panel" role="tabpanel" id="pdfimages-panel-topdf" aria-labelledby="pdfimages-tab-topdf">
+    <div class="toolbar" role="toolbar" aria-label="Actions">
+      <button type="button" class="xp-btn is-default" id="pdfimages-add">Add pictures</button>
+      <input type="file" id="pdfimages-file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp" multiple hidden>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="xp-btn" id="pdfimages-sort" disabled>Sort A to Z</button>
+      <button type="button" class="xp-btn" id="pdfimages-clear">Clear</button>
+    </div>
+    <div class="content" id="pdfimages-content">
+      <fieldset class="listbox">
+        <legend>Pictures, one per page, in this order</legend>
+        <ol class="files" id="pdfimages-list" aria-label="Pictures"></ol>
+        <div class="empty" id="pdfimages-empty">Add pictures (JPG, PNG, WebP, GIF or BMP), or drop them here. They are read inside your browser and are not uploaded.</div>
+      </fieldset>
+      <fieldset class="opts">
+        <legend>Pages</legend>
+        <div class="optgrid">
+          <label for="pdfimages-size">Page size</label>
+          <select id="pdfimages-size" class="xp-select">
+            <option value="image">Same shape as the picture</option>
+            <option value="a4">A4</option>
+            <option value="letter">US Letter</option>
+          </select>
+          <label for="pdfimages-orient">Direction</label>
+          <select id="pdfimages-orient" class="xp-select" disabled>
+            <option value="auto">Automatic (follow the picture)</option>
+            <option value="portrait">Upright (portrait)</option>
+            <option value="landscape">Sideways (landscape)</option>
+          </select>
+          <label for="pdfimages-margin">Empty border</label>
+          <select id="pdfimages-margin" class="xp-select">
+            <option value="0">None</option>
+            <option value="10">Small (10 mm)</option>
+            <option value="20">Large (20 mm)</option>
+          </select>
+          <label for="pdfimages-outname">File name</label>
+          <span class="outname"><input type="text" id="pdfimages-outname" class="xp-field" value="pictures" maxlength="60" spellcheck="false" autocomplete="off"><span class="muted">.pdf</span></span>
+        </div>
+        <div class="plan" id="pdfimages-plan" role="status">Add pictures to begin.</div>
+        <button type="button" class="xp-btn is-default big" id="pdfimages-go" disabled>Create PDF and download</button>
+        <div class="note">Pictures are never stretched or cropped. JPG and PNG pictures go into the PDF unchanged, so there is no loss of quality. A picture taken sideways by a phone is turned upright. Use the Turn buttons if a picture still lies on its side.</div>
+      </fieldset>
+    </div>
+  </div>
+
+  <div class="panel" role="tabpanel" id="pdfimages-panel-topics" aria-labelledby="pdfimages-tab-topics" hidden>
+    <div class="toolbar" role="toolbar" aria-label="Actions">
+      <button type="button" class="xp-btn is-default" id="pdfimages-open">Open PDF</button>
+      <input type="file" id="pdfimages-pdffile" accept="application/pdf,.pdf" hidden>
+      <span class="sep" aria-hidden="true"></span>
+      <button type="button" class="xp-btn" id="pdfimages-pclear">Clear</button>
+      <span class="fname" id="pdfimages-pname"></span>
+    </div>
+    <div class="content" id="pdfimages-pcontent">
+      <div class="empty" id="pdfimages-pempty">
+        <p><b>Open a PDF</b>, or drop one onto this window.</p>
+        <p>Every page you choose becomes a picture (PNG or JPG). Several pages come back together in one ZIP file.</p>
+        <p class="muted">The file is read inside your browser. It is not uploaded.</p>
+      </div>
+      <div id="pdfimages-presults" hidden>
+        <fieldset class="opts">
+          <legend>Pictures to make</legend>
+          <div class="optgrid">
+            <label for="pdfimages-pages">Pages</label>
+            <input type="text" id="pdfimages-pages" class="xp-field" placeholder="All pages, or for example 1-3,7" spellcheck="false" autocomplete="off">
+            <label for="pdfimages-fmt">Picture type</label>
+            <select id="pdfimages-fmt" class="xp-select">
+              <option value="png">PNG (sharp, larger)</option>
+              <option value="jpg">JPG (smaller)</option>
+            </select>
+            <label for="pdfimages-dpi">Detail</label>
+            <select id="pdfimages-dpi" class="xp-select">
+              <option value="72">72 dots per inch (small, for screens)</option>
+              <option value="150" selected>150 dots per inch (good for reading)</option>
+              <option value="200">200 dots per inch</option>
+              <option value="300">300 dots per inch (print quality)</option>
+            </select>
+            <label for="pdfimages-q">JPG quality</label>
+            <span class="qrow"><input type="range" id="pdfimages-q" min="50" max="100" value="90" disabled><span id="pdfimages-qv">90</span></span>
+          </div>
+          <div class="plan" id="pdfimages-pplan" role="status">Choose what to make.</div>
+          <div class="gorow">
+            <button type="button" class="xp-btn is-default big" id="pdfimages-pgo" disabled>Make pictures and download</button>
+            <button type="button" class="xp-btn big" id="pdfimages-cancel" hidden>Cancel</button>
+          </div>
+          <div class="note">Each page is drawn on a white background, as it looks on screen. Text stays sharp at 150 dots per inch and above. A page with a very large size may need a lower detail setting.</div>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+
+  <footer class="statusbar" role="status" aria-live="polite">
+    <span class="cell msg" id="pdfimages-status">Ready</span>
+    <span class="cell wide" id="pdfimages-count">Pictures: 0</span>
+  </footer>
+</div>

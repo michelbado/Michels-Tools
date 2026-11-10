@@ -1,0 +1,8 @@
+Michel's Tools
+Copyright 2026 Michel Bado
+
+Licensed under the Apache License, Version 2.0 (see the file LICENSE).
+
+This product includes third-party software, fonts and data in web/vendor/. Each keeps its own licence.
+The list (names, versions, licences, checksums) is sbom.cdx.json; the licence texts are in web/vendor/licenses/
+and web/vendor/pdfjs/standard_fonts/.

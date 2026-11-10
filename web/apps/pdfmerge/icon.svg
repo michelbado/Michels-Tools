@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5A8DF7"/><stop offset="0.5" stop-color="#2860E6"/><stop offset="1" stop-color="#1C4FD9"/></linearGradient>
+    <linearGradient id="red" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0705A"/><stop offset="1" stop-color="#C23A14"/></linearGradient>
+    <linearGradient id="grn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5CC25C"/><stop offset="1" stop-color="#23702A"/></linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="8" fill="url(#bg)" stroke="#0831D9" stroke-width="1.5"/>
+  <path d="M6 7h13a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" fill="#FFFFFF" stroke="#0B3A91"/>
+  <rect x="6" y="10" width="10" height="4" rx="1" fill="url(#red)"/>
+  <path d="M7 17h10M7 20h7" stroke="#9DB3E6" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M29 7h13a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H29a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" fill="#FFFFFF" stroke="#0B3A91"/>
+  <rect x="29" y="10" width="10" height="4" rx="1" fill="url(#red)"/>
+  <path d="M30 17h10M30 20h7" stroke="#9DB3E6" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M13 27v4c0 3 4 3 11 7M35 27v4c0 3-4 3-11 7" fill="none" stroke="#FFD54A" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M15 36h18a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H15a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2z" fill="url(#grn)" stroke="#124A17" stroke-width="1.2"/>
+  <rect x="17" y="38.5" width="10" height="3" rx="1" fill="#FFFFFF"/>
+</svg>
