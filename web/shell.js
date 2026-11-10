@@ -11,7 +11,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "49"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "50"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -459,8 +459,14 @@
     const sub = el("ul", "submenu");
     appsIn(item.folder).forEach(app => sub.append(menuItem(app)));
     const setOpen = open => {
+      if (open) { // one folder at a time, so the menu never grows taller than the screen
+        list.querySelectorAll(".hasSub.open").forEach(o => { if (o !== li) { o.classList.remove("open"); o.querySelector(".folderrow").setAttribute("aria-expanded", "false"); } });
+      }
       li.classList.toggle("open", open);
       row.setAttribute("aria-expanded", String(open));
+      if (open && window.matchMedia("(max-width: 699px)").matches) { // phone: the list scrolls; bring the opened folder to the top of it
+        list.scrollTop += li.getBoundingClientRect().top - list.getBoundingClientRect().top;
+      }
     };
     row.addEventListener("click", () => setOpen(!li.classList.contains("open")));
     row.addEventListener("keydown", e => {

@@ -340,6 +340,9 @@ body {
   left: 100%;
   bottom: -7px; /* the menu sits at the bottom of the screen, so the flyout grows upward */
   width: 250px;
+  max-height: calc(100vh - 56px);
+  max-height: calc(100dvh - 56px);
+  overflow-y: auto;
   z-index: 1;
   border: 1px solid #0831D9;
   border-radius: 0 6px 6px 0;
@@ -395,7 +398,21 @@ body {
   .window .win-body { overflow: auto; border-left-width: 0; border-right-width: 0; }
   .cap.max { display: none; }
   .icon { width: 120px; }
+  .startmenu {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 52px);
+    max-height: calc(100dvh - 52px);
+  }
+  .startmenu > ul {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
   .startmenu .submenu {
+    max-height: none;
+    overflow: visible;
     position: static;
     width: auto;
     border: 0;
