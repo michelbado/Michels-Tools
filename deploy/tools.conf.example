@@ -60,6 +60,14 @@ xmljson = true         # XML & JSON Converter (both directions, with a stated co
 crontab = true         # Crontab Generator (plain-words explanation and next run times of a cron expression)
 chmodcalc = true       # chmod Calculator (permissions as octal, letters and commands; umask)
 colorconv = true       # Color Converter (name, hex, rgb, hsl, hwb; nearest CSS name; contrast)
+jsonfmt = true         # JSON Formatter & Validator (exact formatting, exact error position, repair, path lookup)
+textdiff = true        # Text Compare (line and word differences, unified diff)
+encodetool = true      # Base64 & URL Encoder (Base64, URL, hex, HTML entities, \u escapes)
+hashcalc = true        # Hash & Checksum (MD5, SHA, CRC, HMAC; text or file; compare with a given hash)
+timeconv = true        # Timestamp Converter (Unix time, dates, time zones, Windows/.NET/Excel/Apple epochs)
+passgen = true         # Password & UUID Generator (random passwords, UUID v4/v7, ULID, tokens)
+regextest = true       # Regex Tester (JavaScript regular expressions with a time limit)
+qrcode = true          # QR Code Maker & Reader (Wi-Fi, e-mail, contact and text codes; reads pictures)
 
 # ---- Image Tools (these run in the visitor's browser; no picture is uploaded) ----
 imgexif = true         # Photo Info & Privacy (read, edit and remove hidden camera data such as location; JPEG, PNG, WebP)

@@ -1,0 +1,15 @@
+/* Text Compare: shared look is in xp.css (.tk). */
+.textdiff-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 699px) { .textdiff-two { grid-template-columns: 1fr; } }
+.textdiff-wrap { overflow: auto; max-height: 28rem; border: 1px solid #919B9C; background: #fff; }
+.textdiff-table { border-collapse: collapse; width: 100%; font-family: Consolas, "Courier New", monospace; font-size: 12px; table-layout: fixed; }
+.textdiff-table td { padding: 1px 6px; vertical-align: top; white-space: pre-wrap; overflow-wrap: anywhere; border-bottom: 1px solid #eee; }
+.textdiff-table td.n { width: 3.2rem; text-align: right; color: #7a7a72; background: #F4F3EE; user-select: none; }
+.textdiff-table tr.del td.t.a { background: #FFE3DE; }
+.textdiff-table tr.add td.t.b { background: #DDF4D8; }
+.textdiff-table tr.chg td.t.a { background: #FFF0EC; }
+.textdiff-table tr.chg td.t.b { background: #EEF8EA; }
+.textdiff-table tr.gap td { text-align: center; color: #7a7a72; background: #F4F3EE; font-style: italic; }
+.textdiff-table mark.d { background: #FF9F90; color: inherit; }
+.textdiff-table mark.a { background: #8BD97C; color: inherit; }
+@media (max-width: 699px) { .textdiff-table td.n { width: 2.4rem; } }

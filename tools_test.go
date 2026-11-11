@@ -298,3 +298,34 @@ func TestToolSettings(t *testing.T) {
 		t.Errorf("the error for an unknown setting lists the known ones: %v", err)
 	}
 }
+
+// No two tools may share an id, a title, or the same words in another order ("Crop / Resize Pages" and "Resize / Crop Pages"): a visitor would
+// not know which to choose, and the second one is almost certainly a copy of the first.
+func TestNoDuplicateTools(t *testing.T) {
+	b, err := webFS.ReadFile("web/shell.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	re := regexp.MustCompile(`(?m)^\s*\{ id: "([a-z0-9]+)", title: "([^"]+)", base:`)
+	ids := map[string]bool{}
+	words := map[string]string{}
+	n := 0
+	for _, m := range re.FindAllStringSubmatch(string(b), -1) {
+		n++
+		id, title := m[1], m[2]
+		if ids[id] {
+			t.Errorf("tool id %q appears twice in web/shell.js", id)
+		}
+		ids[id] = true
+		ws := strings.Fields(strings.ToLower(regexp.MustCompile(`[^a-z0-9]+`).ReplaceAllString(title, " ")))
+		sort.Strings(ws)
+		key := strings.Join(ws, " ")
+		if other, ok := words[key]; ok {
+			t.Errorf("tools %q and %q have the same title (or the same words in another order)", other, title)
+		}
+		words[key] = title
+	}
+	if n < 50 {
+		t.Errorf("found only %d tools in web/shell.js; the pattern in this test may be out of date", n)
+	}
+}

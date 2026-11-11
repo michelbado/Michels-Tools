@@ -1,0 +1,51 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Make a QR code</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="qrcode-kind"><b>What is it for?</b>
+          <select id="qrcode-kind" class="xp-select">
+            <option value="text">Text or a web address</option><option value="wifi">Wi-Fi network</option><option value="email">E-mail</option><option value="tel">Phone number</option><option value="sms">Text message</option><option value="vcard">Contact card</option>
+          </select></label>
+      </div>
+      <div id="qrcode-fields"></div>
+      <div class="tk-row">
+        <label class="tk-fld" for="qrcode-ecc"><b>Error correction</b>
+          <select id="qrcode-ecc" class="xp-select"><option value="L">Low (7%): smallest code</option><option value="M" selected>Medium (15%)</option><option value="Q">Quartile (25%)</option><option value="H">High (30%): survives damage or a logo</option></select></label>
+        <label class="tk-fld" for="qrcode-size"><b>Picture size</b>
+          <select id="qrcode-size" class="xp-select"><option value="256">256 pixels</option><option value="384">384 pixels</option><option value="512" selected>512 pixels</option><option value="768">768 pixels</option><option value="1024">1024 pixels</option><option value="2048">2048 pixels</option></select></label>
+        <label class="tk-fld" for="qrcode-margin"><b>Empty border (squares)</b><input type="number" id="qrcode-margin" class="xp-field qrcode-num" min="0" max="10" step="1" value="4"></label>
+      </div>
+      <div class="tk-row">
+        <label class="tk-fld" for="qrcode-fg"><b>Squares</b><input type="color" id="qrcode-fg" value="#000000"></label>
+        <label class="tk-fld" for="qrcode-bg"><b>Background</b><input type="color" id="qrcode-bg" value="#ffffff"></label>
+        <label><input type="checkbox" class="xp-check" id="qrcode-transparent"> Transparent background (PNG and SVG)</label>
+      </div>
+    </fieldset>
+    <ul class="tk-notes" id="qrcode-notes" hidden></ul>
+    <div class="qrcode-out" id="qrcode-outbox" hidden>
+      <canvas id="qrcode-canvas" class="qrcode-canvas" width="10" height="10" aria-label="The QR code"></canvas>
+      <div class="qrcode-side">
+        <p class="tk-summary" id="qrcode-info"></p>
+        <div class="tk-row">
+          <button type="button" class="xp-btn is-default" id="qrcode-png">Download PNG</button>
+          <button type="button" class="xp-btn" id="qrcode-svg">Download SVG</button>
+          <button type="button" class="xp-btn" id="qrcode-copy">Copy the text inside</button>
+        </div>
+        <p class="tk-muted">Test it with your phone's camera before you print or publish it. A code with a long text has small squares and is harder to scan: keep the text short, or use a lower error-correction level.</p>
+      </div>
+    </div>
+    <fieldset>
+      <legend>Read a QR code from a picture</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="qrcode-open">Choose a picture…</button>
+        <input type="file" id="qrcode-file" accept="image/*" hidden>
+        <span class="tk-muted" id="qrcode-fname">A screenshot or a photo that shows the whole code. You can also drop a picture onto this window.</span>
+      </div>
+      <ul class="tk-notes" id="qrcode-rnotes" hidden></ul>
+      <div id="qrcode-result"></div>
+      <div class="tk-row"><button type="button" class="xp-btn" id="qrcode-rcopy" hidden>Copy the text</button></div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="qrcode-status">Ready</span></footer>
+</div>

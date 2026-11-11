@@ -1,0 +1,3 @@
+/* Password & UUID Generator: shared look is in xp.css (.tk). */
+.tk-fld .passgen-num { width: 5rem; }
+.tk-fld .passgen-short { width: 11rem; }

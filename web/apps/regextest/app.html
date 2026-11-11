@@ -1,0 +1,35 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Pattern</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="regextest-pat"><b>Regular expression</b><input type="text" id="regextest-pat" class="xp-field tk-wide regextest-mono" maxlength="2000" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="(\d+)-(\d+)"></label>
+        <label class="tk-fld" for="regextest-ex"><b>Examples</b><select id="regextest-ex" class="xp-select"><option value="">Choose an example…</option></select></label>
+      </div>
+      <div class="tk-row" id="regextest-flags"></div>
+      <p class="tk-muted">JavaScript regular expressions (the kind used in browsers and Node). Other languages (PCRE, Python, .NET) differ in details, for example no atomic groups and no \A \Z here. Matching runs in a separate worker and is stopped after 2 seconds, so a bad pattern cannot freeze this page.</p>
+    </fieldset>
+    <ul class="tk-notes" id="regextest-notes" hidden></ul>
+    <fieldset>
+      <legend>Text to search</legend>
+      <textarea class="xp-text tk-in regextest-mono" id="regextest-text" rows="8" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+    </fieldset>
+    <p class="tk-summary" id="regextest-summary"></p>
+    <fieldset>
+      <legend>Matches in the text</legend>
+      <pre class="tk-pre regextest-hl" id="regextest-hl" aria-label="The text with matches marked"></pre>
+    </fieldset>
+    <div id="regextest-table"></div>
+    <fieldset>
+      <legend>Replace (preview)</legend>
+      <div class="tk-row"><label class="tk-fld" for="regextest-rep"><b>Replace every match with (use $1, $&lt;name&gt;, $&amp;)</b><input type="text" id="regextest-rep" class="xp-field tk-wide regextest-mono" maxlength="1000" autocomplete="off" spellcheck="false"></label></div>
+      <pre class="tk-pre" id="regextest-repout"></pre>
+      <div class="tk-row"><button type="button" class="xp-btn" id="regextest-repcopy" disabled>Copy the replaced text</button></div>
+    </fieldset>
+    <fieldset>
+      <legend>Cheat sheet</legend>
+      <div id="regextest-cheat"></div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="regextest-status">Ready</span></footer>
+</div>

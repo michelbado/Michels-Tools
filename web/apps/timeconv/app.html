@@ -1,0 +1,24 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Type a timestamp or a date</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="timeconv-in"><b>Unix timestamp, ISO date, or e-mail/HTTP date</b>
+          <input type="text" id="timeconv-in" class="xp-field tk-wide" maxlength="80" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="1700000000   or   2024-05-06T07:08:09Z   or   2024-05-06 07:08:09"></label>
+        <button type="button" class="xp-btn" id="timeconv-now">Now</button>
+      </div>
+      <div class="tk-row">
+        <label class="tk-fld" for="timeconv-unit"><b>A number means</b>
+          <select id="timeconv-unit" class="xp-select"><option value="auto">Guess from its size</option><option value="s">Seconds</option><option value="ms">Milliseconds</option><option value="us">Microseconds</option><option value="ns">Nanoseconds</option></select></label>
+        <label class="tk-fld" for="timeconv-zone"><b>Time zone (for dates typed without one, and for the result)</b>
+          <select id="timeconv-zone" class="xp-select timeconv-zone"></select></label>
+      </div>
+      <p class="tk-muted" id="timeconv-clock"></p>
+    </fieldset>
+    <ul class="tk-notes" id="timeconv-notes" hidden></ul>
+    <p class="tk-summary" id="timeconv-summary"></p>
+    <div id="timeconv-out"></div>
+    <div id="timeconv-others"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="timeconv-status">Ready</span></footer>
+</div>

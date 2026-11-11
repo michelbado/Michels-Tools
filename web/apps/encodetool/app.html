@@ -1,0 +1,37 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Choose</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="encodetool-kind"><b>Format</b>
+          <select id="encodetool-kind" class="xp-select">
+            <option value="b64">Base64</option><option value="b64url">Base64 URL-safe</option><option value="pct">URL (percent-encoding)</option><option value="hex">Hexadecimal</option><option value="html">HTML entities</option><option value="uni">\uXXXX escapes</option>
+          </select></label>
+        <label><input type="radio" class="xp-check" name="encodetool-dir" id="encodetool-d1" value="enc" checked> Encode</label>
+        <label><input type="radio" class="xp-check" name="encodetool-dir" id="encodetool-d2" value="dec"> Decode</label>
+      </div>
+      <div class="tk-row" id="encodetool-opts"></div>
+      <p class="tk-muted" id="encodetool-help"></p>
+    </fieldset>
+    <fieldset>
+      <legend id="encodetool-inlegend">Text to encode</legend>
+      <textarea class="xp-text tk-in" id="encodetool-in" rows="8" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="encodetool-open">Use a file instead…</button>
+        <input type="file" id="encodetool-file" hidden>
+        <span class="tk-muted" id="encodetool-fileinfo"></span>
+      </div>
+    </fieldset>
+    <ul class="tk-notes" id="encodetool-notes" hidden></ul>
+    <fieldset>
+      <legend id="encodetool-outlegend">Result</legend>
+      <textarea class="xp-text tk-in" id="encodetool-out" rows="8" readonly spellcheck="false"></textarea>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="encodetool-copy" disabled>Copy result</button>
+        <button type="button" class="xp-btn" id="encodetool-save" disabled>Save as file</button>
+        <button type="button" class="xp-btn" id="encodetool-swap" disabled>Use the result as input (swap direction)</button>
+      </div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="encodetool-status">Ready</span></footer>
+</div>

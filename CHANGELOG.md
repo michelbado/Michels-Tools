@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.2
+
+- **Eight new tools in Engineering Tools** (now fifteen), all running in the browser; nothing typed, pasted or opened is sent anywhere:
+  - **JSON Formatter & Validator** (`jsonfmt`): exact line and column of a mistake in plain words, numbers and strings kept exactly as written, duplicate-key and rounding warnings, repair of the usual mistakes, path lookup.
+  - **Text Compare** (`textdiff`): smallest set of line changes, changed words marked, unified diff to copy or save.
+  - **Base64 & URL Encoder** (`encodetool`): Base64 (standard and URL-safe), percent-encoding, hexadecimal, HTML entities and \u escapes; binary results can be saved as a file.
+  - **Hash & Checksum** (`hashcalc`): MD5, SHA-1/256/384/512, CRC-32, CRC-32C, Adler-32 and HMAC of text or a file, and a check against a hash you were given.
+  - **Timestamp Converter** (`timeconv`): Unix time in any unit, dates, time zones with daylight-saving gaps and repeats explained, and the Windows, .NET, Excel and Apple epochs.
+  - **Password & UUID Generator** (`passgen`): unbiased random passwords, UUID v4 and v7, ULID and tokens.
+  - **Regex Tester** (`regextest`): JavaScript regular expressions with highlighted matches, groups and a replacement preview; matching is stopped after 2 seconds.
+  - **QR Code Maker & Reader** (`qrcode`): codes for text, Wi-Fi, e-mail, phone, SMS and contact cards as PNG or SVG; reads a code from a picture without opening anything.
+- **Upgrading:** the new tools are on unless `tools.conf` lists them as `false`; `deploy/tools.conf.example` shows their names.
+- A test now fails if two tools share an id or a title.
+
 ## 1.0.1
 
 - **New tools**, all of which run in the browser and only read what you paste or type (nothing is sent anywhere):

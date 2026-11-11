@@ -1,0 +1,5 @@
+/* QR Code: shared look is in xp.css (.tk). */
+.tk-fld .qrcode-num { width: 5rem; }
+.qrcode-out { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-start; margin-bottom: 10px; }
+.qrcode-canvas { display: block; max-width: 100%; width: 300px; height: auto; border: 1px solid #919B9C; image-rendering: pixelated; background-color: #fff; background-image: linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%), linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%); background-size: 12px 12px; background-position: 0 0, 6px 6px; }
+.qrcode-side { flex: 1 1 280px; min-width: 0; }

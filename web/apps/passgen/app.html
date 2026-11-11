@@ -1,0 +1,36 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Password</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="passgen-len"><b>Length <span id="passgen-lenv">20</span></b><input type="range" id="passgen-len" min="4" max="128" step="1" value="20"></label>
+        <label class="tk-fld" for="passgen-count"><b>How many</b><input type="number" id="passgen-count" class="xp-field passgen-num" min="1" max="20" step="1" value="5"></label>
+      </div>
+      <div class="tk-row">
+        <label><input type="checkbox" class="xp-check" id="passgen-lower" checked> a-z</label>
+        <label><input type="checkbox" class="xp-check" id="passgen-upper" checked> A-Z</label>
+        <label><input type="checkbox" class="xp-check" id="passgen-digits" checked> 0-9</label>
+        <label><input type="checkbox" class="xp-check" id="passgen-symbols" checked> Symbols</label>
+        <label><input type="checkbox" class="xp-check" id="passgen-amb"> Leave out look-alikes (O 0 l 1 I)</label>
+      </div>
+      <div class="tk-row">
+        <label class="tk-fld" for="passgen-custom"><b>Extra characters to allow</b><input type="text" id="passgen-custom" class="xp-field passgen-short" maxlength="60" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="passgen-excl"><b>Characters never to use</b><input type="text" id="passgen-excl" class="xp-field passgen-short" maxlength="60" autocomplete="off" spellcheck="false"></label>
+        <button type="button" class="xp-btn is-default" id="passgen-go">Generate again</button>
+      </div>
+      <ul class="tk-notes" id="passgen-notes" hidden></ul>
+      <div id="passgen-pw"></div>
+      <p class="tk-muted" id="passgen-rating"></p>
+      <p class="tk-muted">Made in your browser with its secure random generator. Nothing is sent or saved. Use a different password for every account, and keep them in a password manager. Anything you copy goes to the clipboard, which other programs on the computer may be able to read.</p>
+    </fieldset>
+    <fieldset>
+      <legend>Identifiers and tokens</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="passgen-ids">Generate new ones</button>
+        <label class="tk-fld" for="passgen-tokbytes"><b>Token size</b><select id="passgen-tokbytes" class="xp-select"><option value="16">16 bytes (128 bits)</option><option value="32" selected>32 bytes (256 bits)</option><option value="64">64 bytes (512 bits)</option></select></label>
+      </div>
+      <div id="passgen-idout"></div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="passgen-status">Ready</span></footer>
+</div>

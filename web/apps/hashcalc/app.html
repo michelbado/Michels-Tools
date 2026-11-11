@@ -1,0 +1,48 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>What to check</legend>
+      <div class="tk-row">
+        <label><input type="radio" class="xp-check" name="hashcalc-src" id="hashcalc-s1" value="text" checked> Some text</label>
+        <label><input type="radio" class="xp-check" name="hashcalc-src" id="hashcalc-s2" value="file"> A file</label>
+      </div>
+      <div id="hashcalc-textbox">
+        <textarea class="xp-text tk-in" id="hashcalc-in" rows="5" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Type or paste text. It is hashed as UTF-8, exactly as typed (a line break counts as one character)."></textarea>
+      </div>
+      <div id="hashcalc-filebox" class="tk-row" hidden>
+        <button type="button" class="xp-btn" id="hashcalc-open">Choose a file…</button>
+        <input type="file" id="hashcalc-file" hidden>
+        <span class="tk-muted" id="hashcalc-fileinfo">Files up to 200 MB. The file is read in your browser and never uploaded.</span>
+      </div>
+      <div class="tk-row">
+        <b>Algorithms</b>
+        <label><input type="checkbox" class="xp-check hashcalc-alg" value="MD5" checked> MD5</label>
+        <label><input type="checkbox" class="xp-check hashcalc-alg" value="SHA-1" checked> SHA-1</label>
+        <label><input type="checkbox" class="xp-check hashcalc-alg" value="SHA-256" checked> SHA-256</label>
+        <label><input type="checkbox" class="xp-check hashcalc-alg" value="SHA-384"> SHA-384</label>
+        <label><input type="checkbox" class="xp-check hashcalc-alg" value="SHA-512" checked> SHA-512</label>
+        <label><input type="checkbox" class="xp-check hashcalc-alg" value="CRC-32" checked> CRC-32</label>
+        <label><input type="checkbox" class="xp-check hashcalc-alg" value="CRC-32C"> CRC-32C</label>
+        <label><input type="checkbox" class="xp-check hashcalc-alg" value="Adler-32"> Adler-32</label>
+        <label><input type="checkbox" class="xp-check" id="hashcalc-upper"> Capital letters</label>
+      </div>
+    </fieldset>
+    <ul class="tk-notes" id="hashcalc-notes" hidden></ul>
+    <div id="hashcalc-out"></div>
+    <fieldset>
+      <legend>Does it match? Paste the hash you were given</legend>
+      <div class="tk-row"><label class="tk-fld" for="hashcalc-expect"><b>Expected hash (spaces, colons, a name in front, or Base64 are fine)</b>
+        <input type="text" id="hashcalc-expect" class="xp-field tk-wide" maxlength="300" autocomplete="off" spellcheck="false" placeholder="e3b0c44298fc1c149afbf4c8996fb924..."></label></div>
+      <p class="tk-summary" id="hashcalc-verdict"></p>
+    </fieldset>
+    <fieldset>
+      <legend>HMAC (a hash with a secret key)</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="hashcalc-hkey"><b>Secret key (as text)</b><input type="text" id="hashcalc-hkey" class="xp-field tk-wide" maxlength="500" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="hashcalc-halg"><b>Algorithm</b><select id="hashcalc-halg" class="xp-select"><option>SHA-256</option><option>SHA-1</option><option>SHA-384</option><option>SHA-512</option><option>MD5</option></select></label>
+      </div>
+      <div id="hashcalc-hout"></div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="hashcalc-status">Ready</span></footer>
+</div>

@@ -1,0 +1,8 @@
+/* Regex Tester: shared look is in xp.css (.tk). */
+.regextest-mono { font-family: Consolas, "Courier New", monospace; }
+.regextest-hl { max-height: 18rem; }
+.regextest-hl mark { padding: 0; color: inherit; }
+.regextest-hl mark.m0 { background: #FFE27A; }
+.regextest-hl mark.m1 { background: #A8D8FF; }
+.regextest-hl mark.empty { background: #F59A3A; padding: 0 1px; }
+.tk-table td .tk-hint { white-space: pre-wrap; }

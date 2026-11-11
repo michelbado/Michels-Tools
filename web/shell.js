@@ -11,7 +11,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "57"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "58"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -52,6 +52,14 @@
     { id: "crontab", title: "Crontab Generator", base: "apps/crontab/", folder: "engineering", deps: ["lib/tk.js", "lib/crontab.js"], size: { w: 1000, h: 800 } },
     { id: "chmodcalc", title: "chmod Calculator", base: "apps/chmodcalc/", folder: "engineering", deps: ["lib/tk.js", "lib/chmodcalc.js"], size: { w: 960, h: 800 } },
     { id: "colorconv", title: "Color Converter", base: "apps/colorconv/", folder: "engineering", deps: ["lib/tk.js", "lib/colorconv.js"], size: { w: 960, h: 780 } },
+    { id: "jsonfmt", title: "JSON Formatter & Validator", base: "apps/jsonfmt/", folder: "engineering", deps: ["lib/tk.js", "lib/jsonfmt.js"], size: { w: 1000, h: 800 } },
+    { id: "textdiff", title: "Text Compare", base: "apps/textdiff/", folder: "engineering", deps: ["lib/tk.js", "lib/textdiff.js"], size: { w: 1100, h: 800 } },
+    { id: "encodetool", title: "Base64 & URL Encoder", base: "apps/encodetool/", folder: "engineering", deps: ["lib/tk.js", "lib/encodetool.js"], size: { w: 960, h: 780 } },
+    { id: "hashcalc", title: "Hash & Checksum", base: "apps/hashcalc/", folder: "engineering", deps: ["lib/tk.js", "lib/encodetool.js", "lib/softcrypto.js", "lib/hashcalc.js"], size: { w: 980, h: 800 } },
+    { id: "timeconv", title: "Timestamp Converter", base: "apps/timeconv/", folder: "engineering", deps: ["lib/tk.js", "lib/timeconv.js"], size: { w: 980, h: 800 } },
+    { id: "passgen", title: "Password & UUID Generator", base: "apps/passgen/", folder: "engineering", deps: ["lib/tk.js", "lib/passgen.js"], size: { w: 900, h: 780 } },
+    { id: "regextest", title: "Regex Tester", base: "apps/regextest/", folder: "engineering", deps: ["lib/tk.js", "lib/regextest.js"], size: { w: 1000, h: 800 } },
+    { id: "qrcode", title: "QR Code Maker & Reader", base: "apps/qrcode/", folder: "engineering", deps: ["lib/tk.js", "lib/qrcode.js"], size: { w: 1000, h: 800 } },
     { id: "imgexif", title: "Photo Info & Privacy (EXIF)", base: "apps/imgexif/", folder: "images", deps: ["lib/tk.js", "lib/exif.js"], size: { w: 980, h: 780 } },
     { id: "imgresize", title: "Resize / Crop", base: "apps/imgresize/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js"], size: { w: 1100, h: 780 } },
     { id: "imgblur", title: "Blur / Redact", base: "apps/imgblur/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js", "lib/imgproc.js"], size: { w: 1100, h: 780 } },

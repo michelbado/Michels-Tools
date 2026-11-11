@@ -1,0 +1,36 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Compare</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="textdiff-space"><b>White space</b>
+          <select id="textdiff-space" class="xp-select"><option value="none">Count it</option><option value="trim">Ignore at the start and end of lines</option><option value="collapse">Treat several spaces as one</option><option value="all">Ignore it completely</option></select></label>
+        <label><input type="checkbox" class="xp-check" id="textdiff-case"> Ignore capital letters</label>
+        <label><input type="checkbox" class="xp-check" id="textdiff-words" checked> Mark the changed words</label>
+        <label><input type="checkbox" class="xp-check" id="textdiff-only"> Show only the changes (with 3 lines around them)</label>
+      </div>
+      <p class="tk-muted">Paste two texts, or open two files. The tool finds the smallest set of line changes and marks what is different. Everything is done in your browser; nothing is sent anywhere.</p>
+    </fieldset>
+    <div class="textdiff-two">
+      <fieldset>
+        <legend>Original</legend>
+        <textarea class="xp-text tk-in" id="textdiff-a" rows="9" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Original text"></textarea>
+        <div class="tk-row"><button type="button" class="xp-btn" id="textdiff-opena">Open a file…</button><input type="file" id="textdiff-filea" hidden></div>
+      </fieldset>
+      <fieldset>
+        <legend>Changed</legend>
+        <textarea class="xp-text tk-in" id="textdiff-b" rows="9" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Changed text"></textarea>
+        <div class="tk-row"><button type="button" class="xp-btn" id="textdiff-openb">Open a file…</button><input type="file" id="textdiff-fileb" hidden></div>
+      </fieldset>
+    </div>
+    <div class="tk-row">
+      <button type="button" class="xp-btn" id="textdiff-swap">Swap the two texts</button>
+      <button type="button" class="xp-btn" id="textdiff-copy" disabled>Copy as a unified diff</button>
+      <button type="button" class="xp-btn" id="textdiff-save" disabled>Save the unified diff</button>
+    </div>
+    <ul class="tk-notes" id="textdiff-notes" hidden></ul>
+    <p class="tk-summary" id="textdiff-summary"></p>
+    <div class="textdiff-wrap"><table class="textdiff-table" id="textdiff-table" aria-label="Differences"></table></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="textdiff-status">Ready</span></footer>
+</div>

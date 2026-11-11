@@ -1,0 +1,45 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Layout</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="jsonfmt-indent"><b>Output</b>
+          <select id="jsonfmt-indent" class="xp-select"><option value="2">Indented (2 spaces)</option><option value="4">Indented (4 spaces)</option><option value="tab">Indented (tab)</option><option value="0">Compact (one line)</option></select></label>
+        <label><input type="checkbox" class="xp-check" id="jsonfmt-sort"> Sort keys (A to Z)</label>
+        <button type="button" class="xp-btn" id="jsonfmt-open">Open a file…</button>
+        <input type="file" id="jsonfmt-file" accept=".json,.jsonl,.txt,application/json,text/plain" hidden>
+        <button type="button" class="xp-btn" id="jsonfmt-clear">Clear</button>
+      </div>
+      <p class="tk-muted">Checks that the text is valid JSON, shows exactly where a mistake is, and lays the text out. Numbers and strings are kept exactly as written (a 20-digit number is not rounded). Everything is done in your browser; nothing is sent anywhere.</p>
+    </fieldset>
+    <fieldset>
+      <legend>Your JSON</legend>
+      <textarea class="xp-text tk-in" id="jsonfmt-in" rows="11" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder='{"name": "Ann", "tags": ["a", "b"], "active": true}'></textarea>
+    </fieldset>
+    <ul class="tk-notes" id="jsonfmt-notes" hidden></ul>
+    <div class="tk-row" id="jsonfmt-fixrow" hidden>
+      <button type="button" class="xp-btn" id="jsonfmt-goto">Go to the mistake</button>
+      <button type="button" class="xp-btn" id="jsonfmt-repair">Try to repair it</button>
+      <span class="tk-muted" id="jsonfmt-repairnote"></span>
+    </div>
+    <fieldset>
+      <legend>Result</legend>
+      <p class="tk-summary" id="jsonfmt-summary"></p>
+      <textarea class="xp-text tk-in" id="jsonfmt-out" rows="11" readonly spellcheck="false"></textarea>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="jsonfmt-copy" disabled>Copy result</button>
+        <button type="button" class="xp-btn" id="jsonfmt-save" disabled>Save as file</button>
+        <button type="button" class="xp-btn" id="jsonfmt-use" disabled>Use the result as input</button>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Find a value by its path</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="jsonfmt-path"><b>Path (for example $.users[0].name)</b>
+          <input type="text" id="jsonfmt-path" class="xp-field tk-wide" maxlength="300" autocomplete="off" spellcheck="false" placeholder="$.users[0].name"></label>
+      </div>
+      <pre class="tk-pre" id="jsonfmt-pathout"></pre>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="jsonfmt-status">Ready</span></footer>
+</div>
