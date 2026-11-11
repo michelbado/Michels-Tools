@@ -1,0 +1,5 @@
+/* Favicon & Icon Generator: shared look is in xp.css (.tk and .imgtk-*). */
+.imgfavicon-prev { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+.imgfavicon-prev figure { margin: 0; text-align: center; font-size: 11px; color: var(--muted); }
+.imgfavicon-prev canvas { display: block; margin: 0 auto 3px; border: 1px solid #919B9C; max-width: 100%; height: auto; background-color: #fff; background-image: linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%), linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%); background-size: 8px 8px; background-position: 0 0, 4px 4px; }
+.imgfavicon-snip { width: 100%; box-sizing: border-box; font-family: Consolas, "Courier New", monospace; font-size: 12px; }

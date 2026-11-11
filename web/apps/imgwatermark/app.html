@@ -1,0 +1,75 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Picture</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="imgwatermark-open">Open a picture…</button>
+        <input type="file" id="imgwatermark-file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp" hidden>
+        <span class="tk-muted" id="imgwatermark-name">JPEG, PNG, WebP, GIF or BMP. You can also drop a picture onto this window.</span>
+      </div>
+      <p class="tk-muted">Put your name, a copyright line or a logo on a picture. It all happens in your browser: nothing is uploaded and your original file is never touched. The saved copy carries no hidden camera data. A visible mark can be cropped out by someone determined: a mark across the middle or a tiled mark is harder to remove than one in a corner.</p>
+    </fieldset>
+    <ul class="tk-notes" id="imgwatermark-notes" hidden></ul>
+    <div id="imgwatermark-work" hidden>
+      <div class="imgtk-grid">
+        <div class="imgtk-main">
+          <canvas id="imgwatermark-canvas" class="imgtk-canvas" width="10" height="10" aria-label="The picture with the mark"></canvas>
+        </div>
+        <div class="imgtk-side">
+          <fieldset>
+            <legend>1. The mark</legend>
+            <label class="imgtk-opt"><input type="radio" name="imgwatermark-kind" value="text" checked> Text</label>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgwatermark-text"><b>Text</b><input type="text" id="imgwatermark-text" class="xp-field" maxlength="200" value="© Your name" autocomplete="off" spellcheck="false"></label>
+              <label class="tk-fld" for="imgwatermark-font"><b>Letters</b><select id="imgwatermark-font" class="xp-field imgtk-short"><option value="sans">Sans-serif</option><option value="serif">Serif</option><option value="mono">Typewriter</option></select></label>
+            </div>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgwatermark-color"><b>Colour</b><input type="color" id="imgwatermark-color" value="#ffffff"></label>
+              <label class="imgtk-opt"><input type="checkbox" id="imgwatermark-outline" checked> Outline (readable on any picture)</label>
+            </div>
+            <label class="imgtk-opt"><input type="radio" name="imgwatermark-kind" value="logo"> A logo picture</label>
+            <div class="tk-row">
+              <button type="button" class="xp-btn" id="imgwatermark-openlogo">Choose the logo…</button>
+              <input type="file" id="imgwatermark-logofile" accept="image/png,image/jpeg,image/webp,image/gif,.png,.jpg,.jpeg,.webp,.gif" hidden>
+              <span class="tk-muted" id="imgwatermark-logoname">A PNG with a transparent background looks best.</span>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>2. Where, how big</legend>
+            <div class="tk-row">
+              <div class="imgtk-pos" role="radiogroup" aria-label="Position">
+                <label><input type="radio" name="imgwatermark-pos" value="tl"><span title="Top left">↖</span></label>
+                <label><input type="radio" name="imgwatermark-pos" value="tc"><span title="Top centre">↑</span></label>
+                <label><input type="radio" name="imgwatermark-pos" value="tr"><span title="Top right">↗</span></label>
+                <label><input type="radio" name="imgwatermark-pos" value="ml"><span title="Middle left">←</span></label>
+                <label><input type="radio" name="imgwatermark-pos" value="mc"><span title="Centre">●</span></label>
+                <label><input type="radio" name="imgwatermark-pos" value="mr"><span title="Middle right">→</span></label>
+                <label><input type="radio" name="imgwatermark-pos" value="bl"><span title="Bottom left">↙</span></label>
+                <label><input type="radio" name="imgwatermark-pos" value="bc"><span title="Bottom centre">↓</span></label>
+                <label><input type="radio" name="imgwatermark-pos" value="br" checked><span title="Bottom right">↘</span></label>
+              </div>
+              <label class="imgtk-opt"><input type="checkbox" id="imgwatermark-tile"> Repeat across the whole picture</label>
+            </div>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgwatermark-size"><b>Size <span id="imgwatermark-sizev">8</span>%</b><input type="range" id="imgwatermark-size" min="2" max="80" step="1" value="8"></label>
+              <label class="tk-fld" for="imgwatermark-opacity"><b>Strength <span id="imgwatermark-opacityv">70</span>%</b><input type="range" id="imgwatermark-opacity" min="5" max="100" step="1" value="70"></label>
+              <label class="tk-fld" for="imgwatermark-angle"><b>Turn <span id="imgwatermark-anglev">0</span>°</b><input type="range" id="imgwatermark-angle" min="-90" max="90" step="1" value="0"></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>3. Save as</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgwatermark-fmt"><b>Type</b><select id="imgwatermark-fmt" class="xp-field"><option value="jpeg">JPEG</option><option value="png">PNG</option><option value="webp">WebP</option></select></label>
+              <label class="tk-fld" for="imgwatermark-q" id="imgwatermark-qlab"><b>Quality <span id="imgwatermark-qv">90</span></b><input type="range" id="imgwatermark-q" min="30" max="100" step="1" value="90"></label>
+            </div>
+          </fieldset>
+          <div class="tk-row">
+            <button type="button" class="xp-btn is-default" id="imgwatermark-save">Save picture</button>
+            <span class="tk-muted" id="imgwatermark-done"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="imgwatermark-status">Ready</span></footer>
+</div>

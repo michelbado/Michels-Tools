@@ -1,0 +1,22 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Colour</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="colorconv-in"><b>Type a colour in any form</b>
+          <input type="text" id="colorconv-in" class="xp-field tk-wide" value="tomato" maxlength="80" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="tomato, #ff6347, rgb(255 99 71), hsl(9 100% 64%), hwb(9 28% 0%)"></label>
+        <label class="tk-fld" for="colorconv-pick"><b>or pick one</b>
+          <input type="color" id="colorconv-pick" class="colorconv-pick" value="#ff6347"></label>
+      </div>
+      <div class="colorconv-swatch" id="colorconv-swatch" role="img" aria-label="The colour"><span id="colorconv-sample">Sample text on this colour</span></div>
+      <p class="tk-muted">Understands names (148 CSS colour names), hex with 3, 4, 6 or 8 digits (with or without #), rgb(), hsl(), hwb() with commas or spaces, percentages, units like 0.5turn, and an alpha value. Everything is worked out in your browser.</p>
+    </fieldset>
+    <ul class="tk-notes" id="colorconv-notes" hidden></ul>
+    <div id="colorconv-out"></div>
+    <fieldset>
+      <legend>CSS colour names (click one)</legend>
+      <div class="colorconv-names" id="colorconv-names"></div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="colorconv-status">Ready</span></footer>
+</div>

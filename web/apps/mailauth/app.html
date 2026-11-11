@@ -1,0 +1,20 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>DNS text records (TXT)</legend>
+      <textarea class="xp-text tk-in" id="mailauth-in" rows="8" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="v=spf1 include:_spf.example.net -all&#10;v=DMARC1; p=quarantine; rua=mailto:dmarc@example.com&#10;v=DKIM1; k=rsa; p=MIIBIjANBgkq..."></textarea>
+      <div class="tk-row">
+        <label class="tk-fld" for="mailauth-domain"><b>Your domain (optional)</b>
+          <input type="text" id="mailauth-domain" class="xp-field" maxlength="253" placeholder="example.com" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="mailauth-selector"><b>DKIM selector (optional)</b>
+          <input type="text" id="mailauth-selector" class="xp-field" maxlength="63" placeholder="mail2026" autocomplete="off" spellcheck="false"></label>
+        <button type="button" class="xp-btn" id="mailauth-copy" disabled>Copy as text</button>
+      </div>
+      <p class="tk-muted">Paste one or several records: SPF (starts with v=spf1), DMARC (v=DMARC1) or a DKIM key (a p= tag). Quotes, split strings and zone-file lines are fine. The tool explains each part in plain words and points out mistakes. It cannot look anything up: it works only on what you paste, nothing is sent anywhere, and SPF "include" records are not followed (so the lookup count is a lower bound). To see the records of a domain, run <b>dig TXT example.com</b>, <b>dig TXT _dmarc.example.com</b> or <b>dig TXT selector._domainkey.example.com</b>, or ask your DNS provider.</p>
+    </fieldset>
+    <div class="tk-summary" id="mailauth-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="mailauth-notes" hidden></ul>
+    <div id="mailauth-out"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="mailauth-status">Ready</span></footer>
+</div>

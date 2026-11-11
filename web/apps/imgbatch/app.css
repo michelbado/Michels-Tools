@@ -1,0 +1,6 @@
+/* Batch Pictures: shared look is in xp.css (.tk and .imgtk-*). */
+.imgbatch-list td { padding: 3px 6px 3px 0; vertical-align: top; overflow-wrap: anywhere; }
+.imgbatch-list td.imgbatch-size { white-space: nowrap; color: var(--muted); text-align: right; }
+.imgbatch-list tr.ok td.imgbatch-st { color: #1F4A12; }
+.imgbatch-list tr.bad td.imgbatch-st { color: #7A1F06; }
+.imgbatch-list button { padding: 0 6px; }

@@ -77,8 +77,8 @@ func TestHiddenList(t *testing.T) {
 		t.Errorf("hidden = %v", got)
 	}
 	// switching off every tool of a folder hides the folder too
-	all := "subnet=false\nsplitter=false\nchecker=false\naggregator=false\nipv6calc=false\nipconv=false\nmaclookup=false\nportref=false\ncertdecode=false\nmailhdr=false\n"
-	if got := mustParse(t, all).hidden(); !reflect.DeepEqual(got, []string{"aggregator", "certdecode", "checker", "ipconv", "ipv6calc", "maclookup", "mailhdr", "network", "portref", "splitter", "subnet"}) {
+	all := "subnet=false\nsplitter=false\nchecker=false\naggregator=false\nipv6calc=false\nipconv=false\nmaclookup=false\nportref=false\ncertdecode=false\nmailhdr=false\nmailauth=false\nmtucalc=false\n"
+	if got := mustParse(t, all).hidden(); !reflect.DeepEqual(got, []string{"aggregator", "certdecode", "checker", "ipconv", "ipv6calc", "maclookup", "mailauth", "mailhdr", "mtucalc", "network", "portref", "splitter", "subnet"}) {
 		t.Errorf("hidden with the whole folder off = %v", got)
 	}
 	if s := ts.toolsScript(); s != "window.TOOLS_OFF=[\"aggregator\",\"pdfimages\"];\n" {

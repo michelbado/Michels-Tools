@@ -1,0 +1,24 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Create a Basic Authorization header</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="basicauth-user"><b>User name</b>
+          <input type="text" id="basicauth-user" class="xp-field" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+        <label class="tk-fld" for="basicauth-pass"><b>Password</b>
+          <input type="password" id="basicauth-pass" class="xp-field" autocomplete="new-password" spellcheck="false" autocapitalize="off"></label>
+        <label><input type="checkbox" class="xp-check" id="basicauth-show"> Show the password</label>
+      </div>
+      <p class="tk-muted">Basic authentication sends "user:password" as Base64 text. <b>Base64 is not encryption</b>: anyone who sees the header can read the password, so use it only over https. Use a test account here, not a real password. Nothing is sent anywhere.</p>
+    </fieldset>
+    <ul class="tk-notes" id="basicauth-notes" hidden></ul>
+    <div id="basicauth-out"></div>
+    <fieldset>
+      <legend>Read a Basic Authorization header</legend>
+      <textarea class="xp-text tk-in" id="basicauth-in" rows="3" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="></textarea>
+      <ul class="tk-notes" id="basicauth-dnotes" hidden></ul>
+      <div id="basicauth-dout"></div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="basicauth-status">Ready</span></footer>
+</div>

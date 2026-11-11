@@ -1,0 +1,63 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Picture</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="imgfavicon-open">Open a picture…</button>
+        <input type="file" id="imgfavicon-file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp" hidden>
+        <span class="tk-muted" id="imgfavicon-name">A square logo of at least 512 × 512 pixels works best. You can also drop a picture onto this window.</span>
+      </div>
+      <p class="tk-muted">Makes the small icons a website needs (browser tab, phone home screen) from one picture: <b>favicon.ico</b>, the PNG sizes, an Apple touch icon, a web manifest and the lines to paste into your page. Everything is made in your browser and downloaded as one ZIP; nothing is uploaded.</p>
+    </fieldset>
+    <ul class="tk-notes" id="imgfavicon-notes" hidden></ul>
+    <div id="imgfavicon-work" hidden>
+      <div class="imgtk-grid">
+        <div class="imgtk-main">
+          <fieldset>
+            <legend>Preview</legend>
+            <div class="imgfavicon-prev" id="imgfavicon-prev"></div>
+          </fieldset>
+          <fieldset>
+            <legend>Paste this into the head of your page</legend>
+            <textarea id="imgfavicon-snippet" class="xp-field imgfavicon-snip" rows="8" readonly spellcheck="false" aria-label="HTML lines for the icons"></textarea>
+            <div class="tk-row"><button type="button" class="xp-btn" id="imgfavicon-copy">Copy</button></div>
+            <p class="tk-muted">Put all the files from the ZIP in the top folder of your website (the paths above start with a slash).</p>
+          </fieldset>
+        </div>
+        <div class="imgtk-side">
+          <fieldset>
+            <legend>1. Shape</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgfavicon-fit"><b>How the picture fills the square</b>
+                <select id="imgfavicon-fit" class="xp-field"><option value="fit">Show the whole picture (space around it)</option><option value="crop">Fill the square (cut the long sides)</option></select></label>
+              <label class="tk-fld" for="imgfavicon-shape"><b>Outline</b>
+                <select id="imgfavicon-shape" class="xp-field imgtk-short"><option value="square">Square</option><option value="rounded">Rounded corners</option><option value="circle">Circle</option></select></label>
+            </div>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgfavicon-pad"><b>Space around <span id="imgfavicon-padv">8</span>%</b><input type="range" id="imgfavicon-pad" min="0" max="40" step="1" value="8"></label>
+            </div>
+            <div class="tk-row">
+              <label class="imgtk-opt"><input type="checkbox" id="imgfavicon-transparent" checked> Transparent background</label>
+              <label class="tk-fld" for="imgfavicon-bg"><b>or this colour</b><input type="color" id="imgfavicon-bg" value="#ffffff"></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>2. For the web manifest</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgfavicon-appname"><b>Site name</b><input type="text" id="imgfavicon-appname" class="xp-field" maxlength="60" value="My site" autocomplete="off" spellcheck="false"></label>
+              <label class="tk-fld" for="imgfavicon-short"><b>Short name</b><input type="text" id="imgfavicon-short" class="xp-field imgtk-short" maxlength="20" value="My site" autocomplete="off" spellcheck="false"></label>
+              <label class="tk-fld" for="imgfavicon-theme"><b>Theme colour</b><input type="color" id="imgfavicon-theme" value="#ffffff"></label>
+            </div>
+          </fieldset>
+          <div class="tk-row">
+            <button type="button" class="xp-btn is-default" id="imgfavicon-zip">Download everything (ZIP)</button>
+            <button type="button" class="xp-btn" id="imgfavicon-ico">Download favicon.ico only</button>
+          </div>
+          <p class="tk-muted" id="imgfavicon-done"></p>
+          <p class="tk-muted">The ZIP holds: <span id="imgfavicon-list"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="imgfavicon-status">Ready</span></footer>
+</div>

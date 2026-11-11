@@ -1,0 +1,47 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>The link</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="mtucalc-link"><b>Link MTU (bytes)</b>
+          <input type="text" id="mtucalc-link" class="xp-field" inputmode="numeric" maxlength="5" value="1500" autocomplete="off"></label>
+        <label class="tk-fld" for="mtucalc-inner"><b>Traffic you carry</b>
+          <select id="mtucalc-inner" class="xp-select"><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
+        <label class="tk-fld" for="mtucalc-under"><b>Tunnels run over</b>
+          <select id="mtucalc-under" class="xp-select"><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
+      </div>
+      <p class="tk-muted">The link MTU is the largest packet the physical link carries: 1500 on normal Ethernet, 9000 or more on a jumbo-frame network. "Traffic you carry" is the kind of packets whose size you want to know; "Tunnels run over" is the kind of packets the tunnels themselves travel in.</p>
+    </fieldset>
+    <fieldset>
+      <legend>What the packet goes through, outermost layer first</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="mtucalc-l1"><b>Layer 1</b><select id="mtucalc-l1" class="xp-select"></select></label>
+        <label class="tk-fld" for="mtucalc-l2"><b>Layer 2</b><select id="mtucalc-l2" class="xp-select"></select></label>
+        <label class="tk-fld" for="mtucalc-l3"><b>Layer 3</b><select id="mtucalc-l3" class="xp-select"></select></label>
+      </div>
+      <div class="tk-row">
+        <label><input type="checkbox" class="xp-check" id="mtucalc-natt"> IPsec behind NAT (NAT-T: ESP inside UDP)</label>
+        <label><input type="checkbox" class="xp-check" id="mtucalc-transport"> IPsec in transport mode (default is tunnel mode)</label>
+        <label class="tk-fld" for="mtucalc-extra"><b>Other overhead (bytes)</b>
+          <input type="text" id="mtucalc-extra" class="xp-field" inputmode="numeric" maxlength="4" value="0" autocomplete="off"></label>
+      </div>
+      <p class="tk-muted">Pick the layers in the order the packet meets them on its way out. IPsec padding changes with the packet size, so for IPsec the result is the largest packet that still fits. This is arithmetic only: nothing is read from your device or network, and nothing is sent anywhere.</p>
+    </fieldset>
+    <div class="tk-summary" id="mtucalc-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="mtucalc-notes" hidden></ul>
+    <div id="mtucalc-sections"></div>
+    <fieldset>
+      <legend>I ran a ping test: what does it tell me?</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="mtucalc-ping"><b>Largest payload that got an answer (bytes)</b>
+          <input type="text" id="mtucalc-ping" class="xp-field" inputmode="numeric" maxlength="5" placeholder="e.g. 1372" autocomplete="off"></label>
+        <label class="tk-fld" for="mtucalc-pingv"><b>Test was over</b>
+          <select id="mtucalc-pingv" class="xp-select"><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
+      </div>
+      <p class="tk-muted">Send pings with "do not fragment" set and raise the size until they stop being answered; enter the largest size that worked. The commands are shown above.</p>
+      <div id="mtucalc-pingout"></div>
+    </fieldset>
+    <div id="mtucalc-ref"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="mtucalc-status">Ready</span></footer>
+</div>

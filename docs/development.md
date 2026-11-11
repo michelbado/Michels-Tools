@@ -58,7 +58,7 @@ SBOM; `go test` fails if a file and its entry disagree, if a licence text is mis
 - **vendored libraries:** the libraries in `web/vendor` are copied files that dependency tools cannot see, so the SBOM (`sbom.cdx.json`)
   is scanned against the open vulnerability database (osv.dev); `osv-scanner.toml` leaves the Go standard library to `govulncheck`.
 
-The workflow has no secrets and a read-only token, and each action is pinned to an exact commit and the runner image is fixed (`ubuntu-24.04`); update them deliberately.
+The workflow has no secrets and a read-only token. Each action is pinned to an exact commit and the runner image is fixed (`ubuntu-24.04`), so a result cannot change without a change in this repository.
 A failing run emails the repository owner. A vulnerable vendored library means: update the file and its SBOM entry (see above).
 
 ## Keeping this guide true

@@ -1,0 +1,67 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Pictures</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="imgbatch-open">Add pictures…</button>
+        <input type="file" id="imgbatch-file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp" multiple hidden>
+        <button type="button" class="xp-btn" id="imgbatch-clear" disabled>Remove all</button>
+        <span class="tk-muted" id="imgbatch-count">No pictures yet. You can also drop pictures onto this window.</span>
+      </div>
+      <p class="tk-muted">Do the same thing to many pictures and download them in one ZIP: shrink them, change their type, remove location and other hidden data, or put a text mark on them. Everything happens in your browser: nothing is uploaded and your original files are never touched. Up to 200 pictures, 60 MB each.</p>
+    </fieldset>
+    <ul class="tk-notes" id="imgbatch-notes" hidden></ul>
+    <div id="imgbatch-work" hidden>
+      <div class="imgtk-grid">
+        <div class="imgtk-main">
+          <fieldset>
+            <legend>List</legend>
+            <table class="tk-table imgbatch-list"><tbody id="imgbatch-rows"></tbody></table>
+          </fieldset>
+        </div>
+        <div class="imgtk-side">
+          <fieldset>
+            <legend>1. Hidden data (location, camera, names)</legend>
+            <div class="tk-row"><label class="tk-fld" for="imgbatch-meta"><b>What to do</b>
+              <select id="imgbatch-meta" class="xp-field"><option value="keep">Leave as it is</option><option value="nogps">Remove the location only</option><option value="all">Remove all hidden data (except the rotation)</option></select></label></div>
+            <p class="tk-muted" id="imgbatch-metahelp">Without any other change below, the pictures are not re-compressed: only the hidden data around them changes (JPEG, PNG and WebP). The rotation of a photo is kept, so it does not turn sideways.</p>
+          </fieldset>
+          <fieldset>
+            <legend>2. Size</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgbatch-rmode"><b>Resize</b><select id="imgbatch-rmode" class="xp-field"><option value="none">Keep the size</option><option value="long">Longest side</option><option value="pct">Percent</option></select></label>
+              <label class="tk-fld" for="imgbatch-rval"><b id="imgbatch-rlab">Pixels</b><input type="number" id="imgbatch-rval" class="xp-field imgtk-num" min="1" step="1" value="1600" disabled></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>3. Type</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgbatch-fmt"><b>Save as</b><select id="imgbatch-fmt" class="xp-field"><option value="keep">Keep each picture's type</option><option value="jpeg">JPEG</option><option value="webp">WebP</option><option value="png">PNG</option></select></label>
+              <label class="tk-fld" for="imgbatch-q" id="imgbatch-qlab"><b>Quality <span id="imgbatch-qv">85</span></b><input type="range" id="imgbatch-q" min="30" max="100" step="1" value="85"></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>4. Text mark (optional)</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgbatch-wm"><b>Text (empty = none)</b><input type="text" id="imgbatch-wm" class="xp-field" maxlength="200" autocomplete="off" spellcheck="false" placeholder="© Your name"></label>
+              <label class="tk-fld" for="imgbatch-wpos"><b>Where</b><select id="imgbatch-wpos" class="xp-field imgtk-short"><option value="br">Bottom right</option><option value="bl">Bottom left</option><option value="bc">Bottom centre</option><option value="mc">Centre</option><option value="tr">Top right</option><option value="tl">Top left</option><option value="tile">Repeated everywhere</option></select></label>
+            </div>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgbatch-wsize"><b>Size <span id="imgbatch-wsizev">6</span>%</b><input type="range" id="imgbatch-wsize" min="2" max="40" step="1" value="6"></label>
+              <label class="tk-fld" for="imgbatch-wop"><b>Strength <span id="imgbatch-wopv">70</span>%</b><input type="range" id="imgbatch-wop" min="5" max="100" step="1" value="70"></label>
+              <label class="tk-fld" for="imgbatch-wcol"><b>Colour</b><input type="color" id="imgbatch-wcol" value="#ffffff"></label>
+            </div>
+          </fieldset>
+          <p class="tk-muted" id="imgbatch-plan"></p>
+          <div class="tk-row">
+            <button type="button" class="xp-btn is-default" id="imgbatch-go" disabled>Make the ZIP</button>
+            <button type="button" class="xp-btn" id="imgbatch-stop" hidden>Stop</button>
+            <progress id="imgbatch-prog" max="1" value="0" hidden></progress>
+          </div>
+          <p class="imgtk-result" id="imgbatch-result" role="status"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="imgbatch-status">Ready</span></footer>
+</div>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8E5CD9"/>
+      <stop offset="1" stop-color="#5A2FB0"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="8" fill="url(#bg)" stroke="#3E1D85" stroke-width="1.5"/>
+  <rect x="6" y="6" width="36" height="14" rx="4" fill="#FFFFFF" opacity="0.22"/>
+  <rect x="14" y="8" width="25" height="19" rx="3" fill="#FFFFFF" stroke="#2B1466" stroke-width="1.1"/>
+  <rect x="10" y="13" width="25" height="19" rx="3" fill="#F2ECFF" stroke="#2B1466" stroke-width="1.1"/>
+  <rect x="6" y="18" width="25" height="19" rx="3" fill="#FFFFFF" stroke="#2B1466" stroke-width="1.1"/>
+  <path d="M8 35l7-8 5 5 4-4 6 7z" fill="#4C9A3F"/>
+  <text x="24" y="44" text-anchor="middle" font-family="Verdana, Arial, sans-serif" font-weight="700" font-size="6.5" fill="#FFE27A">BATCH</text>
+</svg>

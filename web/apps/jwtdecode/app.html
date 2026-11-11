@@ -1,0 +1,25 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>JSON Web Token (JWT)</legend>
+      <textarea class="xp-text tk-in" id="jwtdecode-in" rows="5" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.signature"></textarea>
+      <div class="tk-row"><button type="button" class="xp-btn" id="jwtdecode-copy" disabled>Copy as text</button></div>
+      <p class="tk-muted">Paste a token (with or without "Bearer ") to read its header, payload and times. A token is only <b>encoded, not encrypted</b>: anyone who has it can read it. <b>Do not paste a token that is still valid and gives access to something real</b>; use a test token or one that has expired. The reading is done in your browser and nothing is sent anywhere.</p>
+    </fieldset>
+    <div class="tk-summary" id="jwtdecode-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="jwtdecode-notes" hidden></ul>
+    <div id="jwtdecode-out"></div>
+    <fieldset id="jwtdecode-verify" hidden>
+      <legend>Check the signature</legend>
+      <label class="tk-fld" for="jwtdecode-key"><b id="jwtdecode-keylabel">Key</b></label>
+      <textarea class="xp-text tk-in" id="jwtdecode-key" rows="5" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="the secret (HS256 ...) or a public key in PEM form (-----BEGIN PUBLIC KEY-----) or a certificate or a JWK"></textarea>
+      <div class="tk-row">
+        <label id="jwtdecode-b64row" hidden><input type="checkbox" class="xp-check" id="jwtdecode-b64"> The secret is Base64 text</label>
+        <button type="button" class="xp-btn" id="jwtdecode-check">Check the signature</button>
+      </div>
+      <ul class="tk-notes" id="jwtdecode-result" hidden></ul>
+      <p class="tk-muted">Use the PUBLIC key (or a certificate) for RS, PS and ES tokens, or the shared secret for HS tokens. <b>Never paste a private key into a website</b>: it is refused here. Checking needs the browser's crypto, which only works on https pages and on localhost.</p>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="jwtdecode-status">Ready</span></footer>
+</div>

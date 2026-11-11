@@ -1,0 +1,38 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Convert</legend>
+      <div class="tk-row">
+        <label><input type="radio" class="xp-check" name="xmljson-mode" id="xmljson-m1" value="x2j" checked> XML to JSON</label>
+        <label><input type="radio" class="xp-check" name="xmljson-mode" id="xmljson-m2" value="j2x"> JSON to XML</label>
+        <label class="tk-fld" for="xmljson-indent"><b>Layout</b>
+          <select id="xmljson-indent" class="xp-select"><option value="2">Indented (2 spaces)</option><option value="4">Indented (4 spaces)</option><option value="0">Compact</option></select></label>
+      </div>
+      <div class="tk-row" id="xmljson-optx">
+        <label><input type="checkbox" class="xp-check" id="xmljson-arrays"> Always use arrays for child elements</label>
+        <label><input type="checkbox" class="xp-check" id="xmljson-types"> Turn numbers and true/false into JSON numbers and booleans</label>
+      </div>
+      <div class="tk-row" id="xmljson-optj" hidden>
+        <label class="tk-fld" for="xmljson-root"><b>Wrapper element (when the JSON needs one)</b>
+          <input type="text" id="xmljson-root" class="xp-field" value="root" maxlength="60" autocomplete="off" spellcheck="false"></label>
+        <label><input type="checkbox" class="xp-check" id="xmljson-decl" checked> Add the &lt;?xml ... ?&gt; line</label>
+      </div>
+      <p class="tk-muted" id="xmljson-help"></p>
+    </fieldset>
+    <fieldset>
+      <legend id="xmljson-inlegend">XML</legend>
+      <textarea class="xp-text tk-in" id="xmljson-in" rows="11" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+    </fieldset>
+    <ul class="tk-notes" id="xmljson-notes" hidden></ul>
+    <fieldset>
+      <legend id="xmljson-outlegend">JSON</legend>
+      <textarea class="xp-text tk-in" id="xmljson-out" rows="11" readonly spellcheck="false"></textarea>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="xmljson-copy" disabled>Copy result</button>
+        <button type="button" class="xp-btn" id="xmljson-save" disabled>Save as file</button>
+        <button type="button" class="xp-btn" id="xmljson-swap" disabled>Use the result as input (swap direction)</button>
+      </div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="xmljson-status">Ready</span></footer>
+</div>

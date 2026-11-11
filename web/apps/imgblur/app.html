@@ -1,0 +1,57 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Picture</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="imgblur-open">Open a picture…</button>
+        <input type="file" id="imgblur-file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp" hidden>
+        <span class="tk-muted" id="imgblur-name">JPEG, PNG, WebP, GIF or BMP. You can also drop a picture onto this window.</span>
+      </div>
+      <p class="tk-muted">Hide faces, number plates, names, screens or documents in a picture. It all happens in your browser: nothing is uploaded and your original file is never touched. The saved copy has the hidden parts really changed (not just covered by a layer) and carries no hidden camera data. <b>Solid black is the only choice that can never be undone.</b> Pixelating and blurring remove most of the detail, but for text, numbers or anything where a guess could be enough, use black.</p>
+    </fieldset>
+    <ul class="tk-notes" id="imgblur-notes" hidden></ul>
+    <div id="imgblur-work" hidden>
+      <div class="imgtk-grid">
+        <div class="imgtk-main">
+          <canvas id="imgblur-canvas" class="imgtk-canvas imgblur-canvas" width="10" height="10" tabindex="0" aria-label="The picture. Drag on it to mark an area to hide. Press Delete to remove the selected area."></canvas>
+          <p class="tk-muted">Drag on the picture to mark an area. Click a marked area to select it: drag it to move, drag a corner to resize, press Delete to remove it.</p>
+        </div>
+        <div class="imgtk-side">
+          <fieldset>
+            <legend>1. How to hide</legend>
+            <label class="imgtk-opt"><input type="radio" name="imgblur-mode" value="pixelate" checked> Pixelate (big squares)</label>
+            <label class="imgtk-opt"><input type="radio" name="imgblur-mode" value="blur"> Blur (squares, smoothed)</label>
+            <label class="imgtk-opt"><input type="radio" name="imgblur-mode" value="black"> Solid black (cannot be undone)</label>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgblur-strength" id="imgblur-strlab"><b>Strength <span id="imgblur-strv">6</span></b><input type="range" id="imgblur-strength" min="1" max="10" step="1" value="6"></label>
+              <label class="tk-fld" for="imgblur-shape"><b>Shape of new areas</b><select id="imgblur-shape" class="xp-field imgtk-short"><option value="rect">Rectangle</option><option value="oval">Oval (faces)</option></select></label>
+            </div>
+            <p class="tk-muted">With an area selected, changing these changes that area.</p>
+          </fieldset>
+          <fieldset>
+            <legend>2. Areas</legend>
+            <div class="tk-row">
+              <button type="button" class="xp-btn" id="imgblur-del" disabled>Delete selected</button>
+              <button type="button" class="xp-btn" id="imgblur-undo" disabled>Undo last</button>
+              <button type="button" class="xp-btn" id="imgblur-clear" disabled>Clear all</button>
+            </div>
+            <p class="tk-muted" id="imgblur-count">No areas yet.</p>
+          </fieldset>
+          <fieldset>
+            <legend>3. Save as</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgblur-fmt"><b>Type</b><select id="imgblur-fmt" class="xp-field"><option value="jpeg">JPEG</option><option value="png">PNG</option><option value="webp">WebP</option></select></label>
+              <label class="tk-fld" for="imgblur-q" id="imgblur-qlab"><b>Quality <span id="imgblur-qv">92</span></b><input type="range" id="imgblur-q" min="40" max="100" step="1" value="92"></label>
+            </div>
+          </fieldset>
+          <div class="tk-row">
+            <button type="button" class="xp-btn is-default" id="imgblur-save" disabled>Save picture</button>
+            <span class="tk-muted" id="imgblur-done"></span>
+          </div>
+          <ul class="tk-notes" id="imgblur-check" hidden></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="imgblur-status">Ready</span></footer>
+</div>

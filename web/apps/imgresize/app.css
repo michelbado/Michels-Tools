@@ -1,0 +1,10 @@
+/* Resize / Crop: shared look is in xp.css (.tk). The crop box is drawn on the canvas, so nothing needs inline styles. */
+.imgresize-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.imgresize-stage { flex: 1 1 360px; min-width: 0; }
+.imgresize-side { flex: 1 1 340px; min-width: 0; }
+.imgresize-canvas { display: block; max-width: 100%; height: auto; border: 1px solid #919B9C; background: #fff; touch-action: none; cursor: crosshair; }
+.tk-fld .imgresize-num { width: 6.5rem; }
+.tk-fld .imgresize-wide { width: 12rem; }
+.imgresize-lock { align-self: center; }
+.imgresize-result { margin: 8px 0; font-weight: 700; }
+.imgresize-side fieldset { margin-bottom: 8px; }

@@ -1,0 +1,14 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>HTTP response headers</legend>
+      <textarea class="xp-text tk-in" id="httphdr-in" rows="9" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="HTTP/2 200&#10;content-type: text/html; charset=utf-8&#10;strict-transport-security: max-age=31536000&#10;set-cookie: ..."></textarea>
+      <div class="tk-row"><button type="button" class="xp-btn" id="httphdr-copy" disabled>Copy as text</button></div>
+      <p class="tk-muted">Paste the response headers of a web page: from <b>curl -I https://example.com</b> (or <b>curl -sv</b>), or from your browser's developer tools (Network tab, click a request, Response Headers). The tool checks the security headers, cookies, caching, CORS and what the server gives away. It works only on what you paste: it makes no request, nothing is sent anywhere, and cookie values are never shown or copied. Headers can still reveal internal host names, so share the result with care.</p>
+    </fieldset>
+    <div class="tk-summary" id="httphdr-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="httphdr-notes" hidden></ul>
+    <div id="httphdr-out"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="httphdr-status">Ready</span></footer>
+</div>

@@ -1,0 +1,74 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Picture</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="imgexif-open">Open a picture…</button>
+        <input type="file" id="imgexif-file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" hidden>
+        <span class="tk-muted" id="imgexif-name">JPEG, PNG or WebP. You can also drop a picture onto this window.</span>
+      </div>
+      <p class="tk-muted">Pictures carry hidden details: the camera, the date, the exact place, sometimes serial numbers and the owner's name. Here you can read them, change or remove them, and save a clean copy. The picture itself is not re-compressed, so its quality does not change. Everything happens in your browser; nothing is uploaded, and your original file is never touched.</p>
+    </fieldset>
+
+    <ul class="tk-notes" id="imgexif-notes" hidden></ul>
+
+    <div id="imgexif-work" hidden>
+      <fieldset>
+        <legend>What this picture gives away</legend>
+        <ul class="tk-notes" id="imgexif-reveal"></ul>
+        <div id="imgexif-gps" class="imgexif-gps" hidden></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Edit details (also works on a picture that has none: just fill in what you want)</legend>
+        <div class="tk-row">
+          <label class="tk-fld" for="imgexif-f-date"><b>Date and time taken</b><input type="datetime-local" step="1" id="imgexif-f-date" class="xp-field imgexif-short"></label>
+          <label class="tk-fld" for="imgexif-sh-h"><b>or shift all dates by (hours)</b><input type="number" id="imgexif-sh-h" class="xp-field imgexif-num" value="0" step="1"></label>
+          <label class="tk-fld" for="imgexif-sh-m"><b>(minutes)</b><input type="number" id="imgexif-sh-m" class="xp-field imgexif-num" value="0" step="1"></label>
+        </div>
+        <div class="tk-row">
+          <label class="tk-fld" for="imgexif-f-artist"><b>Artist / photographer</b><input type="text" id="imgexif-f-artist" class="xp-field" maxlength="200" autocomplete="off" spellcheck="false"></label>
+          <label class="tk-fld" for="imgexif-f-copy"><b>Copyright</b><input type="text" id="imgexif-f-copy" class="xp-field" maxlength="200" autocomplete="off" spellcheck="false"></label>
+          <label class="tk-fld" for="imgexif-f-desc"><b>Description</b><input type="text" id="imgexif-f-desc" class="xp-field" maxlength="200" autocomplete="off" spellcheck="false"></label>
+        </div>
+        <div class="tk-row">
+          <label class="tk-fld" for="imgexif-f-make"><b>Camera make</b><input type="text" id="imgexif-f-make" class="xp-field" maxlength="100" autocomplete="off" spellcheck="false"></label>
+          <label class="tk-fld" for="imgexif-f-model"><b>Camera model</b><input type="text" id="imgexif-f-model" class="xp-field" maxlength="100" autocomplete="off" spellcheck="false"></label>
+          <label class="tk-fld" for="imgexif-f-soft"><b>Software</b><input type="text" id="imgexif-f-soft" class="xp-field" maxlength="100" autocomplete="off" spellcheck="false"></label>
+        </div>
+        <div class="tk-row">
+          <label class="tk-fld" for="imgexif-f-lat"><b>Latitude (for example 48.858333)</b><input type="text" id="imgexif-f-lat" class="xp-field imgexif-short" maxlength="24" inputmode="decimal" autocomplete="off" spellcheck="false"></label>
+          <label class="tk-fld" for="imgexif-f-lon"><b>Longitude (for example 2.351944)</b><input type="text" id="imgexif-f-lon" class="xp-field imgexif-short" maxlength="24" inputmode="decimal" autocomplete="off" spellcheck="false"></label>
+        </div>
+        <p class="tk-muted">A box that already has a value shows what the picture contains now. Change it to replace it, or empty it to remove it. A box that is empty and stays empty adds nothing. Text can use plain letters and digits only (accents are simplified, other characters become "?"). Latitude is positive in the north and negative in the south; longitude is positive in the east and negative in the west. Typing a place here does not make the picture truthful: it only writes what you type.</p>
+        <div class="tk-row"><button type="button" class="xp-btn is-default" id="imgexif-save2">Save a copy with these changes</button></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>What to do</legend>
+        <div class="tk-row">
+          <button type="button" class="xp-btn" id="imgexif-all">Remove everything</button>
+          <button type="button" class="xp-btn" id="imgexif-personal">Remove personal details</button>
+          <button type="button" class="xp-btn" id="imgexif-nogps">Remove location only</button>
+          <button type="button" class="xp-btn" id="imgexif-keep">Keep everything</button>
+        </div>
+        <p class="tk-muted">These buttons only tick and untick the boxes below. They also clear or restore the boxes above. Then you can still change single items: untick a box in the list below to remove that item.</p>
+        <label class="imgexif-opt"><input type="checkbox" id="imgexif-rot" checked> Keep the rotation, so the picture still shows the right way up (the only thing kept when you remove everything)</label>
+      </fieldset>
+
+      <div id="imgexif-tables"></div>
+
+      <fieldset id="imgexif-otherbox" hidden>
+        <legend>Other data inside the file</legend>
+        <div id="imgexif-other"></div>
+      </fieldset>
+
+      <div class="tk-row imgexif-save">
+        <button type="button" class="xp-btn is-default" id="imgexif-save">Save a copy</button>
+        <span class="tk-muted" id="imgexif-result"></span>
+      </div>
+      <ul class="tk-notes" id="imgexif-check" hidden></ul>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="imgexif-status">Ready</span></footer>
+</div>

@@ -1,0 +1,53 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Cron expression</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="crontab-expr"><b>Schedule (five fields, or @daily ...), optionally with the command</b>
+          <input type="text" id="crontab-expr" class="xp-field tk-wide" value="30 2 * * 1" maxlength="400" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+        <label class="tk-fld" for="crontab-preset"><b>Examples</b>
+          <select id="crontab-preset" class="xp-select"></select></label>
+      </div>
+      <p class="tk-muted">Type an expression to hear it in plain words, or build one from the boxes below. The five fields are minute (0-59), hour (0-23), day of month (1-31), month (1-12 or jan-dec) and day of week (0-7 or sun-sat; 0 and 7 are Sunday). * means every, */5 every fifth, 1-5 a range, 1,15 a list.</p>
+    </fieldset>
+    <fieldset>
+      <legend>Build it from the fields</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="crontab-f-minute"><b>Minute</b><input type="text" id="crontab-f-minute" class="xp-field tk-narrow" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="crontab-f-hour"><b>Hour</b><input type="text" id="crontab-f-hour" class="xp-field tk-narrow" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="crontab-f-dom"><b>Day of month</b><input type="text" id="crontab-f-dom" class="xp-field tk-narrow" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="crontab-f-month"><b>Month</b><input type="text" id="crontab-f-month" class="xp-field tk-narrow" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="crontab-f-dow"><b>Day of week</b><input type="text" id="crontab-f-dow" class="xp-field tk-narrow" autocomplete="off" spellcheck="false"></label>
+      </div>
+      <div class="tk-row">
+        <label class="tk-fld" for="crontab-cmd"><b>Command (optional, to build a full crontab line)</b>
+          <input type="text" id="crontab-cmd" class="xp-field tk-wide" maxlength="400" placeholder="/usr/local/bin/backup.sh >> /var/log/backup.log 2>&amp;1" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+      </div>
+    </fieldset>
+    <div class="tk-summary" id="crontab-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="crontab-notes" hidden></ul>
+    <div id="crontab-line"></div>
+    <fieldset id="crontab-runbox" hidden>
+      <legend>Next run times</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="crontab-tz"><b>Show times in</b>
+          <select id="crontab-tz" class="xp-select"><option value="utc">UTC</option><option value="local">My computer's time zone</option></select></label>
+        <label class="tk-fld" for="crontab-count"><b>How many</b>
+          <select id="crontab-count" class="xp-select"><option>5</option><option selected>10</option><option>20</option></select></label>
+      </div>
+      <div id="crontab-runs"></div>
+      <p class="tk-muted">Cron on a server runs in the server's own time zone (often UTC). Daylight-saving changes are not modelled: on the day the clocks jump forward, a time that does not exist is skipped here.</p>
+    </fieldset>
+    <fieldset>
+      <legend>Good to know</legend>
+      <ul class="tk-notes">
+        <li>Cron starts jobs with a very small PATH and no login settings: use full paths to programs, or set PATH at the top of the crontab.</li>
+        <li>Output goes to e-mail (MAILTO) unless you redirect it: add &gt;&gt; /var/log/job.log 2&gt;&amp;1.</li>
+        <li>A % in a crontab line means a new line: write \% inside commands such as date +\%F.</li>
+        <li>When both day of month and day of week are set, the job runs when EITHER matches.</li>
+        <li>Edit your own crontab with crontab -e; the system-wide /etc/crontab and /etc/cron.d files have an extra user name column before the command.</li>
+      </ul>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="crontab-status">Ready</span></footer>
+</div>

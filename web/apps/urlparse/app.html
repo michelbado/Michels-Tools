@@ -1,0 +1,14 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Web address (URL)</legend>
+      <textarea class="xp-text tk-in" id="urlparse-in" rows="3" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="https://user:pass@example.com:8443/a/b?x=1&amp;y=two#section"></textarea>
+      <div class="tk-row"><button type="button" class="xp-btn" id="urlparse-copy" disabled>Copy as text</button></div>
+      <p class="tk-muted">Paste a link to see its parts: scheme, user name, password, host, port, path, every query parameter with its decoded value, and the fragment. The tool also points out tricks that hide where a link really goes (a name before an @, look-alike letters in a domain, an address written as a number). Everything is read in your browser; nothing is sent anywhere and no site is visited.</p>
+    </fieldset>
+    <div class="tk-summary" id="urlparse-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="urlparse-notes" hidden></ul>
+    <div id="urlparse-out"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="urlparse-status">Ready</span></footer>
+</div>

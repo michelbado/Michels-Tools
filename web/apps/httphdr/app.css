@@ -1,0 +1,8 @@
+/* HTTP Header Reader: shared look is in xp.css (.tk). */
+.httphdr-lv { font-weight: 700; white-space: nowrap; }
+.httphdr-lv.good { color: #1F6A12; }
+.httphdr-lv.warn { color: #8A6D00; }
+.httphdr-lv.bad { color: #B3320D; }
+.httphdr-lv.missing { color: #B3320D; }
+.httphdr-lv.info { color: #3A5A8C; }
+.httphdr-val { font-family: Consolas, "Courier New", monospace; font-size: 12px; word-break: break-all; }

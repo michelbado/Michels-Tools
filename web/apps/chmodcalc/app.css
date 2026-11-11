@@ -1,0 +1,4 @@
+/* chmod Calculator: shared look is in xp.css (.tk). */
+.chmodcalc-grid { width: auto; min-width: 22rem; }
+.chmodcalc-grid td, .chmodcalc-grid th { text-align: center; }
+.chmodcalc-grid td:first-child { text-align: left; }

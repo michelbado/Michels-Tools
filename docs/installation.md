@@ -40,7 +40,7 @@ Take ten minutes for a short risk assessment first:
 Then act on the result:
 
 1. Copy [`deploy/tools.conf.example`](../deploy/tools.conf.example) to `tools.conf` next to the program.
-2. Go through it line by line and set every tool you do not want to offer to `false` (and a whole folder with `network`, `pdf` or `trouble`).
+2. Go through it line by line and set every tool you do not want to offer to `false` (and a whole folder with `network`, `pdf`, `trouble`, `engineering`, `images` or `reference`).
 3. Decide the limits and the log (see [Configuration](configuration.md)).
 4. Start the program. A tool that is off is really gone: its files and API answer `404 Not Found`.
 

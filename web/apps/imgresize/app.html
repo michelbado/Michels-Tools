@@ -1,0 +1,88 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Picture</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="imgresize-open">Open a picture…</button>
+        <input type="file" id="imgresize-file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp" hidden>
+        <span class="tk-muted" id="imgresize-name">JPEG, PNG, WebP, GIF or BMP. You can also drop a picture onto this window.</span>
+      </div>
+      <p class="tk-muted">Crop, rotate and resize a picture, then save it as JPEG, PNG or WebP. It all happens in your browser: nothing is uploaded and your original file is never touched. The saved copy carries no hidden camera data (no location, no camera details, no colour profile).</p>
+    </fieldset>
+    <ul class="tk-notes" id="imgresize-notes" hidden></ul>
+
+    <div id="imgresize-work" hidden>
+      <div class="imgresize-grid">
+        <div class="imgresize-stage">
+          <canvas id="imgresize-canvas" class="imgresize-canvas" width="10" height="10" aria-label="The picture. Drag on it to choose the part to keep."></canvas>
+          <p class="tk-muted" id="imgresize-hint">Drag on the picture to choose the part to keep. Drag inside the box to move it, or a corner to change its size.</p>
+        </div>
+        <div class="imgresize-side">
+          <fieldset>
+            <legend>1. Rotate</legend>
+            <div class="tk-row">
+              <button type="button" class="xp-btn" id="imgresize-rotl">Turn left</button>
+              <button type="button" class="xp-btn" id="imgresize-rotr">Turn right</button>
+              <button type="button" class="xp-btn" id="imgresize-fh">Flip left-right</button>
+              <button type="button" class="xp-btn" id="imgresize-fv">Flip up-down</button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>2. Crop</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgresize-aspect"><b>Shape</b>
+                <select id="imgresize-aspect" class="xp-field">
+                  <option value="free">Free</option><option value="orig">Same as the picture</option>
+                  <option value="1:1">Square 1:1</option><option value="4:3">4:3</option><option value="3:2">3:2</option><option value="16:9">16:9</option>
+                  <option value="3:4">3:4 (upright)</option><option value="2:3">2:3 (upright)</option><option value="9:16">9:16 (upright)</option><option value="35:45">Passport 35:45</option>
+                </select></label>
+              <button type="button" class="xp-btn" id="imgresize-cropall">Whole picture</button>
+            </div>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgresize-cx"><b>Left</b><input type="number" id="imgresize-cx" class="xp-field imgresize-num" min="0" step="1"></label>
+              <label class="tk-fld" for="imgresize-cy"><b>Top</b><input type="number" id="imgresize-cy" class="xp-field imgresize-num" min="0" step="1"></label>
+              <label class="tk-fld" for="imgresize-cw"><b>Width</b><input type="number" id="imgresize-cw" class="xp-field imgresize-num" min="1" step="1"></label>
+              <label class="tk-fld" for="imgresize-ch"><b>Height</b><input type="number" id="imgresize-ch" class="xp-field imgresize-num" min="1" step="1"></label>
+            </div>
+            <p class="tk-muted">Numbers are pixels of the picture as shown (after turning).</p>
+          </fieldset>
+          <fieldset>
+            <legend>3. Resize</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgresize-mode"><b>How</b>
+                <select id="imgresize-mode" class="xp-field">
+                  <option value="none">Keep the size</option><option value="exact">Exact width and height</option><option value="pct">Percent</option><option value="long">Longest side</option>
+                </select></label>
+            </div>
+            <div class="tk-row" id="imgresize-exactrow" hidden>
+              <label class="tk-fld" for="imgresize-w"><b>Width</b><input type="number" id="imgresize-w" class="xp-field imgresize-num" min="1" step="1"></label>
+              <label class="tk-fld" for="imgresize-h"><b>Height</b><input type="number" id="imgresize-h" class="xp-field imgresize-num" min="1" step="1"></label>
+              <label class="imgresize-lock"><input type="checkbox" id="imgresize-lock" checked> Keep the shape</label>
+            </div>
+            <div class="tk-row" id="imgresize-pctrow" hidden>
+              <label class="tk-fld" for="imgresize-pct"><b>Percent of the cropped size</b><input type="number" id="imgresize-pct" class="xp-field imgresize-num" min="1" max="400" step="1" value="50"></label>
+            </div>
+            <div class="tk-row" id="imgresize-longrow" hidden>
+              <label class="tk-fld" for="imgresize-long"><b>Longest side in pixels</b><input type="number" id="imgresize-long" class="xp-field imgresize-num" min="1" step="1" value="1600"></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>4. Save as</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgresize-fmt"><b>Type</b>
+                <select id="imgresize-fmt" class="xp-field"><option value="jpeg">JPEG (photos, small)</option><option value="png">PNG (sharp, keeps transparency)</option><option value="webp">WebP (small, modern)</option></select></label>
+              <label class="tk-fld" for="imgresize-q" id="imgresize-qlab"><b>Quality <span id="imgresize-qv">85</span></b><input type="range" id="imgresize-q" min="30" max="100" step="1" value="85"></label>
+              <label class="tk-fld" for="imgresize-bg" id="imgresize-bglab"><b>Background for transparent parts</b><input type="color" id="imgresize-bg" value="#ffffff"></label>
+            </div>
+          </fieldset>
+          <p class="imgresize-result" id="imgresize-result" role="status"></p>
+          <div class="tk-row">
+            <button type="button" class="xp-btn is-default" id="imgresize-save">Save picture</button>
+            <span class="tk-muted" id="imgresize-done"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="imgresize-status">Ready</span></footer>
+</div>

@@ -1,0 +1,41 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Permissions</legend>
+      <table class="tk-list chmodcalc-grid" aria-label="Permission checkboxes">
+        <tr class="tk-head"><th></th><th>Read (r)</th><th>Write (w)</th><th>Execute (x)</th></tr>
+        <tr><td><b>Owner (user)</b></td><td><input type="checkbox" class="xp-check" id="chmodcalc-ur" aria-label="Owner read"></td><td><input type="checkbox" class="xp-check" id="chmodcalc-uw" aria-label="Owner write"></td><td><input type="checkbox" class="xp-check" id="chmodcalc-ux" aria-label="Owner execute"></td></tr>
+        <tr><td><b>Group</b></td><td><input type="checkbox" class="xp-check" id="chmodcalc-gr" aria-label="Group read"></td><td><input type="checkbox" class="xp-check" id="chmodcalc-gw" aria-label="Group write"></td><td><input type="checkbox" class="xp-check" id="chmodcalc-gx" aria-label="Group execute"></td></tr>
+        <tr><td><b>Everyone else (other)</b></td><td><input type="checkbox" class="xp-check" id="chmodcalc-or" aria-label="Other read"></td><td><input type="checkbox" class="xp-check" id="chmodcalc-ow" aria-label="Other write"></td><td><input type="checkbox" class="xp-check" id="chmodcalc-ox" aria-label="Other execute"></td></tr>
+      </table>
+      <div class="tk-row">
+        <label><input type="checkbox" class="xp-check" id="chmodcalc-suid"> setuid (4000)</label>
+        <label><input type="checkbox" class="xp-check" id="chmodcalc-sgid"> setgid (2000)</label>
+        <label><input type="checkbox" class="xp-check" id="chmodcalc-sticky"> sticky (1000)</label>
+        <label><input type="radio" class="xp-check" name="chmodcalc-kind" id="chmodcalc-file" checked> a file</label>
+        <label><input type="radio" class="xp-check" name="chmodcalc-kind" id="chmodcalc-dir"> a directory</label>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Or type it in any form</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="chmodcalc-octal"><b>Octal number</b><input type="text" id="chmodcalc-octal" class="xp-field tk-narrow" maxlength="4" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="chmodcalc-letters"><b>Letters (as ls -l shows)</b><input type="text" id="chmodcalc-letters" class="xp-field" maxlength="10" autocomplete="off" spellcheck="false"></label>
+        <label class="tk-fld" for="chmodcalc-expr"><b>chmod expression (applied to the mode above)</b><input type="text" id="chmodcalc-expr" class="xp-field" placeholder="u+x,go-w" maxlength="60" autocomplete="off" spellcheck="false"></label>
+        <button type="button" class="xp-btn" id="chmodcalc-apply">Apply the expression</button>
+      </div>
+      <p class="tk-muted" id="chmodcalc-msg" role="status" aria-live="polite">Octal digits are owner, group, other: read = 4, write = 2, execute = 1, added together (7 = rwx, 5 = r-x, 4 = r--). A fourth digit in front holds setuid (4), setgid (2) and sticky (1).</p>
+    </fieldset>
+    <div class="tk-summary" id="chmodcalc-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="chmodcalc-notes" hidden></ul>
+    <div id="chmodcalc-out"></div>
+    <fieldset>
+      <legend>umask: what new files and directories get</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="chmodcalc-umask"><b>umask</b><input type="text" id="chmodcalc-umask" class="xp-field tk-narrow" value="022" maxlength="4" autocomplete="off" spellcheck="false"></label>
+      </div>
+      <div id="chmodcalc-uout"></div>
+    </fieldset>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="chmodcalc-status">Ready</span></footer>
+</div>

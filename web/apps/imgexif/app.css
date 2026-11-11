@@ -1,0 +1,16 @@
+/* Photo Info & Privacy: shared look is in xp.css (.tk). */
+.imgexif-opt { display: block; margin-top: 6px; }
+.imgexif-gps { margin-top: 6px; padding: 6px 10px; border: 1px solid #C23A14; background: #FFF1EC; color: #7A1F06; overflow-wrap: anywhere; }
+.imgexif-tbl { border-collapse: collapse; width: 100%; }
+.imgexif-tbl th { text-align: left; font-weight: 400; color: var(--muted); padding: 3px 10px 3px 0; vertical-align: top; width: 34%; }
+.imgexif-tbl td { padding: 3px 6px 3px 0; vertical-align: top; overflow-wrap: anywhere; }
+.imgexif-tbl td.imgexif-k { width: 28px; }
+.imgexif-tbl input[type="text"] { width: 100%; box-sizing: border-box; }
+.imgexif-flag { display: inline-block; font-size: 11px; padding: 0 5px; border: 1px solid #C23A14; color: #7A1F06; background: #FFF1EC; margin-left: 6px; white-space: nowrap; }
+.imgexif-flag.device { border-color: #8A6D00; color: #5A4500; background: #FFF6DC; }
+.imgexif-gone { text-decoration: line-through; opacity: 0.55; }
+.imgexif-save { margin-top: 10px; }
+.imgexif-oth label { display: block; margin: 3px 0; }
+@media (max-width: 699px) { .imgexif-tbl th { width: 40%; } }
+.tk-fld .imgexif-short { width: 14rem; }
+.tk-fld .imgexif-num { width: 6.5rem; }

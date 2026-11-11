@@ -25,9 +25,12 @@ import (
 
 // toolFolders: folder id -> the tools inside it.
 var toolFolders = map[string][]string{
-	"network": {"aggregator", "subnet", "splitter", "checker", "ipv6calc", "ipconv", "maclookup", "portref", "certdecode", "mailhdr"},
-	"pdf":     {"pdfinfo", "pdfverify", "pdfmeta", "pdfstamp", "pdfwatermark", "pdfpages", "pdfmerge", "pdforganize", "pdfcrop", "pdfredact", "pdfimages", "pdfextract"},
-	"trouble": {"netquality", "connfacts", "idletest", "pathread", "browsercaps"},
+	"network":     {"aggregator", "subnet", "splitter", "checker", "ipv6calc", "ipconv", "maclookup", "certdecode", "mailhdr", "mailauth", "mtucalc"},
+	"pdf":         {"pdfinfo", "pdfverify", "pdfmeta", "pdfstamp", "pdfwatermark", "pdfpages", "pdfmerge", "pdforganize", "pdfcrop", "pdfredact", "pdfimages", "pdfextract"},
+	"trouble":     {"netquality", "connfacts", "idletest", "pathread", "browsercaps", "httphdr"},
+	"engineering": {"urlparse", "jwtdecode", "basicauth", "xmljson", "crontab", "chmodcalc", "colorconv"},
+	"images":      {"imgexif", "imgresize", "imgblur", "imgconvert", "imgwatermark", "imgbatch", "imgfavicon"},
+	"reference":   {"portref", "dscp", "httpstatus", "dnstypes", "icmptypes", "tcpref", "ipsecref"},
 }
 
 func isToolApp(name string) bool {

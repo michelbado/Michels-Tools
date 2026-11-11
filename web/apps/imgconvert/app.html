@@ -1,0 +1,50 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Picture</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="imgconvert-open">Open a picture…</button>
+        <input type="file" id="imgconvert-file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp" hidden>
+        <span class="tk-muted" id="imgconvert-name">JPEG, PNG, WebP, GIF or BMP. You can also drop a picture onto this window.</span>
+      </div>
+      <p class="tk-muted">Change the type of a picture and make the file smaller. It all happens in your browser: nothing is uploaded and your original file is never touched. The saved copy carries no hidden camera data (no location, no camera details, no colour profile). A GIF becomes a still picture.</p>
+    </fieldset>
+    <ul class="tk-notes" id="imgconvert-notes" hidden></ul>
+    <div id="imgconvert-work" hidden>
+      <div class="imgtk-grid">
+        <div class="imgtk-main">
+          <canvas id="imgconvert-canvas" class="imgtk-canvas" width="10" height="10" aria-label="The picture as it will be saved"></canvas>
+          <p class="tk-muted">This is the picture as it will be saved. Look at it closely: strong compression shows as blocks and blur.</p>
+        </div>
+        <div class="imgtk-side">
+          <fieldset>
+            <legend>1. Type</legend>
+            <div class="tk-row">
+              <label class="tk-fld" for="imgconvert-fmt"><b>Save as</b>
+                <select id="imgconvert-fmt" class="xp-field"><option value="jpeg">JPEG (photos, small)</option><option value="webp">WebP (small, modern)</option><option value="png">PNG (sharp, keeps transparency, large)</option></select></label>
+              <label class="tk-fld" for="imgconvert-bg" id="imgconvert-bglab"><b>Background for transparent parts</b><input type="color" id="imgconvert-bg" value="#ffffff"></label>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>2. How small</legend>
+            <label class="imgtk-opt"><input type="radio" name="imgconvert-how" value="q" checked> Choose the quality myself</label>
+            <div class="tk-row"><label class="tk-fld" for="imgconvert-q"><b>Quality <span id="imgconvert-qv">80</span></b><input type="range" id="imgconvert-q" min="20" max="100" step="1" value="80"></label></div>
+            <label class="imgtk-opt"><input type="radio" name="imgconvert-how" value="kb"> Make the file smaller than</label>
+            <div class="tk-row"><label class="tk-fld" for="imgconvert-kb"><b>Kilobytes</b><input type="number" id="imgconvert-kb" class="xp-field imgtk-num" min="1" step="1" value="200"></label></div>
+            <p class="tk-muted">With a size limit the tool looks for the best quality that still fits. If even the lowest quality is too large, it tells you and you can shrink the picture below. PNG has no quality setting; only the size below makes it smaller.</p>
+          </fieldset>
+          <fieldset>
+            <legend>3. Shrink the picture (optional)</legend>
+            <div class="tk-row"><label class="tk-fld" for="imgconvert-long"><b>Longest side in pixels (empty = keep)</b><input type="number" id="imgconvert-long" class="xp-field imgtk-num" min="1" step="1" placeholder="e.g. 1600"></label></div>
+          </fieldset>
+          <p class="imgtk-result" id="imgconvert-result" role="status"></p>
+          <div class="tk-row">
+            <button type="button" class="xp-btn is-default" id="imgconvert-save" disabled>Save picture</button>
+            <span class="tk-muted" id="imgconvert-done"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="imgconvert-status">Ready</span></footer>
+</div>

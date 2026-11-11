@@ -13,6 +13,9 @@
 network = true
 pdf = true
 trouble = true
+engineering = true
+images = true
+reference = true
 
 # ---- Network Tools ----
 aggregator = true      # IP Aggregator (also switches off its server API, POST /api/aggregate)
@@ -22,9 +25,10 @@ checker = true         # IP Checker
 ipv6calc = true        # IPv6 Calculator (addresses, prefixes, address types, splitting, reverse DNS names)
 ipconv = true          # IP & Number Converter (decimal, hex, binary, reverse DNS, unusual forms)
 maclookup = true       # MAC Lookup (manufacturer from the IEEE list, address formats, random-address check)
-portref = true         # Port Reference (what a port number is used for, which ones are risky)
 certdecode = true      # Certificate Decoder (certificates, chains and CSRs; read in the browser)
 mailhdr = true         # Email Header Analyser (route, delays, SPF/DKIM/DMARC, forged-sender hints)
+mailauth = true       # SPF, DKIM & DMARC Reader (explains pasted DNS records and finds mistakes; nothing is looked up)
+mtucalc = true         # MTU & MSS Calculator (largest packet through PPPoE, GRE, IPsec, WireGuard, VXLAN ...; TCP MSS to set)
 
 # ---- PDF Tools (all of these run in the visitor's browser; nothing is uploaded) ----
 pdfinfo = true         # PDF Info
@@ -46,6 +50,34 @@ connfacts = true      # Connection Facts (what the site sees of the visitor: add
 idletest = true       # Idle-timeout finder (how long the path lets a quiet connection live; holds a request open on the server)
 pathread = true       # Ping & Traceroute Reader (paste the output of ping, tracert, traceroute, mtr, pathping; read in the browser)
 browsercaps = true     # Browser Capability Report (what this browser can do; read in the browser)
+httphdr = true         # HTTP Header Reader (paste response headers: security headers, cookies, caching, CORS; read in the browser)
+
+# ---- Engineering Tools (all of these run in the visitor's browser; nothing typed or pasted is sent anywhere) ----
+urlparse = true        # URL Parser (scheme, user, password, host, port, path, every query parameter; spots look-alike and hidden addresses)
+jwtdecode = true       # JWT Decoder (header, payload, times; optional signature check with a public key or secret)
+basicauth = true       # Basic Auth Generator (makes and reads the Authorization: Basic header)
+xmljson = true         # XML & JSON Converter (both directions, with a stated convention)
+crontab = true         # Crontab Generator (plain-words explanation and next run times of a cron expression)
+chmodcalc = true       # chmod Calculator (permissions as octal, letters and commands; umask)
+colorconv = true       # Color Converter (name, hex, rgb, hsl, hwb; nearest CSS name; contrast)
+
+# ---- Image Tools (these run in the visitor's browser; no picture is uploaded) ----
+imgexif = true         # Photo Info & Privacy (read, edit and remove hidden camera data such as location; JPEG, PNG, WebP)
+imgresize = true       # Resize / Crop (crop, rotate, resize, save as JPEG, PNG or WebP)
+imgblur = true         # Blur / Redact (pixelate, blur or black out parts of a picture)
+imgconvert = true      # Convert & Compress (JPEG, PNG, WebP; quality or "smaller than N KB")
+imgwatermark = true    # Watermark (text or logo on a picture)
+imgbatch = true        # Batch Pictures (resize, convert, remove hidden data or mark many pictures; one ZIP)
+imgfavicon = true      # Favicon & Icon Generator (favicon.ico, PNG sizes, manifest, HTML lines; one ZIP)
+
+# ---- Reference (look-up tables; they run in the visitor's browser and cost the server nothing) ----
+portref = true         # Port Reference (what a port number is used for, which ones are risky)
+dscp = true            # DSCP & QoS Values (code points, ToS bytes, typical uses)
+httpstatus = true      # HTTP Status Codes (meaning and usual causes)
+dnstypes = true        # DNS Record Types (what each is for, with examples)
+icmptypes = true       # ICMP Types (IPv4 and IPv6, with firewall advice)
+tcpref = true          # TCP Reference (flags, connection states, options)
+ipsecref = true        # IPsec Reference (DH groups, matching strengths, algorithms, ports and terms)
 
 # ---- Settings (tool.setting = value). The values below are the defaults. ----
 # Connection Quality has a Monitor mode: it keeps probing the link until the visitor presses Stop. It keeps one connection busy

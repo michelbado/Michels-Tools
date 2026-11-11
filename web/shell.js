@@ -11,7 +11,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "50"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "57"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -22,9 +22,11 @@
     { id: "ipv6calc", title: "IPv6 Calculator", base: "apps/ipv6calc/", folder: "network", deps: ["lib/tk.js", "lib/ipv6.js"], size: { w: 900, h: 720 } },
     { id: "ipconv", title: "IP & Number Converter", base: "apps/ipconv/", folder: "network", deps: ["lib/tk.js", "lib/ipv6.js", "lib/ipconv.js"], size: { w: 860, h: 700 } },
     { id: "maclookup", title: "MAC Lookup", base: "apps/maclookup/", folder: "network", deps: ["lib/tk.js", "lib/maclib.js"], size: { w: 820, h: 680 } },
-    { id: "portref", title: "Port Reference", base: "apps/portref/", folder: "network", deps: ["lib/tk.js", "lib/portdata.js"], size: { w: 980, h: 700 } },
+    { id: "portref", title: "Port Reference", base: "apps/portref/", folder: "reference", deps: ["lib/tk.js", "lib/portdata.js"], size: { w: 980, h: 700 } },
     { id: "certdecode", title: "Certificate Decoder", base: "apps/certdecode/", folder: "network", deps: ["lib/tk.js", "lib/ipv6.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/certinfo.js"], size: { w: 980, h: 760 } },
     { id: "mailhdr", title: "Email Header Analyser", base: "apps/mailhdr/", folder: "network", deps: ["lib/tk.js", "lib/mailhdr.js"], size: { w: 1000, h: 760 } },
+    { id: "mailauth", title: "SPF, DKIM & DMARC Reader", base: "apps/mailauth/", folder: "network", deps: ["lib/tk.js", "lib/mailauth.js"], size: { w: 1000, h: 760 } },
+    { id: "mtucalc", title: "MTU & MSS Calculator", base: "apps/mtucalc/", folder: "network", deps: ["lib/tk.js", "lib/mtucalc.js"], size: { w: 960, h: 760 } },
     { id: "pdfinfo", title: "PDF Info", base: "apps/pdfinfo/", folder: "pdf", deps: ["lib/pdfcommon.js"], size: { w: 880, h: 680 } },
     { id: "pdfverify", title: "Verify Signatures", base: "apps/pdfverify/", folder: "pdf", deps: ["lib/pdfcommon.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/pdfsig.js"], size: { w: 980, h: 720 } },
     { id: "pdfmeta", title: "Metadata", base: "apps/pdfmeta/", folder: "pdf", deps: ["lib/pdfcommon.js", "vendor/pdf-lib.min.js"], size: { w: 920, h: 740 } },
@@ -42,6 +44,27 @@
     { id: "idletest", title: "Idle-timeout Finder", base: "apps/idletest/", folder: "trouble", deps: ["lib/tk.js", "lib/idleanalysis.js"], size: { w: 820, h: 720 } },
     { id: "pathread", title: "Ping & Traceroute Reader", base: "apps/pathread/", folder: "trouble", deps: ["lib/tk.js", "lib/pathread.js"], size: { w: 1000, h: 760 } },
     { id: "browsercaps", title: "Browser Capability Report", base: "apps/browsercaps/", folder: "trouble", deps: ["lib/tk.js", "lib/browsercaps.js"], size: { w: 860, h: 760 } },
+    { id: "httphdr", title: "HTTP Header Reader", base: "apps/httphdr/", folder: "trouble", deps: ["lib/tk.js", "lib/cdn.js", "lib/httphdr.js"], size: { w: 1000, h: 760 } },
+    { id: "urlparse", title: "URL Parser", base: "apps/urlparse/", folder: "engineering", deps: ["lib/tk.js", "lib/urlparse.js"], size: { w: 1000, h: 760 } },
+    { id: "jwtdecode", title: "JWT Decoder", base: "apps/jwtdecode/", folder: "engineering", deps: ["lib/tk.js", "lib/jwtdecode.js"], size: { w: 1000, h: 780 } },
+    { id: "basicauth", title: "Basic Auth Generator", base: "apps/basicauth/", folder: "engineering", deps: ["lib/tk.js", "lib/basicauth.js"], size: { w: 900, h: 720 } },
+    { id: "xmljson", title: "XML & JSON Converter", base: "apps/xmljson/", folder: "engineering", deps: ["lib/tk.js", "lib/xmljson.js"], size: { w: 1000, h: 800 } },
+    { id: "crontab", title: "Crontab Generator", base: "apps/crontab/", folder: "engineering", deps: ["lib/tk.js", "lib/crontab.js"], size: { w: 1000, h: 800 } },
+    { id: "chmodcalc", title: "chmod Calculator", base: "apps/chmodcalc/", folder: "engineering", deps: ["lib/tk.js", "lib/chmodcalc.js"], size: { w: 960, h: 800 } },
+    { id: "colorconv", title: "Color Converter", base: "apps/colorconv/", folder: "engineering", deps: ["lib/tk.js", "lib/colorconv.js"], size: { w: 960, h: 780 } },
+    { id: "imgexif", title: "Photo Info & Privacy (EXIF)", base: "apps/imgexif/", folder: "images", deps: ["lib/tk.js", "lib/exif.js"], size: { w: 980, h: 780 } },
+    { id: "imgresize", title: "Resize / Crop", base: "apps/imgresize/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js"], size: { w: 1100, h: 780 } },
+    { id: "imgblur", title: "Blur / Redact", base: "apps/imgblur/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js", "lib/imgproc.js"], size: { w: 1100, h: 780 } },
+    { id: "imgconvert", title: "Convert & Compress", base: "apps/imgconvert/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js", "lib/imgproc.js"], size: { w: 1100, h: 780 } },
+    { id: "imgwatermark", title: "Watermark", base: "apps/imgwatermark/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js", "lib/imgproc.js"], size: { w: 1100, h: 800 } },
+    { id: "imgbatch", title: "Batch Pictures", base: "apps/imgbatch/", folder: "images", deps: ["lib/tk.js", "lib/exif.js", "lib/imgmath.js", "lib/imgproc.js", "vendor/fflate.js"], size: { w: 1100, h: 800 } },
+    { id: "imgfavicon", title: "Favicon & Icon Generator", base: "apps/imgfavicon/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js", "lib/imgproc.js", "lib/imgicon.js", "vendor/fflate.js"], size: { w: 1100, h: 800 } },
+    { id: "dscp", title: "DSCP & QoS Values", base: "apps/dscp/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-dscp.js"], size: { w: 1000, h: 720 } },
+    { id: "httpstatus", title: "HTTP Status Codes", base: "apps/httpstatus/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-http.js"], size: { w: 1000, h: 720 } },
+    { id: "dnstypes", title: "DNS Record Types", base: "apps/dnstypes/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-dns.js"], size: { w: 1000, h: 720 } },
+    { id: "icmptypes", title: "ICMP Types", base: "apps/icmptypes/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-icmp.js"], size: { w: 1000, h: 720 } },
+    { id: "tcpref", title: "TCP Reference", base: "apps/tcpref/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-tcp.js"], size: { w: 1000, h: 720 } },
+    { id: "ipsecref", title: "IPsec Reference", base: "apps/ipsecref/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-ipsec.js"], size: { w: 1000, h: 720 } },
   ];
   APPS.forEach(a => { a.icon = a.base + "icon.svg"; });
 
@@ -50,6 +73,9 @@
     { id: "network", title: "Network Tools", size: { w: 640, h: 500 } },
     { id: "pdf", title: "PDF Tools", size: { w: 700, h: 610 } },
     { id: "trouble", title: "Troubleshooting", size: { w: 640, h: 440 } },
+    { id: "engineering", title: "Engineering Tools", size: { w: 640, h: 440 } },
+    { id: "images", title: "Image Tools", size: { w: 640, h: 440 } },
+    { id: "reference", title: "Reference", size: { w: 640, h: 440 } },
   ];
   // Tools the deployer switched off in tools.conf: the server sends window.TOOLS_OFF (script tools-config.js) before this file.
   // Switched-off apps, and folders that are off or left empty, are removed here, so no icon, menu entry or link remains.

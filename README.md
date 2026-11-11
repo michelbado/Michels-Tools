@@ -8,8 +8,8 @@
 # Michel's Tools
 
 A small web "desktop" with a classic early-2000s look, served by **one Go program** with all web files embedded. It offers
-network tools (IP aggregation, subnet maths, IPv6, MAC lookup and more), PDF tools (redact, merge, sign check and more) and connection
-troubleshooting tools. Almost everything runs **inside the visitor's browser**: PDFs and pasted text never leave it. All icons and
+network tools (IP aggregation, subnet maths, IPv6, MAC lookup and more), PDF tools (redact, merge, sign check and more), connection
+troubleshooting tools, image tools (photo privacy and EXIF, blur, resize, compress, watermark, favicons), everyday engineering tools (URL, JWT, cron, chmod, colours and more) and quick reference cards. Almost everything runs **inside the visitor's browser**: PDFs and pasted text never leave it. All icons and
 artwork are original; nothing is taken from Microsoft. Not affiliated with or endorsed by Microsoft.
 
 ## Quick start

@@ -1,0 +1,8 @@
+/* Colour Converter: shared look is in xp.css (.tk). The colours themselves are set from script (element.style), which the page's security policy allows. */
+.colorconv-swatch { height: 90px; border: 1px solid #919B9C; display: flex; align-items: center; justify-content: center; margin: 8px 0; background-image: linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%), linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%); background-size: 16px 16px; background-position: 0 0, 8px 8px; position: relative; }
+.colorconv-swatch .colorconv-fill { position: absolute; inset: 0; }
+.colorconv-swatch span { position: relative; font-weight: 700; font-size: 16px; }
+.colorconv-pick { width: 60px; height: 30px; padding: 0; border: 1px solid #919B9C; background: #fff; }
+.colorconv-names { display: flex; flex-wrap: wrap; gap: 4px; }
+.colorconv-names button { border: 1px solid #919B9C; padding: 2px 6px; font-size: 11px; cursor: pointer; min-width: 4.5rem; }
+.colorconv-names button:focus-visible { outline: 2px solid #0831D9; }
