@@ -4,10 +4,10 @@
 
 - Go server in the repository root: `main.go` (flags, security headers, file serving), `aggregate.go` (the IP/subnet parser and
   aggregation engine), `analytics.go` (visit log), `clientip.go` (real visitor address behind a proxy), `ratelimit.go`, `diag.go` /
-  `facts.go` / `hold.go` (the Troubleshooting endpoints), `resources.go` (memory and job sizing), `tools.go` (`tools.conf`).
+  `facts.go` / `hold.go` (the Troubleshooting endpoints), `resources.go` (memory and job sizing), `tools.go` (`tools.conf`), `web/lib/derkit.js`, `oldcrypto.js`, `keyfmt.js`, `pkcs12.js`, `certkit.js`, `certconv.js`, `certgen.js`, `certui.js`, `sslcmds.js` (the Certificates folder: a small DER reader/writer; DES, RC2, RC4, AES, HMAC and PBKDF2 written out so old PFX files and old encrypted keys open on every browser, even plain http; the readers and writers for keys and PFX; the package analysis; the converter; the CSR generator; the shared input box; the openssl command data. All of it is pure code tested against a real `openssl`; none of it touches the network or storage), `web/lib/speedcalc.js` (Connection Quality: when a speed measurement is steady or has hit its data limit; pure, tested on simulated lines), `web/lib/toolsearch.js` (the Tools menu search; every tool id needs an entry in its `KEYS`, a Go test checks), `lock.go` (locked tools: the access-code cookie, the guard that refuses a locked tool's files and API, the unlock calls).
   Tests are the `*_test.go` files.
 - `web/`: the page (`index.html`, `shell.js` = window manager, taskbar and menu, `shell.css`, `xp.css`), `apps/<id>/` (one folder per tool:
-  `app.html`, `app.css`, `app.js`, `icon.svg`), `lib/` (shared code, mostly pure functions that run in the browser and in tests),
+  `app.html`, `app.css`, `app.js`, `icon.svg`), `lib/` (shared code, mostly pure functions that run in the browser and in tests; `gamekit.js` is what the games share: a canvas that fits its window, the frame loop, input, pause, sound and best scores),
   `vendor/` (third-party libraries, see below), `brand/` (logo files). The whole folder is embedded in the program.
 - `deploy/`: the service file and `tools.conf.example`.
 - `docs/`: this guide.

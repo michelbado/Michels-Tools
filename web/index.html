@@ -9,8 +9,8 @@
 <link rel="icon" type="image/png" sizes="32x32" href="brand/icon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
-<link rel="stylesheet" href="xp.css?v=58">
-<link rel="stylesheet" href="shell.css?v=58">
+<link rel="stylesheet" href="xp.css?v=63">
+<link rel="stylesheet" href="shell.css?v=63">
 </head>
 <body>
 <div class="desktop">
@@ -29,6 +29,8 @@
 
   <div class="startmenu" id="startmenu" hidden>
     <div class="smhead">Michel's Tools</div>
+    <div class="smsearch"><input type="search" id="menuSearch" class="xp-field" placeholder="Search tools…  (Ctrl+K)" aria-label="Search tools" aria-controls="menuResults" autocomplete="off" spellcheck="false" autocapitalize="off" maxlength="60"><span class="sronly" id="menuCount" role="status"></span></div>
+    <ul id="menuResults" aria-label="Search results" hidden></ul>
     <ul id="menuList"></ul>
   </div>
 </div>
@@ -47,6 +49,22 @@
   </div>
 </dialog>
 
+<dialog id="lockdlg" class="xp-dialog" aria-labelledby="lockTitle" aria-describedby="lockMsg">
+  <div class="titlebar">
+    <h3 class="wtitle" id="lockTitle">Locked tool</h3>
+    <button type="button" class="cap close" id="lockX" aria-label="Close"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7"/></svg></button>
+  </div>
+  <div class="dlgbody">
+    <div class="dlgmsg">
+      <img src="icons/lock.svg" width="32" height="32" alt="">
+      <p id="lockMsg"></p>
+    </div>
+    <label class="lockfield" for="lockCode"><span>Access code</span><input type="password" id="lockCode" class="xp-field" maxlength="200" autocomplete="off" spellcheck="false" autocapitalize="off"></label>
+    <p class="lockerr" id="lockErr" role="alert" hidden></p>
+    <div class="dlgbtn"><button type="button" class="xp-btn is-default" id="lockOk">Unlock</button><button type="button" class="xp-btn" id="lockCancel">Cancel</button></div>
+  </div>
+</dialog>
+
 <dialog id="notice" class="xp-dialog wide" aria-labelledby="noticeTitle" aria-describedby="noticeMsg">
   <div class="titlebar">
     <h3 class="wtitle" id="noticeTitle">Privacy notice</h3>
@@ -55,13 +73,14 @@
   <div class="dlgbody">
     <div class="dlgmsg">
       <svg aria-hidden="true" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#2F6FDB" stroke="#0B3A91"/><circle cx="16" cy="9.6" r="2.2" fill="#FFFFFF"/><path d="M16 14.6v9.2" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round"/></svg>
-      <p id="noticeMsg">This tool does not collect, store or log anything you type, paste or upload. Your input is processed in memory and discarded as soon as the result is returned. For page analytics and statistics only, only your IP address and your browser type and version are collected (for example, "Chrome 126 on Windows from IP 100.64.0.5"). If you have any concerns, please do not use it.</p>
+      <p id="noticeMsg">This tool does not collect, store or log anything you type, paste or upload. Your input is processed in memory and discarded as soon as the result is returned. For page analytics and statistics only, only your IP address and your browser type and version are collected (for example, "Chrome 126 on Windows from IP 100.64.0.5"). On a server that locks some tools, entering the access code sets one small cookie so that you do not have to enter it again; it holds no personal information and is used for nothing else. If you have any concerns, please do not use it.</p>
     </div>
     <div class="dlgbtn"><button type="button" class="xp-btn is-default" id="noticeOk">OK</button></div>
   </div>
 </dialog>
 
 <script src="tools-config.js"></script>
-<script src="shell.js?v=58"></script>
+<script src="lib/toolsearch.js?v=63"></script>
+<script src="shell.js?v=63"></script>
 </body>
 </html>

@@ -98,6 +98,7 @@ func newHandler(cfg config) (http.Handler, error) {
 		w.Header().Set("Content-Type", "text/javascript; charset=utf-8")
 		w.Header().Set("Cache-Control", "no-store")
 		io.WriteString(w, tools.toolsScript())
+		io.WriteString(w, tools.lockScript(r))
 	})
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		// a tool switched off in tools.conf is not served at all, not just hidden
@@ -117,6 +118,7 @@ func newHandler(cfg config) (http.Handler, error) {
 	registerDiag(mux, cfg)
 	registerFacts(mux, cfg)
 	registerHold(mux, cfg)
+	registerLock(mux, cfg)
 	mux.HandleFunc("POST /api/aggregate", func(w http.ResponseWriter, r *http.Request) {
 		if tools.appOff("aggregator") {
 			http.NotFound(w, r)
@@ -154,7 +156,7 @@ func newHandler(cfg config) (http.Handler, error) {
 			InvalidSamples: c.InvalidSamples, Bytes: c.Bytes, V4: v4, V6: v6,
 		})
 	})
-	var h http.Handler = mux
+	var h http.Handler = lockGuard(tools, mux)
 	if cfg.Visits != nil {
 		h = cfg.Visits.middleware(h)
 	}

@@ -106,7 +106,7 @@
     else if (now > na) { validity = "Expired " + ago(na, now) + " days ago"; notes.push({ level: "bad", text: "This certificate expired on " + fmtDate(na) + ". It must be renewed." }); }
     else { validity = "Valid, " + days + " days left"; if (days < 14) notes.push({ level: "bad", text: "Only " + days + " days left. Renew it now." }); else if (days < 30) notes.push({ level: "warn", text: days + " days left. Plan the renewal." }); else notes.push({ level: "good", text: "Within its validity period (" + days + " days left)." }); }
     const lifeDays = Math.round((na - nb) / DAY);
-    if (!isCA && lifeDays > 398 && ekus.some(x => /Web server/.test(x))) notes.push({ level: "warn", text: "Valid for " + lifeDays + " days. Browsers refuse publicly trusted web certificates that last longer than 398 days (private certificates are not affected)." });
+    if (!isCA && lifeDays > 398 && ekus.some(x => /Web server/.test(x))) notes.push({ level: "warn", text: "Valid for " + lifeDays + " days. Browsers refuse publicly trusted web certificates that last longer than 398 days, and since 15 March 2026 not longer than 200 days (private certificates are not affected)." });
     if (/SHA-1|MD5/.test(sigName)) notes.push({ level: "bad", text: "Signed with " + sigName + ", which is broken. Browsers reject it." });
     if (ki.weak) notes.push({ level: "bad", text: "The key is only " + ki.bits + " bits. 2048 is the minimum accepted today." });
     if (!isCA && ekus.some(x => /Web server/.test(x)) && !sans.some(s => s[0] === "DNS" || s[0] === "IP")) notes.push({ level: "bad", text: "A web server certificate with no Subject Alternative Names: browsers ignore the Common Name and will refuse it." });

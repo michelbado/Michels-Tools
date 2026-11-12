@@ -1,0 +1,15 @@
+<div class="gm">
+  <div class="gm-bar">
+    <button type="button" class="xp-btn small is-default" id="mines-new">New game</button>
+    <label for="mines-level">Size <select id="mines-level" class="xp-select">
+      <option value="0">Small (9 x 9, 10 mines)</option>
+      <option value="1">Medium (16 x 16, 40 mines)</option>
+      <option value="2">Large (30 x 16, 99 mines)</option>
+    </select></label>
+    <button type="button" class="xp-btn small" id="mines-flag" aria-pressed="false">Flag mode: off</button>
+    <button type="button" class="xp-btn small gm-sound" id="mines-sound" aria-pressed="false">Sound: off</button>
+    <span class="gm-info" id="mines-info"></span>
+  </div>
+  <div class="gm-stage mines-stage" id="mines-stage"><canvas class="gm-canvas" id="mines-canvas" tabindex="0" aria-label="Mines game"></canvas></div>
+  <footer class="statusbar" role="status"><span class="cell msg" id="mines-status">Click to open a square. Right-click (or press and hold) to plant a flag. A number tells how many mines touch that square.</span></footer>
+</div>

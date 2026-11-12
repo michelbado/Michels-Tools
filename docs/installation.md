@@ -20,7 +20,7 @@ Take ten minutes for a short risk assessment first:
 
    | Tool (id) | What it costs the server | How to reduce it |
    |---|---|---|
-   | Connection Quality (`netquality`) | A busy-line test that downloads up to 8 MB and uploads up to 4 MB, plus a steady stream of small probes. At the defaults one visitor can draw roughly 6 Mbit/s (6 transfers a minute of 8 MB) and send up to 1,800 probes a minute. Monitor mode keeps one visitor probing for up to 10 minutes. | `netquality = false`, or keep the tool and set `netquality.monitor = false`, `netquality.monitor_fine = false`, a lower `-rate-heavy` and `-rate-diag` |
+   | Connection Quality (`netquality`) | A speed test that downloads and uploads data (at most 15 MB on the default Light level, 150 MB on Full; the visitor chooses, and it stops as soon as the speed is steady), plus a steady stream of small probes. One transfer at a time per visitor, 6 a minute at the defaults (`-rate-heavy`), up to 1,800 probes a minute. Monitor mode keeps one visitor probing for up to 10 minutes. | `netquality = false`, or keep the tool and set `netquality.monitor = false`, `netquality.monitor_fine = false`, a lower `-rate-heavy` and `-rate-diag` |
    | Idle-timeout Finder (`idletest`) | Holds connections open, up to 300 seconds each by default (at most 600), 4 per visitor and 40 in total. Almost no bandwidth, but every held request occupies a connection on your proxy, CDN or firewall. | `idletest = false`, or a lower `idletest.max_seconds` |
    | IP Aggregator (`aggregator`) | The only tool that sends text to the server: up to `-max-mb` (50) per request, processed in memory, several at once. Costs CPU and memory. | `aggregator = false`, or a lower `-max-mb`, `-rate-api` and `-jobs` |
    | Connection Facts (`connfacts`) | Almost nothing: one small answer showing the visitor's own address and proxy headers. | `connfacts = false` if you do not want to show those |
@@ -40,7 +40,7 @@ Take ten minutes for a short risk assessment first:
 Then act on the result:
 
 1. Copy [`deploy/tools.conf.example`](../deploy/tools.conf.example) to `tools.conf` next to the program.
-2. Go through it line by line and set every tool you do not want to offer to `false` (and a whole folder with `network`, `pdf`, `trouble`, `engineering`, `images` or `reference`).
+2. Go through it line by line and set every tool you do not want to offer to `false` (or to `locked`, to keep it visible but behind an access code: see [Locking tools](configuration.md#locking-tools)) (and a whole folder with `network`, `pdf`, `trouble`, `engineering`, `images` or `reference`).
 3. Decide the limits and the log (see [Configuration](configuration.md)).
 4. Start the program. A tool that is off is really gone: its files and API answer `404 Not Found`.
 

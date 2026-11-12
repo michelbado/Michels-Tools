@@ -48,7 +48,7 @@ func TestToolConfigParsing(t *testing.T) {
 func TestToolConfigErrors(t *testing.T) {
 	cases := map[string]string{
 		"pdfimage = false\n":                "line 1: unknown tool \"pdfimage\"",
-		"pdf = maybe\n":                     "line 1: \"maybe\" is not true or false",
+		"pdf = maybe\n":                     "line 1: \"maybe\" is not true, false or locked",
 		"pdf false\n":                       "expected \"name = true\"",
 		"pdf = false\n# x\npdf = true\n":    "line 3: pdf is listed twice",
 		"\n\n = true\n":                     "line 3",
@@ -77,8 +77,8 @@ func TestHiddenList(t *testing.T) {
 		t.Errorf("hidden = %v", got)
 	}
 	// switching off every tool of a folder hides the folder too
-	all := "subnet=false\nsplitter=false\nchecker=false\naggregator=false\nipv6calc=false\nipconv=false\nmaclookup=false\nportref=false\ncertdecode=false\nmailhdr=false\nmailauth=false\nmtucalc=false\n"
-	if got := mustParse(t, all).hidden(); !reflect.DeepEqual(got, []string{"aggregator", "certdecode", "checker", "ipconv", "ipv6calc", "maclookup", "mailauth", "mailhdr", "mtucalc", "network", "portref", "splitter", "subnet"}) {
+	all := "subnet=false\nsplitter=false\nchecker=false\naggregator=false\nipv6calc=false\nipconv=false\nmaclookup=false\nportref=false\nmailhdr=false\nmailauth=false\nmtucalc=false\n"
+	if got := mustParse(t, all).hidden(); !reflect.DeepEqual(got, []string{"aggregator", "checker", "ipconv", "ipv6calc", "maclookup", "mailauth", "mailhdr", "mtucalc", "network", "portref", "splitter", "subnet"}) {
 		t.Errorf("hidden with the whole folder off = %v", got)
 	}
 	if s := ts.toolsScript(); s != "window.TOOLS_OFF=[\"aggregator\",\"pdfimages\"];\n" {
@@ -248,6 +248,9 @@ func TestExampleConfigListsEveryTool(t *testing.T) {
 	if _, err := parseToolConfig(strings.NewReader(string(b)), "tools.conf.example"); err != nil {
 		t.Fatalf("the example file does not parse: %v", err)
 	}
+	if ts, err := parseToolConfig(strings.NewReader(string(b)), "tools.conf.example"); err == nil && (ts.lockCode() != "" || len(ts.lockedNames()) != 0) {
+		t.Errorf("the example file must lock nothing and carry no access code (a comment after lock.code would become the code): code %q, locked %v", ts.lockCode(), ts.lockedNames())
+	}
 	listed := map[string]bool{}
 	for _, m := range regexp.MustCompile(`(?m)^([a-z0-9._]+)\s*=`).FindAllStringSubmatch(string(b), -1) {
 		listed[m[1]] = true
@@ -327,5 +330,22 @@ func TestNoDuplicateTools(t *testing.T) {
 	}
 	if n < 50 {
 		t.Errorf("found only %d tools in web/shell.js; the pattern in this test may be out of date", n)
+	}
+}
+
+// Every tool must be findable in the Tools menu search by everyday words: web/lib/toolsearch.js needs an entry for each tool id in web/shell.js.
+func TestEveryToolHasSearchWords(t *testing.T) {
+	shell, err := webFS.ReadFile("web/shell.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	search, err := webFS.ReadFile("web/lib/toolsearch.js")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, m := range regexp.MustCompile(`(?m)^\s*\{ id: "([a-z0-9]+)", title: "[^"]+", base:`).FindAllStringSubmatch(string(shell), -1) {
+		if !regexp.MustCompile(`(?m)^\s+` + m[1] + `: "`).Match(search) {
+			t.Errorf("web/lib/toolsearch.js has no search words for the tool %q: add a line to KEYS", m[1])
+		}
 	}
 }

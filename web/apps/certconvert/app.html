@@ -1,0 +1,53 @@
+<div class="tk">
+  <div class="tk-body">
+    <div id="certconvert-panel"></div>
+    <div id="certconvert-pkg" class="tk-muted" role="status" aria-live="polite"></div>
+    <fieldset>
+      <legend>What do you want to make?</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="certconvert-kind"><b>Make</b>
+          <select id="certconvert-kind" class="xp-field tk-wide">
+            <option value="pfx">PFX / PKCS#12 file (certificate, key and chain in one file)</option>
+            <option value="pem-fullchain">Server certificate + intermediates in one PEM file (fullchain)</option>
+            <option value="pem-chain">CA bundle: the intermediates and the root as PEM</option>
+            <option value="pem-cert">Server certificate only (PEM)</option>
+            <option value="pem-all">Certificate, chain and private key in ONE PEM file (HAProxy style)</option>
+            <option value="key">The private key in another format</option>
+            <option value="der-cert">Server certificate as DER (.cer, binary)</option>
+            <option value="p7b">P7B file (certificates only)</option>
+            <option value="server">Ready-made files for a web server</option>
+          </select></label>
+        <label class="tk-fld" id="certconvert-presetbox" for="certconvert-preset" hidden><b>Server</b>
+          <select id="certconvert-preset" class="xp-field">
+            <option value="nginx">nginx</option><option value="apache">Apache</option><option value="haproxy">HAProxy</option><option value="iis">IIS / Windows (PFX)</option><option value="tomcat">Tomcat / Java (PFX)</option>
+          </select></label>
+        <label class="tk-fld" id="certconvert-keyfmtbox" for="certconvert-keyfmt" hidden><b>Key format</b>
+          <select id="certconvert-keyfmt" class="xp-field tk-wide">
+            <option value="pkcs8">PKCS#8 PEM, no password ("BEGIN PRIVATE KEY")</option>
+            <option value="traditional">Traditional PEM, no password ("BEGIN RSA / EC PRIVATE KEY")</option>
+            <option value="pkcs8-encrypted">PKCS#8 protected with a password (AES-256)</option>
+            <option value="pkcs8-encrypted-3des">PKCS#8 protected with a password (old 3DES, for old software)</option>
+            <option value="der">DER, binary, no password</option>
+          </select></label>
+        <label class="tk-fld" id="certconvert-flavourbox" for="certconvert-flavour" hidden><b>PFX encryption</b>
+          <select id="certconvert-flavour" class="xp-field">
+            <option value="modern">Modern (AES-256, SHA-256)</option>
+            <option value="compat">Old-compatible (3DES, SHA-1): old Windows and Java</option>
+          </select></label>
+      </div>
+      <div class="tk-row" id="certconvert-pwbox" hidden>
+        <label class="tk-fld" for="certconvert-pw"><b>Password</b><input type="password" id="certconvert-pw" class="xp-field" autocomplete="new-password" spellcheck="false"></label>
+        <label class="tk-fld" for="certconvert-pw2"><b>Type it again</b><input type="password" id="certconvert-pw2" class="xp-field" autocomplete="new-password" spellcheck="false"></label>
+        <label class="ct-ack" for="certconvert-show"><input type="checkbox" id="certconvert-show"> Show</label>
+        <label class="ct-ack" id="certconvert-nopwbox" for="certconvert-nopw"><input type="checkbox" id="certconvert-nopw"> No password (the key is then not protected)</label>
+      </div>
+      <div class="tk-row">
+        <label class="ct-ack" id="certconvert-rootbox" for="certconvert-root"><input type="checkbox" id="certconvert-root"> Include the root certificate</label>
+        <button type="button" class="xp-btn is-default" id="certconvert-make">Make it</button>
+      </div>
+      <p class="tk-muted" id="certconvert-hint"></p>
+    </fieldset>
+    <div id="certconvert-result"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="certconvert-status">Ready</span></footer>
+</div>

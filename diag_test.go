@@ -147,8 +147,12 @@ func TestDownloadAndUpload(t *testing.T) {
 	if w.Code != 200 || w.Body.Len() != 300<<10 || w.Header().Get("Content-Length") != "307200" || w.Header().Get("Cache-Control") != "no-store" || w.Header().Get("Content-Encoding") != "identity" {
 		t.Errorf("download 300 KB: %d len %d %v", w.Code, w.Body.Len(), w.Header())
 	}
-	if n := serve(h, "GET", "/api/download?kb=999999").Body.Len(); n != maxDownloadKB<<10 {
-		t.Errorf("download is capped at %d KB, sent %d bytes", maxDownloadKB, n)
+	{ // the cap is 100 MB: count the bytes instead of keeping them
+		cw := &countWriter{h: http.Header{}}
+		h.ServeHTTP(cw, httptest.NewRequest("GET", "/api/download?kb=999999999", nil))
+		if cw.n != maxDownloadKB<<10 {
+			t.Errorf("download is capped at %d KB, sent %d bytes", maxDownloadKB, cw.n)
+		}
 	}
 	if n := serve(h, "GET", "/api/download").Body.Len(); n != 1024<<10 {
 		t.Errorf("default download is 1 MB, got %d", n)
@@ -181,6 +185,38 @@ func TestDownloadAndUpload(t *testing.T) {
 	}
 	if c := serve(h, "POST", "/api/ping?run=abcdef123456&seq=1").Code; c == 200 {
 		t.Error("ping must not answer POST")
+	}
+}
+
+// countWriter is a response writer that only counts what is written.
+type countWriter struct {
+	h http.Header
+	n int
+}
+
+func (c *countWriter) Header() http.Header         { return c.h }
+func (c *countWriter) Write(b []byte) (int, error) { c.n += len(b); return len(b), nil }
+func (c *countWriter) WriteHeader(int)             {}
+
+// The server counts the upload bytes of a run and reports them in the "u" field of the probe answer.
+func TestUploadBytesAreReportedInProbes(t *testing.T) {
+	h := diagHandler(t)
+	if b := serve(h, "GET", "/api/ping?run=uprun123456&seq=0").Body.String(); !strings.Contains(b, `"u":0`) {
+		t.Fatalf("a fresh run has received 0 upload bytes: %s", b)
+	}
+	post := func(path string, n int) {
+		rec := httptest.NewRecorder()
+		h.ServeHTTP(rec, httptest.NewRequest("POST", path, strings.NewReader(strings.Repeat("x", n))))
+	}
+	post("/api/upload?run=uprun123456", 300000)
+	post("/api/upload?run=uprun123456", 200000)
+	post("/api/upload?run=otherrun9999", 99999) // another run (never probed): ignored
+	post("/api/upload", 50000)                  // no run id: still accepted, not counted
+	if b := serve(h, "GET", "/api/ping?run=uprun123456&seq=1").Body.String(); !strings.Contains(b, `"u":500000`) {
+		t.Errorf("the run received 500000 upload bytes: %s", b)
+	}
+	if b := serve(h, "GET", "/api/ping?run=otherrun9999&seq=0").Body.String(); !strings.Contains(b, `"u":0`) {
+		t.Errorf("a run is not credited for bytes sent before it existed: %s", b)
 	}
 }
 

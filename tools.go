@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 )
 
 // Which tools a deployer wants on. A plain text file, one "name = true|false" per line:
@@ -25,12 +26,14 @@ import (
 
 // toolFolders: folder id -> the tools inside it.
 var toolFolders = map[string][]string{
-	"network":     {"aggregator", "subnet", "splitter", "checker", "ipv6calc", "ipconv", "maclookup", "certdecode", "mailhdr", "mailauth", "mtucalc"},
+	"network":     {"aggregator", "subnet", "splitter", "checker", "ipv6calc", "ipconv", "maclookup", "mailhdr", "mailauth", "mtucalc"},
 	"pdf":         {"pdfinfo", "pdfverify", "pdfmeta", "pdfstamp", "pdfwatermark", "pdfpages", "pdfmerge", "pdforganize", "pdfcrop", "pdfredact", "pdfimages", "pdfextract"},
 	"trouble":     {"netquality", "connfacts", "idletest", "pathread", "browsercaps", "httphdr"},
+	"certs":       {"certcheck", "certconvert", "certcsr", "certdecode", "opensslhelp"},
 	"engineering": {"urlparse", "jwtdecode", "basicauth", "xmljson", "crontab", "chmodcalc", "colorconv", "jsonfmt", "textdiff", "encodetool", "hashcalc", "timeconv", "passgen", "regextest", "qrcode"},
 	"images":      {"imgexif", "imgresize", "imgblur", "imgconvert", "imgwatermark", "imgbatch", "imgfavicon"},
 	"reference":   {"portref", "dscp", "httpstatus", "dnstypes", "icmptypes", "tcpref", "ipsecref"},
+	"games":       {"blocks", "mines", "pinball", "racer", "pool", "birdhunt"},
 }
 
 func isToolApp(name string) bool {
@@ -56,9 +59,11 @@ func knownToolNames() []string {
 
 // toolSet holds the names switched off explicitly, and the settings. A nil *toolSet means everything is on and every setting has its default.
 type toolSet struct {
-	off   map[string]bool
-	bools map[string]bool // settings of type true/false that the file gave
-	ints  map[string]int  // settings that are whole numbers
+	off    map[string]bool
+	locked map[string]bool   // tools and folders marked "locked": visible, but they need the shared access code (see lock.go)
+	bools  map[string]bool   // settings of type true/false that the file gave
+	ints   map[string]int    // settings that are whole numbers
+	strs   map[string]string // settings that are text (lock.code)
 }
 
 // settings of the tools: name -> kind ('b' true/false, 'i' whole number between min and max) and default
@@ -69,12 +74,17 @@ type settingSpec struct {
 	defInt   int
 }
 
+// lockMinCode is the shortest access code the program accepts.
+const lockMinCode = 4
+
 var toolSettings = map[string]settingSpec{
 	"netquality.monitor":           {kind: 'b', defBool: true},
 	"netquality.monitor_exclusive": {kind: 'b', defBool: true},
 	"netquality.monitor_fine":      {kind: 'b', defBool: true},
 	"netquality.monitor_minutes":   {kind: 'i', min: 1, max: 60, defInt: 10},
 	"idletest.max_seconds":         {kind: 'i', min: 30, max: 600, defInt: 300},
+	"lock.hours":                   {kind: 'i', min: 1, max: 168, defInt: 12},
+	"lock.code":                    {kind: 's'}, // no default: locked tools need one
 }
 
 func settingNames() []string {
@@ -134,10 +144,23 @@ func parseToolConfig(r io.Reader, source string) (*toolSet, error) {
 		known[n] = true
 	}
 	seen := map[string]bool{}
-	t := &toolSet{off: map[string]bool{}, bools: map[string]bool{}, ints: map[string]int{}}
+	t := &toolSet{off: map[string]bool{}, locked: map[string]bool{}, bools: map[string]bool{}, ints: map[string]int{}, strs: map[string]string{}}
 	sc := bufio.NewScanner(r)
 	for ln := 1; sc.Scan(); ln++ {
 		line := sc.Text()
+		// the access code is read before comments are cut off, so it may contain a "#"; for the same reason no comment may follow it on its line
+		if k, v, found := strings.Cut(strings.TrimSpace(strings.TrimPrefix(line, "\xef\xbb\xbf")), "="); found && strings.EqualFold(strings.TrimSpace(k), "lock.code") {
+			if seen["lock.code"] {
+				return nil, fmt.Errorf("%s line %d: lock.code is listed twice", source, ln)
+			}
+			seen["lock.code"] = true
+			code := strings.TrimSpace(v)
+			if code != "" && utf8.RuneCountInString(code) < lockMinCode {
+				return nil, fmt.Errorf("%s line %d: lock.code must be at least %d characters (a longer one is safer)", source, ln, lockMinCode)
+			}
+			t.strs["lock.code"] = code
+			continue
+		}
 		if i := strings.IndexByte(line, '#'); i >= 0 {
 			line = line[:i]
 		}
@@ -176,12 +199,17 @@ func parseToolConfig(r io.Reader, source string) (*toolSet, error) {
 		if !known[name] {
 			return nil, fmt.Errorf("%s line %d: unknown tool %q (known names: %s)", source, ln, name, strings.Join(knownToolNames(), ", "))
 		}
-		val, okv := parseBool(v)
-		if !okv {
-			return nil, fmt.Errorf("%s line %d: %q is not true or false (for %s)", source, ln, strings.TrimSpace(v), name)
-		}
 		if seen[name] {
 			return nil, fmt.Errorf("%s line %d: %s is listed twice", source, ln, name)
+		}
+		if strings.EqualFold(strings.TrimSpace(v), "locked") {
+			seen[name] = true
+			t.locked[name] = true
+			continue
+		}
+		val, okv := parseBool(v)
+		if !okv {
+			return nil, fmt.Errorf("%s line %d: %q is not true, false or locked (for %s)", source, ln, strings.TrimSpace(v), name)
 		}
 		seen[name] = true
 		if !val {
@@ -191,7 +219,61 @@ func parseToolConfig(r io.Reader, source string) (*toolSet, error) {
 	if err := sc.Err(); err != nil {
 		return nil, fmt.Errorf("%s: %w", source, err)
 	}
+	// a tool that is meant to be locked must never end up open because the code was forgotten
+	if names := t.lockedNames(); len(names) > 0 && t.strs["lock.code"] == "" {
+		return nil, fmt.Errorf("%s: %s %s marked locked but there is no access code: add a line \"lock.code = ...\" (at least %d characters)", source, strings.Join(names, ", "), map[bool]string{true: "is", false: "are"}[len(names) == 1], lockMinCode)
+	}
 	return t, nil
+}
+
+func (t *toolSet) lockedNames() []string {
+	if t == nil {
+		return nil
+	}
+	var n []string
+	for k := range t.locked {
+		n = append(n, k)
+	}
+	sort.Strings(n)
+	return n
+}
+
+// appLocked: the tool needs the access code. A tool or folder marked locked is locked; a tool that is switched off is off, not locked.
+func (t *toolSet) appLocked(id string) bool {
+	if t == nil || len(t.locked) == 0 || t.appOff(id) {
+		return false
+	}
+	if t.locked[id] {
+		return true
+	}
+	for folder, apps := range toolFolders {
+		if t.locked[folder] {
+			for _, a := range apps {
+				if a == id {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+// lockedApps: every tool the page must ask a code for, sorted.
+func (t *toolSet) lockedApps() []string {
+	var out []string
+	for _, n := range knownToolNames() {
+		if isToolApp(n) && t.appLocked(n) {
+			out = append(out, n)
+		}
+	}
+	return out
+}
+
+func (t *toolSet) lockCode() string {
+	if t == nil {
+		return ""
+	}
+	return t.strs["lock.code"]
 }
 
 // loadToolConfig: an explicit path must exist; with no path, tools.conf next to the program is used if it is there.

@@ -5,13 +5,14 @@
  *   2. add { id, title, base } to APPS below; ALSO add its id to toolFolders in tools.go (go test checks this; it is what lets a
  *      deployer switch the tool off in tools.conf). Add folder: "<folder id>" to put it inside a
  *      folder (see FOLDERS), leave it out to show the app directly on the desktop
+ *      ALSO add its id to KEYS in lib/toolsearch.js (words people would type to find it; a Go test checks)
  *   3. prefix every element id in app.html with the app id (e.g. "subnet-ip"): ids are document-wide
  *   4. in app.js: (window.DesktopApps ||= {}).<id> = { init(root, shell) { ...; return { destroy() {} }; } };
  */
 (() => {
   "use strict";
 
-  const VERSION = "58"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "63"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -23,7 +24,11 @@
     { id: "ipconv", title: "IP & Number Converter", base: "apps/ipconv/", folder: "network", deps: ["lib/tk.js", "lib/ipv6.js", "lib/ipconv.js"], size: { w: 860, h: 700 } },
     { id: "maclookup", title: "MAC Lookup", base: "apps/maclookup/", folder: "network", deps: ["lib/tk.js", "lib/maclib.js"], size: { w: 820, h: 680 } },
     { id: "portref", title: "Port Reference", base: "apps/portref/", folder: "reference", deps: ["lib/tk.js", "lib/portdata.js"], size: { w: 980, h: 700 } },
-    { id: "certdecode", title: "Certificate Decoder", base: "apps/certdecode/", folder: "network", deps: ["lib/tk.js", "lib/ipv6.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/certinfo.js"], size: { w: 980, h: 760 } },
+    { id: "certcheck", title: "Certificate Package Checker", base: "apps/certcheck/", folder: "certs", deps: ["lib/tk.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/hashcalc.js", "lib/ipv6.js", "lib/derkit.js", "lib/oldcrypto.js", "lib/keyfmt.js", "lib/pkcs12.js", "lib/certinfo.js", "lib/certkit.js", "lib/certui.js"], size: { w: 1000, h: 780 } },
+    { id: "certconvert", title: "Certificate Converter", base: "apps/certconvert/", folder: "certs", deps: ["lib/tk.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/hashcalc.js", "lib/ipv6.js", "lib/derkit.js", "lib/oldcrypto.js", "lib/keyfmt.js", "lib/pkcs12.js", "lib/certinfo.js", "lib/certkit.js", "lib/certconv.js", "lib/certui.js", "vendor/fflate.js"], size: { w: 1000, h: 780 } },
+    { id: "certcsr", title: "CSR & Key Generator", base: "apps/certcsr/", folder: "certs", deps: ["lib/tk.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/hashcalc.js", "lib/ipv6.js", "lib/derkit.js", "lib/oldcrypto.js", "lib/keyfmt.js", "lib/pkcs12.js", "lib/certinfo.js", "lib/certkit.js", "lib/certgen.js"], size: { w: 980, h: 780 } },
+    { id: "certdecode", title: "Certificate Decoder", base: "apps/certdecode/", folder: "certs", deps: ["lib/tk.js", "lib/ipv6.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/certinfo.js"], size: { w: 980, h: 760 } },
+    { id: "opensslhelp", title: "OpenSSL Command Helper", base: "apps/opensslhelp/", folder: "certs", deps: ["lib/tk.js", "lib/sslcmds.js"], size: { w: 980, h: 720 } },
     { id: "mailhdr", title: "Email Header Analyser", base: "apps/mailhdr/", folder: "network", deps: ["lib/tk.js", "lib/mailhdr.js"], size: { w: 1000, h: 760 } },
     { id: "mailauth", title: "SPF, DKIM & DMARC Reader", base: "apps/mailauth/", folder: "network", deps: ["lib/tk.js", "lib/mailauth.js"], size: { w: 1000, h: 760 } },
     { id: "mtucalc", title: "MTU & MSS Calculator", base: "apps/mtucalc/", folder: "network", deps: ["lib/tk.js", "lib/mtucalc.js"], size: { w: 960, h: 760 } },
@@ -39,7 +44,7 @@
     { id: "pdfredact", title: "Redact", base: "apps/pdfredact/", folder: "pdf", deps: ["lib/pdfcommon.js", "vendor/pdf-lib.min.js"], size: { w: 1180, h: 780 } },
     { id: "pdfimages", title: "Images / PDF Converter", base: "apps/pdfimages/", folder: "pdf", deps: ["lib/pdfcommon.js", "vendor/pdf-lib.min.js", "vendor/fflate.js"], size: { w: 1000, h: 740 } },
     { id: "pdfextract", title: "Extract Content", base: "apps/pdfextract/", folder: "pdf", deps: ["lib/pdfcommon.js", "vendor/fflate.js"], size: { w: 960, h: 740 } },
-    { id: "netquality", title: "Connection Quality", base: "apps/netquality/", folder: "trouble", deps: ["lib/cdn.js", "lib/netanalysis.js", "lib/netreport.js"], size: { w: 1180, h: 780 } },
+    { id: "netquality", title: "Connection Quality", base: "apps/netquality/", folder: "trouble", deps: ["lib/cdn.js", "lib/speedcalc.js", "lib/netanalysis.js", "lib/netreport.js"], size: { w: 1180, h: 780 } },
     { id: "connfacts", title: "Connection Facts", base: "apps/connfacts/", folder: "trouble", deps: ["lib/cdn.js", "lib/connfacts.js"], size: { w: 760, h: 700 } },
     { id: "idletest", title: "Idle-timeout Finder", base: "apps/idletest/", folder: "trouble", deps: ["lib/tk.js", "lib/idleanalysis.js"], size: { w: 820, h: 720 } },
     { id: "pathread", title: "Ping & Traceroute Reader", base: "apps/pathread/", folder: "trouble", deps: ["lib/tk.js", "lib/pathread.js"], size: { w: 1000, h: 760 } },
@@ -73,6 +78,12 @@
     { id: "icmptypes", title: "ICMP Types", base: "apps/icmptypes/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-icmp.js"], size: { w: 1000, h: 720 } },
     { id: "tcpref", title: "TCP Reference", base: "apps/tcpref/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-tcp.js"], size: { w: 1000, h: 720 } },
     { id: "ipsecref", title: "IPsec Reference", base: "apps/ipsecref/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-ipsec.js"], size: { w: 1000, h: 720 } },
+    { id: "blocks", title: "Blocks", base: "apps/blocks/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 600, h: 800 } },
+    { id: "mines", title: "Mines", base: "apps/mines/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 860, h: 720 } },
+    { id: "pinball", title: "Pinball", base: "apps/pinball/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 720, h: 940 } },
+    { id: "racer", title: "Road Racer", base: "apps/racer/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 1040, h: 740 } },
+    { id: "pool", title: "Pool", base: "apps/pool/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 1100, h: 780 } },
+    { id: "birdhunt", title: "Bird Hunt", base: "apps/birdhunt/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 1040, h: 740 } },
   ];
   APPS.forEach(a => { a.icon = a.base + "icon.svg"; });
 
@@ -81,15 +92,25 @@
     { id: "network", title: "Network Tools", size: { w: 640, h: 500 } },
     { id: "pdf", title: "PDF Tools", size: { w: 700, h: 610 } },
     { id: "trouble", title: "Troubleshooting", size: { w: 640, h: 440 } },
+    { id: "certs", title: "Certificates", size: { w: 640, h: 440 } },
     { id: "engineering", title: "Engineering Tools", size: { w: 640, h: 440 } },
     { id: "images", title: "Image Tools", size: { w: 640, h: 440 } },
     { id: "reference", title: "Reference", size: { w: 640, h: 440 } },
+    { id: "games", title: "Games", size: { w: 640, h: 440 } },
   ];
   // Tools the deployer switched off in tools.conf: the server sends window.TOOLS_OFF (script tools-config.js) before this file.
   // Switched-off apps, and folders that are off or left empty, are removed here, so no icon, menu entry or link remains.
   const OFF = new Set(Array.isArray(window.TOOLS_OFF) ? window.TOOLS_OFF : []);
   for (let i = APPS.length - 1; i >= 0; i--) if (OFF.has(APPS[i].id)) APPS.splice(i, 1);
   for (let i = FOLDERS.length - 1; i >= 0; i--) if (OFF.has(FOLDERS[i].id) || !APPS.some(a => a.folder === FOLDERS[i].id)) FOLDERS.splice(i, 1);
+  // Tools marked "locked" in tools.conf stay visible but ask for the access code before they open. The server (script tools-config.js) says which ones are locked and
+  // whether this browser has already unlocked them; the real check is made by the server, which refuses the tool's files without the code.
+  const LOCKED = new Set(Array.isArray(window.TOOLS_LOCKED) ? window.TOOLS_LOCKED : []);
+  let unlocked = !!window.TOOLS_UNLOCKED;
+  APPS.forEach(a => { a.locked = LOCKED.has(a.id); });
+  const lockMarks = [];   // the padlock pictures, switched between closed and open
+  const lockPicture = () => unlocked ? "icons/lock-open.svg" : "icons/lock.svg";
+  const lockTitle = () => unlocked ? "Unlocked for now" : "Locked: asks for an access code";
   const FOLDER_ITEMS = FOLDERS.map(f => ({ id: "folder-" + f.id, title: f.title, icon: "icons/folder.svg", kind: "folder", folder: f, size: f.size }));
   const ALL = APPS.concat(FOLDER_ITEMS);
   const appsIn = folder => APPS.filter(a => a.folder === folder.id);
@@ -185,16 +206,65 @@
       return;
     }
     if (pending.has(id)) return;
+    if (app.locked && !unlocked && !(await askCode(app))) return;
     pending.add(id);
     try {
       if (app.kind !== "folder") await loadApp(app);
     } catch (e) {
+      pending.delete(id);
+      if (app.locked && await lockExpired()) { if (await askCode(app)) openApp(id); return; }   // the code's time ran out while the page was open
       shell.alert(`Could not open ${app.title}. ${e.message}.`);
       return;
     } finally {
       pending.delete(id);
     }
     createWindow(app);
+  }
+
+  /* ---------- locked tools: the access code window ---------- */
+
+  function refreshLocks() {
+    lockMarks.forEach(i => { i.src = lockPicture(); i.title = lockTitle(); });
+    lockAgain.hidden = lockAgainList.hidden = !(unlocked && LOCKED.size);
+  }
+  // has the server stopped accepting our cookie (its hours ran out)? If so, remember it.
+  async function lockExpired() {
+    try {
+      const t = await (await fetch("tools-config.js", { cache: "no-store" })).text();
+      if (/TOOLS_UNLOCKED=true/.test(t)) return false;
+    } catch (e) { return false; }
+    unlocked = false; refreshLocks();
+    return true;
+  }
+  let lockAsk = null;
+  function askCode(app) {
+    if (lockAsk) return lockAsk;
+    const d = $("lockdlg"), input = $("lockCode"), err = $("lockErr"), ok = $("lockOk");
+    $("lockMsg").textContent = `${app.title} is locked. Type the access code to use it.`;
+    input.value = ""; err.hidden = true; err.textContent = ""; ok.disabled = false;
+    lockAsk = new Promise(resolve => {
+      let done = false;
+      const finish = v => { if (done) return; done = true; lockAsk = null; d.onclose = null; try { d.close(); } catch (e) { /* already closed */ } resolve(v); };
+      const show = m => { err.textContent = m; err.hidden = false; };
+      async function submit() {
+        if (!input.value.trim()) { show("Type the access code."); input.focus(); return; }
+        ok.disabled = true; err.hidden = true;
+        try {
+          const r = await fetch("api/unlock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: input.value }), credentials: "same-origin" });
+          const j = await r.json().catch(() => ({}));
+          if (r.ok) { unlocked = true; refreshLocks(); finish(true); return; }
+          show(j.error || `The code could not be checked (error ${r.status}).`);
+        } catch (e) { show("The server could not be reached. Try again."); }
+        ok.disabled = false; input.value = ""; input.focus();
+      }
+      ok.onclick = submit;
+      $("lockCancel").onclick = $("lockX").onclick = () => finish(false);
+      input.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); submit(); } };
+      d.onclose = () => finish(false);   // Escape
+      if (typeof d.showModal === "function") { if (!d.open) d.showModal(); input.focus(); }
+      else { const c = window.prompt($("lockMsg").textContent); if (c === null) finish(false); else { input.value = c; submit(); } }
+    });
+    return lockAsk;
   }
 
   function geometry(app) {
@@ -262,6 +332,7 @@
       const name = el("span");
       name.textContent = app.title;
       b.append(img, name);
+      if (app.locked) { const m = el("img", "lockmark", { src: lockPicture(), alt: "", title: lockTitle() }); lockMarks.push(m); b.append(m); }
       b.addEventListener("click", () => {
         view.querySelectorAll(".ficon").forEach(i => i.classList.toggle("selected", i === b));
         openApp(app.id);
@@ -477,6 +548,7 @@
     const s = el("span");
     s.textContent = app.title;
     b.append(img, s);
+    if (app.locked) { const m = el("img", "lockmark", { src: lockPicture(), alt: "", title: lockTitle() }); lockMarks.push(m); b.append(m); }
     b.addEventListener("click", () => openApp(app.id));
     li.append(b);
     return li;
@@ -513,8 +585,65 @@
     list.append(li);
   });
   APPS.filter(a => !a.folder).forEach(app => list.append(menuItem(app)));
+  // "Lock again": forget the code on this computer and close the locked tools that are open
+  const lockAgain = el("li", "lockagain"), lockAgainList = el("ul", "lockagainlist");
+  { const b = el("button", "", { type: "button" }); b.textContent = "Lock again";
+    b.addEventListener("click", async () => {
+      closeMenu();
+      try { await fetch("api/lock", { method: "POST", credentials: "same-origin" }); } catch (e) { /* the cookie simply stays until it expires */ }
+      unlocked = false;
+      [...wins.values()].filter(w => w.app.locked).forEach(closeWindow);
+      refreshLocks();
+    });
+    lockAgain.append(b); lockAgain.hidden = true; lockAgainList.append(lockAgain); lockAgainList.hidden = true; menu.append(lockAgainList); }
+  refreshLocks();
+
+  /* ---------- search in the Tools menu ---------- */
+
+  const searchBox = $("menuSearch"), results = $("menuResults"), srCount = $("menuCount");
+  const folderName = id => (FOLDERS.find(f => f.id === id) || {}).title || "";
+  const searchIndex = window.ToolSearch ? window.ToolSearch.build(APPS.map(a => ({ id: a.id, title: a.title, folder: folderName(a.folder) }))) : null;
+  function showResults(q) {
+    const query = q.trim();
+    results.textContent = ""; results.hidden = !query; list.hidden = !!query;
+    if (!query) { srCount.textContent = ""; return; }
+    const hits = searchIndex ? window.ToolSearch.search(searchIndex, query, 12) : [];
+    hits.forEach(h => {
+      const app = APPS.find(a => a.id === h.id); if (!app) return;
+      const li = el("li"), b = el("button", "", { type: "button", title: app.title });
+      const t = el("span", "smtext"), name = el("span"), fo = el("small", "smfolder");
+      name.textContent = app.title; fo.textContent = h.folder; t.append(name, fo);
+      b.append(el("img", "", { src: app.icon, alt: "" }), t);
+      if (app.locked) b.append(el("img", "lockmark", { src: lockPicture(), alt: "", title: lockTitle() }));
+      b.addEventListener("click", () => openApp(app.id));
+      li.append(b); results.append(li);
+    });
+    if (!hits.length) { const li = el("li", "smnone"); li.textContent = `No tool matches "${query}". Try one or two simple words, like pdf, hash or subnet.`; results.append(li); }
+    srCount.textContent = hits.length ? `${hits.length} result${hits.length === 1 ? "" : "s"}` : "No results";
+  }
+  const clearSearch = () => { searchBox.value = ""; showResults(""); };
+  const focusMenu = () => { if (mobileMQ.matches) { const f = list.querySelector("button"); if (f) f.focus(); } else searchBox.focus(); };
+  searchBox.addEventListener("input", () => showResults(searchBox.value));
+  searchBox.addEventListener("keydown", e => {
+    if (e.key === "Enter") { const first = results.querySelector("button"); if (first) { e.preventDefault(); first.click(); } }
+    else if (e.key === "ArrowDown") { e.preventDefault(); const f = (results.hidden ? list : results).querySelector("button"); if (f) f.focus(); }
+    else if (e.key === "Escape" && searchBox.value) { e.preventDefault(); e.stopPropagation(); clearSearch(); }
+  });
+  results.addEventListener("keydown", e => {
+    const bs = [...results.querySelectorAll("button")], i = bs.indexOf(document.activeElement);
+    if (e.key === "ArrowDown" && i >= 0) { e.preventDefault(); (bs[i + 1] || bs[i]).focus(); }
+    else if (e.key === "ArrowUp" && i >= 0) { e.preventDefault(); if (i === 0) searchBox.focus(); else bs[i - 1].focus(); }
+  });
+  // Ctrl+K (or Cmd+K) opens the menu on the search box, unless a message window is open
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === "k" && !document.querySelector("dialog[open]")) {
+      e.preventDefault(); if (menu.hidden) { menu.hidden = false; startBtn.setAttribute("aria-expanded", "true"); }
+      searchBox.focus(); searchBox.select();
+    }
+  });
 
   function closeMenu() {
+    clearSearch();
     menu.hidden = true;
     startBtn.setAttribute("aria-expanded", "false");
     list.querySelectorAll(".hasSub.open").forEach(li => {
@@ -527,7 +656,7 @@
     const open = menu.hidden;
     menu.hidden = !open;
     startBtn.setAttribute("aria-expanded", String(open));
-    if (open) list.querySelector("button").focus();
+    if (open) focusMenu();
   });
   document.addEventListener("pointerdown", e => {
     if (!menu.hidden && !menu.contains(e.target) && !startBtn.contains(e.target)) closeMenu();

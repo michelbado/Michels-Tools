@@ -432,3 +432,27 @@ body {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* ---- locked tools: the padlock on an icon, the code window ---- */
+.ficon { position: relative; }
+.lockmark { width: 16px; height: 16px; display: block; flex: 0 0 auto; }
+.ficon .lockmark { position: absolute; left: calc(50% + 6px); top: 36px; width: 20px; height: 20px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .5)); }
+.startmenu .lockmark { margin-left: 8px; width: 14px; height: 14px; }
+.lockfield { display: flex; flex-direction: column; gap: 4px; margin: 10px 0 6px; font-weight: 700; }
+.lockfield .xp-field { width: 100%; box-sizing: border-box; }
+.lockerr { margin: 4px 0 8px; padding: 5px 8px; border: 1px solid #C23A14; background: #FFF1EC; color: #7A1F06; line-height: 1.4; overflow-wrap: anywhere; }
+.dlgbtn { gap: 8px; }
+.startmenu .lockagainlist { list-style: none; margin: 0; padding: 0; border-top: 0; }
+.startmenu .lockagain { border-top: 1px solid #ACA899; }
+.startmenu .lockagain button { color: #333; width: 100%; text-align: left; }
+
+/* ---- search in the Tools menu ---- */
+.startmenu .smsearch { padding: 8px 8px 6px; background: #fff; }
+.startmenu .smsearch input { width: 100%; box-sizing: border-box; }
+.startmenu #menuResults { max-height: calc(100vh - 150px); max-height: calc(100dvh - 150px); overflow-y: auto; }
+.startmenu .smtext { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.startmenu .smfolder { font-size: 11px; color: #6b6b6b; }
+.startmenu button:hover .smfolder, .startmenu button:focus-visible .smfolder { color: #dbe6ff; }
+.startmenu .smnone { padding: 10px; color: #555; line-height: 1.4; }
+.sronly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 699px) { .startmenu .smsearch input { min-height: 44px; font-size: 16px; } }

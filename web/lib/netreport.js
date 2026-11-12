@@ -27,7 +27,7 @@ h2 { font-size: 18px; margin: 26px 0 8px; padding-bottom: 4px; border-bottom: 2p
 .verdict.good { background: #EAF6E8; border-color: #2F7D2F; color: #17501A; }
 .verdict.warn { background: #FFF6DC; border-color: #8A6D00; color: #5A4500; }
 .verdict.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
-.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 12px; }
 .card { border: 1px solid #919B9C; background: #fff; padding: 12px 14px; }
 .card h3 { margin: 0 0 4px; font-size: 14px; }
 .card h3 small { font-weight: 400; color: #666; margin-left: 6px; }
@@ -61,7 +61,7 @@ footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #C9C6B8; col
   }
 
   function build(r, meta = {}) {
-    const m = r.origin, speedCls = { veryclose: "l0", close: "l0", moderate: "l1", far: "l2", veryfar: "l3" }[r.speed.key] || "";
+    const m = r.origin, latCls = { veryclose: "l0", close: "l0", moderate: "l1", far: "l2", veryfar: "l3" }[r.latency.key] || "", sh = NA().speedHeadline(r.speed);
     const vcls = r.qualityLevel === null ? "" : ["good", "good", "warn", "bad"][r.qualityLevel];
     const parts = [];
     const title = `Connection Quality report${meta.when ? " - " + meta.when : ""}`;
@@ -73,16 +73,15 @@ footer { margin-top: 28px; padding-top: 10px; border-top: 1px solid #C9C6B8; col
     ].filter(Boolean).map(x => `<span>${x}</span>`).join("")}</p></header>`);
     parts.push(`<div class="verdict ${vcls}" role="status">${esc(r.sentence)}</div>`);
 
-    const sp = [];
-    if (Number.isFinite(r.speed.median)) sp.push(`Typical answer time ${ms(r.speed.median)}.`, `Best ${ms(r.speed.min)}, 95% of answers under ${ms(r.speed.p95)}, worst ${ms(r.speed.max)}.`);
-    if (r.edge && Number.isFinite(r.edge.median)) sp.push(`${up(meta.edgeName || "the CDN")}'s nearest data centre${meta.colo ? " (" + meta.colo + ")" : ""}: ${ms(r.edge.median)}.`);
-    if (Number.isFinite(r.speed.down)) sp.push(`Download about ${r.speed.down.toFixed(1)} Mbit/s.`);
-    if (Number.isFinite(r.speed.up)) sp.push(`Upload about ${r.speed.up.toFixed(1)} Mbit/s.`);
+    const lt = [];
+    if (Number.isFinite(r.latency.median)) lt.push(`Typical answer time ${ms(r.latency.median)}.`, `Best ${ms(r.latency.min)}, 95% of answers under ${ms(r.latency.p95)}, worst ${ms(r.latency.max)}.`);
+    if (r.edge && Number.isFinite(r.edge.median)) lt.push(`${up(meta.edgeName || "the CDN")}'s nearest data centre${meta.colo ? " (" + meta.colo + ")" : ""}: ${ms(r.edge.median)}.`);
+    const sp = r.speed.measured ? NA().speedLines(r.speed) : ["No data was transferred (the speed test was switched off or could not run)."];
     const ql = [];
     if (m.n) ql.push(`Answered ${m.answered} of ${m.n} probes${m.timeouts ? ` (${m.timeoutPct.toFixed(1)}% got no answer)` : ""}.`);
     if (m.answered) ql.push(`${m.spikes} slow probes (${m.spikePct.toFixed(0)}%). Jitter ${ms(m.jitter)}. Longest silence ${ms(m.longestStall)}.`);
-    parts.push(`<div class="cards">${card("Speed", "how far away, how long answers take", r.speed.label, speedCls, sp)}${card("Quality", "how steady and complete", r.quality.label, r.qualityLevel === null ? "" : "l" + r.qualityLevel, ql)}</div>`);
-    parts.push(`<p class="note">Speed and quality are separate on purpose: a link that always answers in 200 ms is slow but excellent; one that answers in 40 ms but sometimes needs a second, or not at all, is fast but poor.</p>`);
+    parts.push(`<div class="cards">${card("Latency", "how long answers take (distance)", r.latency.label, latCls, lt)}${card("Speed", "download and upload", sh.label, sh.cls, sp)}${card("Quality", "how steady and complete", r.quality.label, r.qualityLevel === null ? "" : "l" + r.qualityLevel, ql)}</div>`);
+    parts.push(`<p class="note">Latency, speed and quality are separate on purpose: a link that always answers in 200 ms is far away but excellent; one that answers in 40 ms but sometimes needs a second, or not at all, is close but poor. Speed is measured over one connection to Michel's Tools.</p>`);
 
     const img = meta.images || {};
     if (img.graph) {

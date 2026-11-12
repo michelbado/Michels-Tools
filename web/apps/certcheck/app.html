@@ -1,0 +1,19 @@
+<div class="tk">
+  <div class="tk-body">
+    <div class="ct-verdict" id="certcheck-verdict" role="status" aria-live="polite" hidden></div>
+    <div class="tk-muted" id="certcheck-inv"></div>
+    <div id="certcheck-panel"></div>
+    <fieldset>
+      <legend>Check</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="certcheck-host"><b>Host name to check (optional)</b>
+          <input type="text" id="certcheck-host" class="xp-field" placeholder="www.example.com" spellcheck="false" autocomplete="off" autocapitalize="off"></label>
+        <button type="button" class="xp-btn" id="certcheck-copy" disabled>Copy report</button>
+        <button type="button" class="xp-btn" id="certcheck-save" disabled>Save report</button>
+      </div>
+      <p class="tk-muted">Add everything you received: the certificate, the key, the CA or CA-bundle file, a PFX, a request. The files are recognised by what is inside, not by their names. You get one verdict for the whole package.</p>
+    </fieldset>
+    <div id="certcheck-out"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="certcheck-status">Ready</span></footer>
+</div>

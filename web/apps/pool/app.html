@@ -1,0 +1,22 @@
+<div class="gm">
+  <div class="gm-bar">
+    <button type="button" class="xp-btn small is-default" id="pool-new">New game</button>
+    <label for="pool-mode">Against <select id="pool-mode" class="xp-select">
+      <option value="cpu1">Computer (easy)</option>
+      <option value="cpu2" selected>Computer (normal)</option>
+      <option value="cpu3">Computer (hard)</option>
+      <option value="two">Second player, same screen</option>
+    </select></label>
+    <label for="pool-power">Power <input type="range" id="pool-power" min="5" max="100" step="1" value="55"></label>
+    <label for="pool-spin">Hit the cue ball <select id="pool-spin" class="xp-select">
+      <option value="0">in the centre</option>
+      <option value="1">high (it follows)</option>
+      <option value="-1">low (it comes back)</option>
+    </select></label>
+    <button type="button" class="xp-btn small" id="pool-shoot">Shoot</button>
+    <button type="button" class="xp-btn small gm-sound" id="pool-sound" aria-pressed="false">Sound: off</button>
+    <span class="gm-info" id="pool-info"></span>
+  </div>
+  <div class="gm-stage pool-stage" id="pool-stage"><canvas class="gm-canvas" id="pool-canvas" tabindex="0" aria-label="Pool game"></canvas></div>
+  <footer class="statusbar" role="status"><span class="cell msg" id="pool-status">Move the mouse to aim and click to shoot. On a touch screen: drag to aim, then press Shoot.</span></footer>
+</div>

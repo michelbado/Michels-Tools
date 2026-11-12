@@ -13,9 +13,11 @@
 network = true
 pdf = true
 trouble = true
+certs = true
 engineering = true
 images = true
 reference = true
+games = true
 
 # ---- Network Tools ----
 aggregator = true      # IP Aggregator (also switches off its server API, POST /api/aggregate)
@@ -25,7 +27,6 @@ checker = true         # IP Checker
 ipv6calc = true        # IPv6 Calculator (addresses, prefixes, address types, splitting, reverse DNS names)
 ipconv = true          # IP & Number Converter (decimal, hex, binary, reverse DNS, unusual forms)
 maclookup = true       # MAC Lookup (manufacturer from the IEEE list, address formats, random-address check)
-certdecode = true      # Certificate Decoder (certificates, chains and CSRs; read in the browser)
 mailhdr = true         # Email Header Analyser (route, delays, SPF/DKIM/DMARC, forged-sender hints)
 mailauth = true       # SPF, DKIM & DMARC Reader (explains pasted DNS records and finds mistakes; nothing is looked up)
 mtucalc = true         # MTU & MSS Calculator (largest packet through PPPoE, GRE, IPsec, WireGuard, VXLAN ...; TCP MSS to set)
@@ -45,12 +46,19 @@ pdfimages = true       # Images / PDF Converter
 pdfextract = true      # Extract Content
 
 # ---- Troubleshooting ----
-netquality = true      # Connection Quality (speed AND stability of the link to this server)
+netquality = true      # Connection Quality (latency, speed and stability of the link to this server)
 connfacts = true      # Connection Facts (what the site sees of the visitor: address, CDN, protocol, clock, time breakdown)
 idletest = true       # Idle-timeout finder (how long the path lets a quiet connection live; holds a request open on the server)
 pathread = true       # Ping & Traceroute Reader (paste the output of ping, tracert, traceroute, mtr, pathping; read in the browser)
 browsercaps = true     # Browser Capability Report (what this browser can do; read in the browser)
 httphdr = true         # HTTP Header Reader (paste response headers: security headers, cookies, caching, CORS; read in the browser)
+
+# ---- Certificates (all of these run in the visitor's browser; nothing added, pasted or opened is sent anywhere; private keys are handled in memory only) ----
+certcheck = true       # Certificate Package Checker (drop certificate, key, CA bundle, PFX, CSR: one verdict on match, chain, dates, names, strength)
+certconvert = true     # Certificate Converter (PEM, DER, PFX with or without a password, P7B, key formats, ready files for nginx, Apache, IIS, Tomcat, HAProxy)
+certcsr = true         # CSR & Key Generator (new key and certificate request made in the browser; needs https)
+certdecode = true      # Certificate Decoder (reads certificates, chains and CSRs; refuses private keys)
+opensslhelp = true     # OpenSSL Command Helper (the exact openssl command for each task, with explanations; runs nothing)
 
 # ---- Engineering Tools (all of these run in the visitor's browser; nothing typed or pasted is sent anywhere) ----
 urlparse = true        # URL Parser (scheme, user, password, host, port, path, every query parameter; spots look-alike and hidden addresses)
@@ -86,6 +94,25 @@ dnstypes = true        # DNS Record Types (what each is for, with examples)
 icmptypes = true       # ICMP Types (IPv4 and IPv6, with firewall advice)
 tcpref = true          # TCP Reference (flags, connection states, options)
 ipsecref = true        # IPsec Reference (DH groups, matching strengths, algorithms, ports and terms)
+
+# ---- Games (they run in the visitor's browser and cost the server nothing; scores stay in the visitor's browser; sound is off until switched on) ----
+blocks = true          # Blocks (falling pieces; fill a row to clear it)
+mines = true           # Mines (open every square that hides no mine; three sizes)
+pinball = true         # Pinball (one table, three balls)
+racer = true           # Road Racer (arcade driving against the clock)
+pool = true            # Pool (8-ball against the computer or a second player on the same screen)
+birdhunt = true        # Bird Hunt (birds burst out of the grass; three shots for each flight)
+
+# ---- Locking ----
+# Instead of "true" or "false", a tool or a whole folder can say "locked": it stays visible, but its files and server calls are refused until the
+# visitor has entered the access code below (they click the tool, a small window asks for the code). One code for all locked tools. Example:
+#     qrcode = locked
+#     pdf = locked          (every tool in the PDF folder)
+# A locked tool whose code is missing stops the program at startup, so a tool can never end up open by mistake. A tool that is switched off stays off.
+# The access code (a PIN or a password): at least 4 characters, and the longer the safer, may contain spaces and #. Because of that, NO comment may follow it on its own line. Empty: nothing may be locked.
+lock.code =
+# How long an entered code stays valid in the visitor's browser, 1 to 168 hours (changing the code logs everybody out at once):
+lock.hours = 12
 
 # ---- Settings (tool.setting = value). The values below are the defaults. ----
 # Connection Quality has a Monitor mode: it keeps probing the link until the visitor presses Stop. It keeps one connection busy

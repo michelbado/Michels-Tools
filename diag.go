@@ -20,15 +20,16 @@ import (
 //	                                The page uses them to tell delay on the way TO the server from delay on the way BACK.
 //	GET  /api/seen?run=ID&seqs=1,2  which probes of this run the server did receive (to tell "request lost" from "reply lost").
 //	                                &done=1 also forgets the run: the page is finished with it.
-//	GET  /api/download?kb=N         N KB of random bytes (at most maxDownloadKB), for the under-load test.
-//	POST /api/upload                reads and discards up to maxUploadBytes, for the under-load test.
+//	GET  /api/download?kb=N         N KB of random bytes (at most maxDownloadKB), for the speed test and the under-load test. The page cancels it as soon as the speed is stable.
+//	POST /api/upload?run=ID         reads and discards up to maxUploadBytes. The bytes received so far are counted per run and reported in the "u" field of /api/ping, so the
+//	                                page can measure the upload speed from what the SERVER received (a browser's own progress only says what it handed to the network).
 //	GET  /api/monitor               how Monitor mode is offered here: on or off, exclusive or not, longest run, fine detail allowed, and whether another visitor is monitoring now.
 //	POST /api/monitor?run=ID        asks to start monitoring (409 when another visitor is, and exclusive mode is on); &release=1 gives it up.
 //	                                While monitoring, probes carry &mon=1, which keeps the claim alive; a claim nobody renews ends by itself.
 
 const (
-	maxDownloadKB   = 8192
-	maxUploadBytes  = 4 << 20
+	maxDownloadKB   = 100 << 10 // 100 MB: the "Full" speed test; the page cancels the transfer as soon as the speed is stable
+	maxUploadBytes  = 50 << 20
 	ringSize        = 4096            // probes remembered per run (about 13 minutes at 5 a second)
 	ringBig         = 16384           // ... for a fine-detail run (20 a second): about 13 minutes
 	runTTL          = 3 * time.Minute // a run that sends nothing for this long is forgotten (a running test sends 5 probes a second)
@@ -48,6 +49,7 @@ type diagRun struct {
 	touched time.Time
 	seqs    []uint32 // which probe each slot holds (seq+1; 0 = empty)
 	at      []int64  // when the server received it
+	up      int64    // upload bytes the server has received in this run
 }
 
 // the one visitor who currently holds Monitor mode (when it is exclusive)
@@ -126,6 +128,24 @@ func (d *diagStore) noteSized(ip, run string, seq uint32, at int64, big bool) bo
 	slot := seq % uint32(len(r.seqs))
 	r.seqs[slot], r.at[slot] = seq+1, at
 	return true
+}
+
+// addUp counts upload bytes received for a run (only its own address may). upBytes reads the total.
+func (d *diagStore) addUp(ip, run string, n int64) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if r := d.runs[run]; r != nil && r.ip == ip {
+		r.up += n
+	}
+}
+
+func (d *diagStore) upBytes(ip, run string) int64 {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if r := d.runs[run]; r != nil && r.ip == ip {
+		return r.up
+	}
+	return 0
 }
 
 // lookup: the arrival time of probe seq, or -1 when the server never saw it (or it fell out of the ring).
@@ -274,7 +294,7 @@ func registerDiag(mux *http.ServeMux, cfg config) {
 			}
 		}
 		noStore(w, "application/json")
-		fmt.Fprintf(w, `{"a":%d,"s":%d}`, a, nowMicros())
+		fmt.Fprintf(w, `{"a":%d,"s":%d,"u":%d}`, a, nowMicros(), store.upBytes(ip, run))
 	})
 	mux.HandleFunc("GET /api/seen", func(w http.ResponseWriter, r *http.Request) {
 		if off(w, r) {
@@ -384,10 +404,27 @@ func registerDiag(mux *http.ServeMux, cfg config) {
 		}
 		rc := http.NewResponseController(w)
 		_ = rc.SetReadDeadline(time.Now().Add(diagTransferMax))
-		n, err := io.Copy(io.Discard, http.MaxBytesReader(w, r.Body, maxUploadBytes))
-		if err != nil {
-			http.Error(w, "upload too large or interrupted", http.StatusRequestEntityTooLarge)
-			return
+		run := r.URL.Query().Get("run")
+		count := validRunID(run)
+		ip := diagIP(cfg, r)
+		buf := make([]byte, 32<<10)
+		var n int64
+		body := http.MaxBytesReader(w, r.Body, maxUploadBytes)
+		for {
+			k, err := body.Read(buf)
+			if k > 0 {
+				n += int64(k)
+				if count {
+					store.addUp(ip, run, int64(k))
+				}
+			}
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				http.Error(w, "upload too large or interrupted", http.StatusRequestEntityTooLarge)
+				return
+			}
 		}
 		noStore(w, "application/json")
 		fmt.Fprintf(w, `{"bytes":%d}`, n)

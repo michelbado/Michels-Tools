@@ -18,9 +18,10 @@ Rules:
 
 - **A tool you do not list is on.** With no `tools.conf` at all, everything is on.
 - **Off means gone:** no icon, no menu entry, and the tool's files and server API answer `404 Not Found`.
-- **Folders:** `network`, `pdf`, `trouble`, `engineering`, `images` and `reference` switch a whole folder. If a folder says `false`, every tool inside it is off whatever the
+- **Folders:** `network`, `pdf`, `trouble`, `certs`, `engineering`, `images`, `reference` and `games` switch a whole folder. If a folder says `false`, every tool inside it is off whatever the
   tool's own line says. A folder whose tools are all off disappears from the desktop.
 - **A typo stops the program at startup** with the line number, so a misspelled name can never leave a tool switched on by accident.
+- **A third choice, `locked`:** see [Locking tools](#locking-tools) below.
 
 Example, turning off the PDF folder's image converter and the whole Troubleshooting folder:
 
@@ -28,6 +29,26 @@ Example, turning off the PDF folder's image converter and the whole Troubleshoot
     trouble = false
 
 The tool names (ids) are listed in [Tools](tools.md); the example file has every one of them, all `true`.
+
+### Locking tools
+
+Write `locked` instead of `true` for a tool, or for a whole folder, to keep it visible but out of casual hands:
+
+    qrcode = locked
+    pdf = locked
+    lock.code = a code of your own
+
+- The icon stays on the desktop and in the menu, with a padlock. Clicking it opens a small window that asks for the **access code**. One code is shared by every locked tool.
+- The check is made **by the server**: a locked tool's files and its server calls (for example `/api/aggregate` for the IP Aggregator) answer `401` until the code has been entered. Its icon stays public.
+- A correct code sets a cookie that lasts `lock.hours` hours (12 by default). The cookie is signed with a key made from the code, so **changing the code logs everybody out**, while restarting the program does not.
+- A folder that says `locked` locks every tool in it (for example `games = locked`, or just `pool = locked` for one game). A tool that is switched off stays off.
+- **A locked tool with no `lock.code`, or a code shorter than 4 characters, stops the program at startup**, so a tool can never end up open by mistake.
+- **A short code is easy to guess.** A 4-digit PIN has only 10,000 possibilities. The limit on wrong codes (8 per address in 10 minutes) slows guessing a lot, but it does not make a short PIN strong; use 8 or more characters for anything that matters. The limit works both ways: someone who keeps entering wrong codes from many addresses can make the server refuse everybody for a while.
+- The code is plain text in `tools.conf`: keep that file readable by the service account only (`chmod 600`). It may contain spaces and `#`, so **no comment may follow it on its line**.
+- Wrong codes are counted: 8 wrong codes from one address in 10 minutes, or 120 from all addresses together, make the server answer `429` ("try again in ...") until the window has passed, and every wrong code is slowed down.
+- Use https (a reverse proxy or tunnel in front of the program), or the code and the cookie travel in clear text. Behind a proxy that does not forward `X-Forwarded-Proto`, the cookie is not marked `Secure`.
+
+What this is **not**: there are no user accounts, nobody can be locked out individually, and it does not protect secrets. Tools run in the visitor's browser and the shared libraries under `/lib` stay public (as does this source code), so the lock keeps people from *using* the tool, not from reading how it works.
 
 ### Tool settings
 
@@ -41,6 +62,8 @@ program at startup.
 | `netquality.monitor_minutes` | `10` | 1 to 60 | The longest a monitoring run may last. |
 | `netquality.monitor_fine` | `true` | true/false | Allow "fine detail" (20 probes a second instead of 5). It catches 50 ms hiccups but sends four times the requests. |
 | `idletest.max_seconds` | `300` | 30 to 600 | The longest a single held request of the Idle-timeout Finder may last. |
+| `lock.code` | empty | 4 or more characters | The shared access code for tools marked `locked` (see [Locking tools](#locking-tools)). Required when anything is locked. No comment may follow it on its line. |
+| `lock.hours` | `12` | 1 to 168 | How long an entered code stays valid in the visitor's browser. |
 
 ## Flags
 

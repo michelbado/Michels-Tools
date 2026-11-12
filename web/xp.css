@@ -272,3 +272,51 @@ fieldset > label { line-height: 1.4; }
 .imgtk-pos input:checked + span { background: #316AC5; color: #fff; border-color: #0831D9; }
 .imgtk-pos input:focus-visible + span { outline: 2px solid #0831D9; outline-offset: 1px; }
 .imgtk-pos label { position: relative; }
+
+/* ---- Games: shared layout (apps in the Games folder; helpers in lib/gamekit.js) ----
+   Markup: .gm > .gm-bar (buttons) + .gm-stage (holds the canvas) + .gm-pad (touch keys, phones only) + footer.statusbar */
+.gm { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.gm-bar { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--bevel); }
+.gm-bar label { display: inline-flex; align-items: center; gap: 5px; }
+.gm-info { margin-left: auto; font-weight: 700; white-space: nowrap; }
+.gm-sound.is-on { box-shadow: inset 0 0 0 2px #3C9A3C; }
+.gm-stage { flex: 1 1 auto; min-height: 0; position: relative; overflow: hidden; background: #0B1026; }
+.gm-canvas { position: absolute; left: 0; top: 0; display: block; touch-action: none; outline: none; -webkit-user-select: none; user-select: none; }
+.gm-pad { display: none; gap: 6px; padding: 6px 8px; justify-content: center; background: var(--face); border-top: 1px solid var(--bevel); }
+.gm-pad button { flex: 1 1 0; min-width: 0; max-width: 110px; min-height: 46px; font-size: 18px; font-weight: 700; touch-action: none; -webkit-user-select: none; user-select: none; }
+.gm-pad button.gm-wide { flex-grow: 1.6; max-width: 160px; font-size: 14px; }
+@media (pointer: coarse) { .gm-pad { display: flex; } }
+
+/* ---------- Certificate tools (Package Checker, Converter, CSR generator, OpenSSL helper): .ct-* ---------- */
+.ct-notice { border: 1px solid #8A6D00; background: #FFF6DC; color: #4A3A00; padding: 8px 12px; margin: 0 0 10px; line-height: 1.45; }
+.ct-notice p { margin: 4px 0 6px; }
+.ct-ack { display: inline-flex; align-items: center; gap: 6px; }
+.ct-drop { border: 2px dashed #7F9DB9; background: #F4F8FF; padding: 12px; margin: 0 0 10px; text-align: center; cursor: pointer; }
+.ct-drop.over, .ct-drop:focus-visible { border-color: #0831D9; background: #E4EEFF; outline: none; }
+.ct-drop-big { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.ct-drop .xp-btn { margin-top: 8px; }
+.ct-paste { margin: 0 0 10px; }
+.ct-paste summary { cursor: pointer; padding: 2px 0; }
+.ct-files { margin: 0 0 8px; }
+.ct-files .tk-list { background: #fff; }
+.ct-unlock { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.ct-unlock .xp-field { width: 14rem; max-width: 100%; }
+.ct-note { padding: 5px 10px; margin: 4px 0; border: 1px solid #919B9C; background: #fff; }
+.ct-note.warn { background: #FFF6DC; border-color: #8A6D00; color: #5A4500; }
+.ct-note.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.ct-verdict { font-size: 17px; padding: 10px 14px; margin: 0 0 8px; border: 1px solid #000; background: var(--info); }
+.ct-verdict.good { background: #EEF8EA; border-color: #3F7A2E; color: #1F4A12; }
+.ct-verdict.warn { background: #FFF6DC; border-color: #8A6D00; color: #5A4500; }
+.ct-verdict.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
+.ct-mark { display: inline-block; min-width: 1.8em; font-weight: 700; }
+.tk-notes li.info { background: #fff; }
+.ct-fix { margin-top: 3px; font-weight: 700; }
+.ct-file { border-top: 1px solid #E3E1D5; padding: 8px 0; }
+.ct-file:first-of-type { border-top: 0; }
+.ct-file-head { margin-bottom: 4px; overflow-wrap: anywhere; }
+.ct-pre { margin: 8px 0; padding: 8px 10px; background: #F6F6EE; border: 1px solid #C9C7B8; white-space: pre-wrap; font-family: Consolas, "Courier New", monospace; font-size: 12px; }
+.ct-cmd { display: flex; gap: 8px; align-items: flex-start; margin: 4px 0; }
+.ct-cmd code { flex: 1 1 auto; min-width: 0; padding: 6px 8px; background: #1C1C22; color: #D8F5DA; font-family: Consolas, "Courier New", monospace; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.tk-side { flex: 1 1 14rem; align-self: center; }
+.tk-fld textarea.xp-text { width: 24rem; max-width: 100%; box-sizing: border-box; }
+@media (max-width: 699px) { .ct-unlock .xp-field { width: 100%; } .ct-cmd { flex-direction: column; } }

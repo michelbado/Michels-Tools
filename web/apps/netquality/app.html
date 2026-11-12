@@ -14,17 +14,26 @@
     <label class="opt"><input type="radio" name="netquality-mode" value="quick" checked> Quick test (30 seconds)</label>
     <label class="opt" id="netquality-monopt"><input type="radio" name="netquality-mode" value="monitor"> <span id="netquality-monlabel">Monitor (until I stop it, at most 10 minutes)</span> <span class="muted" id="netquality-monnote"></span></label>
     <label class="opt" id="netquality-fineopt" hidden><input type="checkbox" id="netquality-fine" checked> Fine detail: a probe every 50 ms <span class="muted">(catches short hiccups of 50 ms; sends 4 times as many requests)</span></label>
-    <label class="opt"><input type="checkbox" id="netquality-load"> Also test while the line is busy <span class="muted">(downloads 8 MB and uploads 4 MB; quick test only)</span></label>
+  </div>
+
+  <div class="opts speedopts" id="netquality-speedopts" role="group" aria-label="Speed test (uses your internet data)">
+    <span class="optlabel"><b>Speed test</b> <span class="muted">(uses your internet data; it stops as soon as the speed is steady)</span></span>
+    <label class="opt"><input type="radio" name="netquality-speed" value="none"> No transfer <span class="muted">(0 MB)</span></label>
+    <label class="opt"><input type="radio" name="netquality-speed" value="light" checked> Light <span class="muted">(at most 15 MB)</span></label>
+    <label class="opt"><input type="radio" name="netquality-speed" value="full"> Full <span class="muted">(at most 150 MB; exact on fast lines)</span></label>
+    <span class="opt plan">My plan, optional: download <input type="number" id="netquality-plandown" min="1" max="100000" step="any" inputmode="decimal" aria-label="My plan, download in Mbit per second"> upload <input type="number" id="netquality-planup" min="1" max="100000" step="any" inputmode="decimal" aria-label="My plan, upload in Mbit per second"> Mbit/s <span class="muted">(gives the speed a verdict)</span></span>
+    <span class="muted" id="netquality-speednote"></span><span class="muted" id="netquality-speedhint"></span>
   </div>
 
   <div class="lockbar" id="netquality-lockbar" role="status">Monitoring is running. Everything is greyed out except <b>Stop</b> and <b>I notice a problem now</b>, and nobody else can start Monitor mode until you press Stop.</div>
 
   <div class="content" id="netquality-content">
     <div class="intro" id="netquality-intro">
-      <p><b>This is not a speed test.</b> It judges two things separately:</p>
+      <p>This test shows three things separately:</p>
       <ul>
-        <li><b>Speed</b>: how long answers from Michel's Tools take. A far-away link can be slow and still perfect.</li>
-        <li><b>Quality</b>: how steady and complete the link is. Delays that jump around, answers that get lost, freezes and drop-outs are what ruin calls, video and page loads.</li>
+        <li><b>Latency</b>: how long answers from Michel's Tools take (the distance). A figure, not a fault: a far-away link can answer slowly and still be perfect.</li>
+        <li><b>Speed</b>: how much data the line carries, download and upload in Mbit/s, measured over one connection to Michel's Tools. It uses your internet data, at most 15 MB on <b>Light</b> and at most 150 MB on <b>Full</b>, and stops as soon as the speed is steady. A slow line needs only a few MB. With <b>No transfer</b> nothing is downloaded. Type your plan's speed to get a verdict.</li>
+        <li><b>Quality</b>: how steady and complete the link is. Delays that jump around, answers that get lost, freezes and drop-outs, and a delay that explodes when the line is busy, are what ruin calls, video and page loads.</li>
       </ul>
       <p>About five small requests per second are sent to Michel's Tools (and, if a CDN such as Cloudflare or Bunny is in front, to the CDN's nearest data centre) while you keep this window open. Nothing you type or any file is used, and nothing is stored on the server.</p>
       <p><b>Tip:</b> press <b>I notice a problem now</b> (or the <b>M</b> key) the moment something freezes for you. The report then tells you whether the network was really responsible at that moment.</p>
@@ -36,8 +45,13 @@
       <div class="progress" id="netquality-progress"></div>
 
       <div class="cards">
+        <section class="card" aria-labelledby="netquality-lath">
+          <h3 id="netquality-lath">Latency <span class="what">how long answers take (distance)</span></h3>
+          <div class="big" id="netquality-latlabel">-</div>
+          <div class="nums" id="netquality-latnums"></div>
+        </section>
         <section class="card" aria-labelledby="netquality-speedh">
-          <h3 id="netquality-speedh">Speed <span class="what">how far away, how long answers take</span></h3>
+          <h3 id="netquality-speedh">Speed <span class="what">download and upload</span></h3>
           <div class="big" id="netquality-speedlabel">-</div>
           <div class="nums" id="netquality-speednums"></div>
         </section>

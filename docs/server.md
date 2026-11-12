@@ -15,9 +15,11 @@ What the program does on the server, what it stores and what it refuses. Everyth
 | `GET /api/ping` | Connection Quality | Answered with the server's receive and send times. |
 | `GET /api/seen` | Connection Quality | Asks whether an earlier probe reached the server. |
 | `GET /api/monitor`, `POST /api/monitor` | Connection Quality | Monitor mode's exclusive claim ("lease"): GET says whether monitoring is possible now; POST takes or releases the claim. |
-| `GET /api/download` | Connection Quality | Random bytes, at most 8 MB, for the busy-line test. |
-| `POST /api/upload` | Connection Quality | Read and thrown away, at most 4 MB. |
+| `GET /api/download` | Connection Quality | Random bytes, at most 100 MB, for the speed test. The page cancels the transfer as soon as the speed is steady. |
+| `POST /api/upload?run=ID` | Connection Quality | Read and thrown away, at most 50 MB. The bytes received so far are counted per test run (memory only) and returned in the `u` field of `/api/ping`, so the page measures the upload speed from what the server received. |
 | `GET /api/hold` | Idle-timeout Finder | Holds a request open (see below). |
+| `POST /api/unlock` | Locked tools | Only exists when `tools.conf` locks something. Body `{"code": "..."}`. A correct code answers `200` and sets the `mt_unlock` cookie (`HttpOnly`, `SameSite=Strict`, `Secure` over https, valid `lock.hours` hours); a wrong one answers `403` after a short delay; too many wrong ones answer `429` with `Retry-After`. See [Locking tools](configuration.md#locking-tools). |
+| `POST /api/lock` | Locked tools | Clears the cookie ("lock again"). Only exists when something is locked. |
 
 A tool that is switched off answers `404` for its endpoints and files.
 

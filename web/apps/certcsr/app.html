@@ -1,0 +1,36 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Make a new key and a certificate request (CSR)</legend>
+      <p class="tk-muted">The key is made inside this browser tab and is never sent anywhere. You send only the CSR to your certificate authority. Keep the key file: the certificate you get back works only with it.</p>
+      <div class="tk-row">
+        <label class="tk-fld" for="certcsr-cn"><b>Common name (main host name)</b><input type="text" id="certcsr-cn" class="xp-field" placeholder="www.example.com" spellcheck="false" autocomplete="off" autocapitalize="off"></label>
+        <label class="tk-fld" for="certcsr-type"><b>Key type</b>
+          <select id="certcsr-type" class="xp-field tk-wide"></select></label>
+      </div>
+      <div class="tk-row">
+        <label class="tk-fld" for="certcsr-names"><b>All names the certificate must cover (one per line)</b>
+          <textarea id="certcsr-names" class="xp-text" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="www.example.com&#10;example.com&#10;*.example.com&#10;10.0.0.5"></textarea></label>
+        <p class="tk-muted tk-side">Host names, wildcards (*.example.com), IP addresses or email addresses. The common name is added by itself when you leave this empty.</p>
+      </div>
+      <div class="tk-row">
+        <label class="tk-fld" for="certcsr-o"><b>Organization (optional)</b><input type="text" id="certcsr-o" class="xp-field" autocomplete="off"></label>
+        <label class="tk-fld" for="certcsr-ou"><b>Department (optional)</b><input type="text" id="certcsr-ou" class="xp-field" autocomplete="off"></label>
+        <label class="tk-fld" for="certcsr-l"><b>City (optional)</b><input type="text" id="certcsr-l" class="xp-field" autocomplete="off"></label>
+        <label class="tk-fld" for="certcsr-st"><b>State or province (optional)</b><input type="text" id="certcsr-st" class="xp-field" autocomplete="off"></label>
+        <label class="tk-fld" for="certcsr-c"><b>Country code (optional)</b><input type="text" id="certcsr-c" class="xp-field tk-narrow" maxlength="2" placeholder="NL" autocomplete="off"></label>
+      </div>
+      <div class="tk-row">
+        <label class="ct-ack" for="certcsr-protect"><input type="checkbox" id="certcsr-protect"> Protect the key file with a password</label>
+        <label class="tk-fld" for="certcsr-pw"><b>Password</b><input type="password" id="certcsr-pw" class="xp-field" autocomplete="new-password" disabled></label>
+        <label class="tk-fld" for="certcsr-pw2"><b>Type it again</b><input type="password" id="certcsr-pw2" class="xp-field" autocomplete="new-password" disabled></label>
+        <label class="tk-fld" for="certcsr-scheme"><b>Protection</b>
+          <select id="certcsr-scheme" class="xp-field" disabled><option value="aes256">AES-256 (modern)</option><option value="3des">3DES (old software)</option></select></label>
+      </div>
+      <div class="tk-row"><button type="button" class="xp-btn is-default" id="certcsr-make">Generate key and request</button><button type="button" class="xp-btn" id="certcsr-clear" disabled>Wipe</button></div>
+      <p class="tk-muted" id="certcsr-warn"></p>
+    </fieldset>
+    <div id="certcsr-result"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="certcsr-status">Ready</span></footer>
+</div>

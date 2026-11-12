@@ -8,6 +8,11 @@
 .nq .opt { display: inline-flex; align-items: center; gap: 6px; }
 .nq .content { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 12px 14px; }
 .nq .opt.off { opacity: .5; }
+.nq .speedopts.off { opacity: .55; }
+.nq .speedopts .optlabel { flex-basis: 100%; }
+.nq .speedopts .plan input { width: 5.5em; }
+.nq .speedopts .plan { flex-basis: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.nq .speedopts .plan .muted { flex-basis: 100%; }
 .nq .lockbar { display: none; padding: 7px 14px; background: #FFF6DC; border-bottom: 1px solid #8A6D00; color: #5A4500; }
 .nq.locked .lockbar { display: block; }
 /* while a Monitor run is going: everything but Stop and the problem button is greyed out */
@@ -20,7 +25,7 @@
 .nq .verdict.warn { background: #FFF6DC; border-color: #8A6D00; color: #5A4500; }
 .nq .verdict.bad { background: #FFF1EC; border-color: #C23A14; color: #7A1F06; }
 .nq .progress { margin: 6px 0 10px; color: var(--muted); font-size: 12px; min-height: 16px; }
-.nq .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.nq .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin-bottom: 10px; }
 .nq .card { border: 1px solid #919B9C; background: #fff; padding: 10px 12px; }
 .nq .card h3 { margin: 0 0 6px; font-size: 14px; }
 .nq .card h3 .what { font-weight: 400; color: var(--muted); font-size: 12px; margin-left: 6px; }

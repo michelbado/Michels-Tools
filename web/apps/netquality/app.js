@@ -3,13 +3,12 @@
    web/lib/netanalysis.js turns the answers into verdicts. Nothing typed or uploaded by the visitor is used; everything shown
    is computed here. Text is only ever put on the page with textContent. */
 (window.DesktopApps = window.DesktopApps || {}).netquality = (() => {
-  const NA = window.NetAnalysis;
+  const NA = window.NetAnalysis, SC = window.SpeedCalc;
   const TICK = 100;                  // ms: origin probe on even ticks (5 a second), edge probe on odd ticks
   const FINE_TICK = 50;              // fine detail (Monitor mode): an origin probe every tick (20 a second), an edge probe every 4th tick
   const FINE_INFLIGHT_MAX = 24;      // fine detail: with this many probes unanswered, more are counted as lost without being sent (a stuck link must not pile up requests)
   const TIMEOUT = 3000;              // ms without an answer = lost
   const QUICK_MS = 30000;
-  const LOAD_PHASE_MAX = 25000;
   // the automated tests shorten the quick test by setting window.__nqTest = { quickMs } before pressing Start
   const quickMs = () => (window.__nqTest && window.__nqTest.quickMs) || QUICK_MS;
 
@@ -20,6 +19,18 @@
     const $ = id => root.querySelector("#netquality-" + id);
     const setStatus = m => { $("status").textContent = m; };
     const mode = () => root.querySelector('input[name="netquality-mode"]:checked').value;
+    const speedLevel = () => { const el = root.querySelector('input[name="netquality-speed"]:checked'); return el && SC.LEVELS[el.value] ? el.value : "light"; };
+    const planValue = id => { const v = parseFloat($(id).value); return Number.isFinite(v) && v > 0 ? Math.min(v, 100000) : 0; };
+    const mb = x => (x / 1e6).toFixed(x < 1e7 ? 1 : 0);
+    const SPEED_INPUTS = 'input[name="netquality-speed"], #netquality-plandown, #netquality-planup';
+    // The speed test needs the quick test (Monitor mode never transfers data); what the visitor chose last time is remembered in this browser only
+    const store = { get(k) { try { return localStorage.getItem("michels-tools-nq-" + k); } catch { return null; } }, set(k, v) { try { localStorage.setItem("michels-tools-nq-" + k, v); } catch { /* private window: fine */ } } };
+    function updateSpeedOptions() {
+      const off = mode() === "monitor";
+      for (const el of root.querySelectorAll(SPEED_INPUTS)) el.disabled = off || !!run;
+      $("speedopts").classList.toggle("off", off);
+      $("speednote").textContent = off ? "The speed test belongs to the quick test; Monitor mode never transfers data." : "";
+    }
     const nq = root.querySelector(".nq");
     let run = null, last = null, uiTimer = 0, observer = null, monTimer = 0;
     // how Monitor mode is offered on this server (tools.conf) and whether somebody else is monitoring right now
@@ -102,7 +113,7 @@
         else s.rtt = end - sent;
         // a cached edge probe that was renewed by the server (every 5 minutes) travelled further than the others: it says nothing about the edge
         if (ch === "e" && r.edge && r.edge.kind === "cache") { if (r.edge.stamp && r.edge.stamp !== body) { r.edge.stamp = body; r.samples.splice(r.samples.indexOf(s), 1); return; } r.edge.stamp = body; }
-        if (ch === "o") { const j = JSON.parse(body); if (!Number.isFinite(j.a) || !Number.isFinite(j.s)) throw new Error("bad answer"); s.sa = j.a; s.ss = j.s; }
+        if (ch === "o") { const j = JSON.parse(body); if (!Number.isFinite(j.a) || !Number.isFinite(j.s)) throw new Error("bad answer"); s.sa = j.a; s.ss = j.s; if (Number.isFinite(j.u)) s.u = j.u; }
         s.ok = true;
       } catch (err) {
         clearTimeout(killer);
@@ -133,10 +144,10 @@
         } catch { setStatus("Could not reach the server to start monitoring."); return; }
       }
       const fine = mode() === "monitor" && $("fine").checked && monInfo.fine;
-      const r = run = { id, fine, tick: fine ? FINE_TICK : TICK, maxMs: monInfo.minutes * 60000, start: 0, samples: [], marks: [], seqO: 0, seqE: 0, nextI: 0, phase: "idle", lastLag: 0, inflight: 0, k: 0, edge: null, proto: "", stopping: false, done: false, phases: [], mode: mode(), load: $("load").checked && mode() === "quick", timer: 0, limited: false };
+      const r = run = { id, fine, tick: fine ? FINE_TICK : TICK, maxMs: monInfo.minutes * 60000, start: 0, samples: [], marks: [], seqO: 0, seqE: 0, nextI: 0, phase: "idle", lastLag: 0, inflight: 0, k: 0, edge: null, proto: "", stopping: false, done: false, phases: [], mode: mode(), load: speedLevel() !== "none" && mode() === "quick", speedLevel: speedLevel(), planDown: planValue("plandown"), planUp: planValue("planup"), used: 0, usedDown: 0, usedUp: 0, speedRes: {}, timer: 0, limited: false };
       $("start").disabled = true; $("stop").disabled = false; $("mark").disabled = false; $("clear").disabled = true; $("copy").disabled = true; $("save").disabled = true; $("savehtml").disabled = true;
       nq.classList.toggle("locked", r.mode === "monitor");
-      for (const el of root.querySelectorAll('input[name="netquality-mode"], #netquality-load, #netquality-fine')) el.disabled = true;
+      for (const el of root.querySelectorAll('input[name="netquality-mode"], #netquality-fine, ' + SPEED_INPUTS)) el.disabled = true;
       $("intro").hidden = true; $("results").hidden = false;
       $("verdict").textContent = "Starting..."; $("verdict").className = "verdict";
       setStatus("Looking for a CDN in front of the server...");
@@ -181,42 +192,87 @@
       r.phase = phase;
     }
 
-    // download 8 MB, then upload 4 MB, while the probes keep running: does the delay explode when the line is busy?
+    /* ---------- the speed test: a download, then an upload, while the probes keep running ---------- */
+    // Both directions are ONE long request that the page ends as soon as the speed has settled (speedcalc.js decides), or when the data limit
+    // of the chosen level is reached. The download is timed by the bytes the page receives; the upload by the bytes the SERVER confirms
+    // (the probe answers carry the server's running count), because a browser's own upload progress only says what it handed to the network.
+    const LIMITED = "The server asked for a pause between speed tests: wait a minute and try again.";
     async function loadPhases(r) {
+      const L = SC.LEVELS[r.speedLevel];
       try {
-        setPhase(r, "down"); setStatus("Now downloading 8 MB while measuring the delay...");
-        const ac = new AbortController(), kill = setTimeout(() => ac.abort(), LOAD_PHASE_MAX);
-        const t0 = performance.now();
-        try {
-          const res = await fetch(new URL(`api/download?kb=8192&run=${r.id}`, document.baseURI), { cache: "no-store", signal: ac.signal });
-          if (res.status === 429) throw new Error("limited");
-          const rd = res.body.getReader(); let got = 0, first = 0;
-          for (;;) { const { done, value } = await rd.read(); if (done) break; if (!first) first = performance.now(); got += value.length; if (r.stopping) { rd.cancel(); break; } }
-          const secs = (performance.now() - (first || t0)) / 1000;
-          if (got > 1e6 && secs > 0.05) r.downMbps = (got * 8) / 1e6 / secs;
-          r.downSecs = (performance.now() - t0) / 1000;
-        } catch (e) { r.loadNote = e && e.message === "limited" ? "The server asked for a pause between speed tests: wait a minute and try again." : "The download part could not be completed."; }
-        clearTimeout(kill);
+        setPhase(r, "down"); setStatus(`Measuring the download speed (at most ${mb(L.down)} MB)...`);
+        try { r.speedRes.down = await measureDown(r, L); } catch (e) { r.loadNote = e && e.message === "limited" ? LIMITED : "The download part could not be completed."; }
         if (r.stopping) return;
-        setPhase(r, "rest"); setStatus("Pausing for the line to calm down..."); await sleep(3000);
+        setPhase(r, "rest"); setStatus("Pausing for the line to calm down..."); await sleep(2500);
         if (r.stopping) return;
-        setPhase(r, "up"); setStatus("Now uploading 4 MB while measuring the delay...");
-        const ac2 = new AbortController(), kill2 = setTimeout(() => ac2.abort(), LOAD_PHASE_MAX);
-        const t1 = performance.now();
-        try {
-          const res = await fetch(new URL(`api/upload?run=${r.id}`, document.baseURI), { method: "POST", body: new Uint8Array(4 << 20), cache: "no-store", signal: ac2.signal, headers: { "Content-Type": "application/octet-stream" } });
-          if (res.status === 429) throw new Error("limited");
-          await res.text();
-          const secs = (performance.now() - t1) / 1000;
-          if (secs > 0.05) r.upMbps = ((4 << 20) * 8) / 1e6 / secs;
-          r.upSecs = secs;
-        } catch (e) { r.loadNote = r.loadNote || (e && e.message === "limited" ? "The server asked for a pause between speed tests: wait a minute and try again." : "The upload part could not be completed."); }
-        clearTimeout(kill2);
+        setPhase(r, "up"); setStatus(`Measuring the upload speed (at most ${mb(L.up)} MB)...`);
+        try { r.speedRes.up = await measureUp(r, L); } catch (e) { r.loadNote = r.loadNote || (e && e.message === "limited" ? LIMITED : "The upload part could not be completed."); }
         if (r.stopping) return;
         setPhase(r, "rest"); await sleep(1500);
       } finally {
         if (run === r && !r.stopping) finish(r);
       }
+    }
+    function showLive(r, name, pts, L) {
+      r.used = r.usedDown + r.usedUp;
+      const t = pts.length ? pts[pts.length - 1].t : 0, now = SC.rate(pts, Math.max(0, t - 1000), t);
+      setStatus(`${name}: ${Number.isFinite(now) ? NA.mbit(now) : "..."} so far. Data used: ${mb(r.used)} MB of at most ${mb(L.total)} MB. Press Stop to end the test.`);
+    }
+    async function measureDown(r, L) {
+      const ac = new AbortController(), kill = setTimeout(() => ac.abort(), L.maxMs + 8000), t0 = performance.now(), pts = [{ t: 0, b: 0 }];
+      let got = 0, j = null, next = 0;
+      try {
+        const res = await fetch(new URL(`api/download?kb=${Math.ceil(L.down / 1024) + 512}&run=${r.id}`, document.baseURI), { cache: "no-store", signal: ac.signal });
+        if (res.status === 429) throw new Error("limited");
+        if (!res.ok || !res.body) throw new Error("failed");
+        const rd = res.body.getReader();
+        for (;;) {
+          const { done, value } = await rd.read();
+          if (done) break;
+          got += value.length; const t = performance.now() - t0; pts.push({ t, b: got }); r.usedDown = got;
+          if (r.stopping) break;
+          if (t >= next) { next = t + 150; j = SC.judge(pts, { capBytes: L.down, maxMs: L.maxMs }); showLive(r, "Download", pts, L); if (j.done) break; }
+        }
+        try { rd.cancel(); } catch { /* already closed */ }
+      } finally { clearTimeout(kill); }
+      if (!j || !j.done) { pts.push({ t: performance.now() - t0, b: got }); j = SC.judge(pts, { capBytes: Math.min(L.down, got), maxMs: 1 }); }
+      return j;
+    }
+    // the newest answered probe that carries the server's upload count
+    const withCount = r => { let best = null; for (const s of r.samples) if (s.ch === "o" && s.ok && Number.isFinite(s.u) && Number.isFinite(s.sa) && (!best || s.sa > best.sa)) best = s; return best; };
+    function upPoints(r, base) {
+      const pts = [{ t: 0, b: 0 }];
+      if (!base) return pts;
+      const list = r.samples.filter(s => s.ch === "o" && s.ok && Number.isFinite(s.u) && Number.isFinite(s.sa) && s.sa > base.sa).sort((x, y) => x.sa - y.sa);
+      for (const s of list) pts.push({ t: (s.sa - base.sa) / 1000, b: s.u - base.u });
+      return pts;
+    }
+    async function measureUp(r, L) {
+      const chunk = new Uint8Array(1 << 20);
+      for (let o = 0; o < chunk.length; o += 65536) crypto.getRandomValues(chunk.subarray(o, o + 65536));     // random, so nothing on the way can squeeze it
+      const body = new Blob(Array.from({ length: Math.ceil(L.up / chunk.length) }, () => chunk)).slice(0, L.up);
+      const base = withCount(r), ac = new AbortController(), t0 = performance.now(), kill = setTimeout(() => ac.abort(), L.maxMs + 8000);
+      let finished = false, failure = null;
+      fetch(new URL(`api/upload?run=${r.id}`, document.baseURI), { method: "POST", body, cache: "no-store", signal: ac.signal, headers: { "Content-Type": "application/octet-stream" } })
+        .then(res => { if (res.status === 429) throw new Error("limited"); return res.text(); }).then(() => { finished = true; }, e => { failure = e; finished = true; });
+      let j = null, pts = [];
+      while (!r.stopping) {
+        await sleep(200);
+        pts = upPoints(r, base);
+        r.usedUp = pts[pts.length - 1].b;
+        j = SC.judge(pts, { capBytes: L.up, maxMs: L.maxMs });
+        showLive(r, "Upload", pts, L);
+        if (j.done || finished || performance.now() - t0 > L.maxMs + 6000) break;
+      }
+      const secs = (performance.now() - t0) / 1000, ok = finished && !failure;
+      ac.abort(); clearTimeout(kill);
+      if (failure && failure.message === "limited") throw failure;
+      if (j && j.done && Number.isFinite(j.mbps)) return j;
+      pts = upPoints(r, base);
+      if (pts.length > 1 && pts[pts.length - 1].b > 0) { j = SC.judge(pts, { capBytes: Math.min(L.up, pts[pts.length - 1].b), maxMs: 1 }); if (j.done && Number.isFinite(j.mbps)) return j; }
+      // an older server does not report the count: the whole request, a lower bound (it includes setting up the connection)
+      if (ok && secs > 0.05) { r.usedUp = L.up; return { done: true, reason: "limit", mbps: (L.up * 8) / 1e6 / secs, atLeast: true, steady: false, bytes: L.up, ms: secs * 1000 }; }
+      return j;
     }
 
     async function finish(r, why) {
@@ -232,7 +288,8 @@
       run = null;
       releaseMonitor(r); nq.classList.remove("locked");
       $("start").disabled = false; $("stop").disabled = true; $("mark").disabled = true; $("clear").disabled = false; $("copy").disabled = false; $("save").disabled = false; $("savehtml").disabled = false;
-      for (const el of root.querySelectorAll('input[name="netquality-mode"], #netquality-load, #netquality-fine')) el.disabled = false;
+      for (const el of root.querySelectorAll('input[name="netquality-mode"], #netquality-fine')) el.disabled = false;
+      updateSpeedOptions();
       pollMonitor();
       setStatus(why ? `Finished. ${why}` : "Finished.");
     }
@@ -256,9 +313,10 @@
     }
 
     /* ---------- the verdict ---------- */
+    const figure = x => (x && Number.isFinite(x.mbps) ? x : null);
+    function speedInput(r) { return { level: r.speedLevel, asked: !!r.load, down: figure(r.speedRes.down), up: figure(r.speedRes.up), used: r.used, planDown: r.planDown, planUp: r.planUp }; }
     function analyzeNow(r) {
-      const res = NA.analyze(r.samples, { marks: r.marks, timeoutMs: TIMEOUT, downMbps: r.downMbps, upMbps: r.upMbps, fine: r.fine, edgeName: edgeName(r) });
-      if (r.load && r.done && !res.underLoad && !r.loadNote) res.findings.push({ level: "info", text: `The test transfers finished in ${(r.downSecs || 0).toFixed(1)} s (download) and ${(r.upSecs || 0).toFixed(1)} s (upload): too quick to keep a fast line busy long enough to see a change in delay. The speed figures are still shown.` });
+      const res = NA.analyze(r.samples, { marks: r.marks, timeoutMs: TIMEOUT, speed: speedInput(r), fine: r.fine, edgeName: edgeName(r) });
       if (r.loadNote) res.findings.push({ level: "warn", text: r.loadNote });
       if (r.limited) res.findings.push({ level: "warn", text: "The server asked this device to slow down for a moment, so a few probes were skipped. Wait a minute between tests." });
       return res;
@@ -283,15 +341,17 @@
       v.textContent = res.sentence;
       v.className = "verdict " + (res.qualityLevel === null ? "" : LEVEL_CLASS[res.qualityLevel]);
       const elapsed = (r.ended !== undefined ? r.ended : performance.now() - r.start) / 1000;
-      $("progress").textContent = live ? `${Math.floor(elapsed)} s so far, ${res.counts.sent} probes sent${r.mode === "monitor" ? ` (stops by itself after ${monInfo.minutes} minute${monInfo.minutes === 1 ? "" : "s"})` : ""}${r.phase === "down" ? "; downloading now" : r.phase === "up" ? "; uploading now" : ""}.` : `Ran for ${Math.round(elapsed)} s, ${res.counts.sent} probes sent to Michel's Tools${r.edge ? ` and ${res.edge ? res.edge.n : 0} to ${edgeName(r)}` : ""}.`;
+      $("progress").textContent = live ? `${Math.floor(elapsed)} s so far, ${res.counts.sent} probes sent${r.mode === "monitor" ? ` (stops by itself after ${monInfo.minutes} minute${monInfo.minutes === 1 ? "" : "s"})` : ""}${r.phase === "down" ? "; downloading now" : r.phase === "up" ? "; uploading now" : ""}${r.load && r.used > 0 ? `; data used ${mb(r.used)} MB of at most ${mb(SC.LEVELS[r.speedLevel].total)} MB` : ""}.` : `Ran for ${Math.round(elapsed)} s, ${res.counts.sent} probes sent to Michel's Tools${r.edge ? ` and ${res.edge ? res.edge.n : 0} to ${edgeName(r)}` : ""}.`;
       const m = res.origin;
 
-      $("speedlabel").textContent = res.speed.label; $("speedlabel").className = "big " + (["veryclose", "close"].includes(res.speed.key) ? "l0" : res.speed.key === "moderate" ? "l1" : res.speed.key === "far" ? "l2" : res.speed.key === "veryfar" ? "l3" : "");
-      const sp = [];
-      if (Number.isFinite(res.speed.median)) sp.push(`Typical answer time: ${fmtMs(res.speed.median)}`, `Best ${fmtMs(res.speed.min)}, 95% of answers under ${fmtMs(res.speed.p95)}, worst ${fmtMs(res.speed.max)}`);
-      if (res.edge && Number.isFinite(res.edge.median)) sp.push(`${upFirst(edgeShort(r) || "CDN")}${r.edge && r.edge.colo ? " (" + r.edge.colo + ")" : ""} nearest data centre: ${fmtMs(res.edge.median)}`);
-      if (Number.isFinite(res.speed.down)) sp.push(`Download: about ${res.speed.down.toFixed(1)} Mbit/s`);
-      if (Number.isFinite(res.speed.up)) sp.push(`Upload: about ${res.speed.up.toFixed(1)} Mbit/s`);
+      $("latlabel").textContent = res.latency.label; $("latlabel").className = "big " + (["veryclose", "close"].includes(res.latency.key) ? "l0" : res.latency.key === "moderate" ? "l1" : res.latency.key === "far" ? "l2" : res.latency.key === "veryfar" ? "l3" : "");
+      const lt = [];
+      if (Number.isFinite(res.latency.median)) lt.push(`Typical answer time: ${fmtMs(res.latency.median)}`, `Best ${fmtMs(res.latency.min)}, 95% of answers under ${fmtMs(res.latency.p95)}, worst ${fmtMs(res.latency.max)}`);
+      if (res.edge && Number.isFinite(res.edge.median)) lt.push(`${upFirst(edgeShort(r) || "CDN")}${r.edge && r.edge.colo ? " (" + r.edge.colo + ")" : ""} nearest data centre: ${fmtMs(res.edge.median)}`);
+      fillLines($("latnums"), lt);
+      const sh = NA.speedHeadline(res.speed);
+      $("speedlabel").textContent = sh.label; $("speedlabel").className = "big " + sh.cls;
+      const sp = res.speed.measured ? NA.speedLines(res.speed) : [r.mode === "monitor" ? "Measured in the quick test only." : r.load ? (r.done ? "No result: see what we found." : "Measured after the quiet part of the test.") : "Not measured: the speed test is set to No transfer."];
       fillLines($("speednums"), sp);
 
       $("quallabel").textContent = res.quality.label; $("quallabel").className = "big " + (res.qualityLevel === null ? "" : "l" + res.qualityLevel);
@@ -352,7 +412,7 @@
       const duration = Math.max(10000, (r.ended !== undefined ? r.ended : performance.now() - r.start) + 500);
       const answered = samples.filter(s => s.ok).map(s => s.rtt).sort((a, b) => a - b);
       const p99 = answered.length ? answered[Math.floor(answered.length * 0.99)] : 100;
-      const ymax = Math.min(3000, Math.max(100, p99 * 1.25, (res.speed.median || 50) * 2));
+      const ymax = Math.min(3000, Math.max(100, p99 * 1.25, (res.latency.median || 50) * 2));
       const X = t => pad.l + ((w - pad.l - pad.r) * t) / duration, Y = v => pad.t + (h - pad.t - pad.b) * (1 - Math.min(v, ymax) / ymax);
       ctx.font = "11px sans-serif"; ctx.textBaseline = "middle";
       // load phases
@@ -371,7 +431,7 @@
       ctx.textAlign = "center"; const stepS = duration > 240000 ? 60 : duration > 90000 ? 20 : duration > 40000 ? 10 : 5;
       for (let s = 0; s * 1000 <= duration; s += stepS) { const x = Math.round(X(s * 1000)) + 0.5; ctx.beginPath(); ctx.moveTo(x, h - pad.b); ctx.lineTo(x, h - pad.b + 4); ctx.stroke(); ctx.fillText(NA.mmss(s * 1000), x, h - 6); }
       // the line of the typical delay
-      if (Number.isFinite(res.speed.median)) { ctx.setLineDash([4, 4]); ctx.strokeStyle = "#9AA"; ctx.beginPath(); ctx.moveTo(pad.l, Y(res.speed.median)); ctx.lineTo(w - pad.r, Y(res.speed.median)); ctx.stroke(); ctx.setLineDash([]); }
+      if (Number.isFinite(res.latency.median)) { ctx.setLineDash([4, 4]); ctx.strokeStyle = "#9AA"; ctx.beginPath(); ctx.moveTo(pad.l, Y(res.latency.median)); ctx.lineTo(w - pad.r, Y(res.latency.median)); ctx.stroke(); ctx.setLineDash([]); }
       // the probes (smaller dots when there are very many)
       const dotR = samples.length > 4000 ? 1.3 : samples.length > 1500 ? 1.8 : 2.3;
       for (const s of samples) {
@@ -434,7 +494,7 @@
       const now = new Date(), pad2 = n => String(n).padStart(2, "0");
       const html = window.NetReport.build(res, {
         when: now.toLocaleString(), host: location.host, protocol: r.proto ? r.proto.toUpperCase() : "", colo: r.edge && r.edge.colo, edgeName: edgeName(r), seconds: (r.ended || 0) / 1000,
-        mode: r.mode === "monitor" ? (r.fine ? "Monitor, fine detail (a probe every 50 ms)" : "Monitor") : r.load ? "Quick test with busy-line test" : "Quick test",
+        mode: r.mode === "monitor" ? (r.fine ? "Monitor, fine detail (a probe every 50 ms)" : "Monitor") : r.load ? `Quick test with the speed test (${SC.LEVELS[r.speedLevel].label}, up to ${mb(SC.LEVELS[r.speedLevel].total)} MB)` : "Quick test",
         images: { graph: g.toDataURL("image/png"), dir: res.direction.available ? dcv.toDataURL("image/png") : null },
       });
       const blob = new Blob([html], { type: "text/html;charset=utf-8" });
@@ -457,7 +517,17 @@
     $("savehtml").addEventListener("click", saveHtml);
     $("clear").addEventListener("click", clear);
     root.addEventListener("keydown", e => { if ((e.key === "m" || e.key === "M") && run && !e.ctrlKey && !e.metaKey && !e.altKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) { e.preventDefault(); mark(); } });
-    for (const el of root.querySelectorAll('input[name="netquality-mode"]')) el.addEventListener("change", updateMonitorOption);
+    for (const el of root.querySelectorAll('input[name="netquality-mode"]')) el.addEventListener("change", () => { updateMonitorOption(); updateSpeedOptions(); });
+    // the speed level and the plan figures are remembered in this browser; on a phone connection or with data saver on, the transfer is off until the visitor chooses
+    {
+      const saved = store.get("speed"), c = navigator.connection, metered = !!(c && (c.saveData || c.type === "cellular"));
+      const pick = saved && SC.LEVELS[saved] ? saved : metered ? "none" : "light";
+      root.querySelector('input[name="netquality-speed"][value="' + pick + '"]').checked = true;
+      if (!saved && metered) $("speedhint").textContent = "Your browser reports a mobile connection or data saver, so the speed test starts switched off. Choose Light to measure the speed.";
+      for (const id of ["plandown", "planup"]) { const v = store.get(id); if (v) $(id).value = v; $(id).addEventListener("change", () => store.set(id, $(id).value)); }
+      for (const el of root.querySelectorAll('input[name="netquality-speed"]')) el.addEventListener("change", () => { store.set("speed", speedLevel()); $("speedhint").textContent = ""; });
+    }
+    updateSpeedOptions();
     updateMonitorOption(); pollMonitor();
     monTimer = setInterval(() => { if (!run) pollMonitor(); }, 8000);
     window.addEventListener("pagehide", () => { if (run) releaseMonitor(run); });

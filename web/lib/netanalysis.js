@@ -11,9 +11,10 @@
      rs, re  when the browser started sending / finished receiving (ms of its own clock)
      seen    for a timeout, asked afterwards: the server's receive time, or -1 when it never saw the probe
 
-   Speed and quality are judged separately: SPEED is how long answers take (distance), QUALITY is how steady and complete
-   they are. A link that always answers in 200 ms is slow but excellent; one that answers in 40 ms but sometimes needs a
-   second, or not at all, is fast but poor. */
+   Three things are shown separately. LATENCY is how long answers take (the distance): a figure, never a fault. SPEED is how much data
+   the line carries (download and upload in Mbit/s, measured by speedcalc.js); it gets a verdict only against the plan the visitor typed in.
+   QUALITY is how steady and complete the link is (jitter, slow probes, lost answers, delay when the line is busy). A link that always
+   answers in 200 ms is far away but excellent; one that answers in 40 ms but sometimes needs a second, or not at all, is close but poor. */
 (() => {
   "use strict";
 
@@ -43,6 +44,16 @@
     if (median < 300) return { key: "far", label: "Far away" };
     return { key: "veryfar", label: "Very far away" };
   }
+
+  // Speed: the figures come from speedcalc.js ({ mbps, atLeast, steady, bytes, ms, reason }). A verdict needs a plan speed to compare with; without one there is no scale.
+  function speedVerdict(m, plan) {
+    if (!m || !Number.isFinite(m.mbps) || !(plan > 0)) return null;
+    const ratio = m.mbps / plan;
+    if (m.atLeast) return ratio >= 0.8 ? { level: 0, label: "At least your plan" } : { level: null, label: "Not conclusive: the data limit stopped the test" };
+    return ratio >= 0.8 ? { level: 0, label: "Near your plan" } : ratio >= 0.5 ? { level: 1, label: "Below your plan" } : ratio >= 0.25 ? { level: 2, label: "Well below your plan" } : { level: 3, label: "Far below your plan" };
+  }
+  const mbit = x => (x >= 100 ? String(Math.round(x)) : x >= 10 ? x.toFixed(1) : x.toFixed(2)) + " Mbit/s";
+  function speedPart(m) { return m && Number.isFinite(m.mbps) ? (m.atLeast ? "at least " : "") + mbit(m.mbps) : ""; }
 
   /* ---------- preparing one series ---------- */
   // The samples of one channel and phase, without warm-up and without moments the device itself was busy.
@@ -340,7 +351,13 @@
     const lostInfo = { up: o.usable.filter(s => s.timeout && s.seen === -1).length, down: o.usable.filter(s => s.timeout && typeof s.seen === "number" && s.seen >= 0).length };
     const res = { fine: !!opts.fine, edgeName, counts: { sent: samples.filter(s => s.ch === "o" && s.phase === "idle").length, device: o.device }, origin: m, edge: em, timeoutMs: opts.timeoutMs };
 
-    res.speed = { ...speedLabel(m.median), median: m.median, min: m.min, p95: m.p95, max: m.max, down: opts.downMbps, up: opts.upMbps };
+    res.latency = { ...speedLabel(m.median), median: m.median, min: m.min, p95: m.p95, max: m.max };
+    // speed: opts.speed = { down, up, used, level, planDown, planUp } from the page; the old opts.downMbps / upMbps (plain numbers) still work
+    const sp = opts.speed || {};
+    const dn = sp.down || (Number.isFinite(opts.downMbps) ? { mbps: opts.downMbps } : null), upm = sp.up || (Number.isFinite(opts.upMbps) ? { mbps: opts.upMbps } : null);
+    const vd = speedVerdict(dn, sp.planDown), vu = speedVerdict(upm, sp.planUp), lv = [vd, vu].filter(v => v && v.level !== null).map(v => v.level);
+    res.speed = { measured: !!(dn || upm), level: sp.level || (dn || upm ? "light" : "none"), down: dn, up: upm, used: sp.used || 0, verdictDown: vd, verdictUp: vu, planDown: sp.planDown || 0, planUp: sp.planUp || 0,
+      worst: lv.length ? Math.max(...lv) : null, asked: !!sp.asked };
     res.enough = m.enough;
     res.qualityLevel = m.enough || m.noAnswer ? m.level : null;
     res.quality = res.qualityLevel === null ? { label: "Not enough data yet", key: "none" } : { label: LEVELS[res.qualityLevel], key: LEVELS[res.qualityLevel].toLowerCase() };
@@ -348,6 +365,11 @@
     res.incidents = m.answered ? incidents(o, m, opts) : [];
     res.marks = judgeMarks(opts.marks, o, e.all.length ? { ...e, median: em && em.median } : null, m);
     res.underLoad = underLoad(samples, m.median);
+    // a line whose delay explodes when it is busy is not good for calls and video, even if it is steady when quiet: Quality drops by one or two steps
+    if (res.underLoad && res.qualityLevel !== null) {
+      const floor = res.underLoad.level >= 3 ? 2 : res.underLoad.level >= 2 ? 1 : 0;
+      if (floor > res.qualityLevel) { res.qualityIdle = res.qualityLevel; res.qualityLevel = floor; res.quality = { label: LEVELS[floor], key: LEVELS[floor].toLowerCase() }; }
+    }
 
     // where is the problem: before or beyond the CDN
     res.attribution = null;
@@ -367,10 +389,10 @@
   function sentence(r) {
     if (r.origin.noAnswer) return "No answer from Michel's Tools during the test.";
     if (r.qualityLevel === null) return "Collecting data... a verdict needs at least 20 probes.";
-    const goodSpeed = ["veryclose", "close", "moderate"].includes(r.speed.key), goodQ = r.qualityLevel <= 1;
+    const goodSpeed = ["veryclose", "close", "moderate"].includes(r.latency.key) && (r.speed.worst === null || r.speed.worst <= 1), goodQ = r.qualityLevel <= 1;
     const phrase = ["very steady", "steady", "unstable", "unreliable"][r.qualityLevel];
-    const word = r.speed.key === "veryfar" ? "Very far away" : r.speed.label;
-    return `${word} (about ${Math.round(r.speed.median)} ms) ${goodSpeed === goodQ ? "and" : "but"} ${phrase}.`;
+    const rates = [r.speed.down && Number.isFinite(r.speed.down.mbps) ? speedPart(r.speed.down) + " down" : "", r.speed.up && Number.isFinite(r.speed.up.mbps) ? speedPart(r.speed.up) + " up" : ""].filter(Boolean).join(", ");
+    return `${r.latency.label} (about ${Math.round(r.latency.median)} ms)${rates ? ", " + rates : ""} ${goodSpeed === goodQ ? "and" : "but"} ${phrase}.`;
   }
 
   function findings(r, opts) {
@@ -403,10 +425,40 @@
         f.push({ level: ["good", "info", "warn", "bad"][p.level], text: `While ${name} was running the delay went from ${ms(m.median)} to ${ms(p.median)} (${p.delta >= 0 ? "+" : ""}${Math.round(p.delta)} ms)${p.timeouts ? `, and ${p.timeouts} probes got no answer` : ""}. ${p.level >= 2 ? "When the line is busy, calls, games and page loads suffer: this is called bufferbloat, and the router can often be set up to avoid it." : "The link copes well with load."}` });
       }
     }
+    if (r.qualityIdle !== undefined) f.push({ level: "warn", text: `Quality is rated one or two steps lower than the quiet line alone would give (${LEVELS[r.qualityIdle]}), because the delay grows a lot when the line is busy. Calls and video suffer when somebody else on the line downloads or uploads.` });
+    if (r.speed.measured) {
+      for (const it of speedItems(r.speed)) f.push(it);
+      f.push({ level: "info", text: "Speed is measured over one connection to Michel's Tools: it shows what reaches this server. A limit on the server's own line would show up here too, so a low figure is not proof that your line is slow." });
+      if (!r.underLoad) f.push({ level: "info", text: "The transfers were too short to keep the line busy long enough to see how the delay changes when the line is busy (a fast line empties the data limit quickly). The speed figures are still shown." });
+    }
     if (r.edge && r.edge.queued) f.push({ level: "info", text: `${r.edge.queued} CDN probe${r.edge.queued === 1 ? " was" : "s were"} left out because ${r.edge.queued === 1 ? "it" : "they"} had to wait in the browser's queue for a free connection (this connection uses HTTP/1.1, which allows only 6 at a time while probes are stuck).` });
     if (m.device) f.push({ level: "info", text: `${m.device} probe${m.device === 1 ? " was" : "s were"} left out because the device itself was busy or the tab was in the background. Keep this tab in front during a test.` });
     for (const k of r.marks) f.push({ level: k.kind === "network" ? "bad" : k.kind === "clear" ? "info" : "warn", text: `Your mark at ${mmss(k.t)}: ${k.text}`, at: k.t });
     return f;
+  }
+
+  // the lines that describe the speed part, for the screen, the text report and the HTML report
+  function speedItems(sp) {
+    const out = [];
+    const one = (name, m, plan, v) => {
+      if (!m || !Number.isFinite(m.mbps)) return;
+      let s = `${name}: ${m.atLeast ? "at least " : "about "}${mbit(m.mbps)}`;
+      if (m.atLeast) s += " (the data limit was reached before the speed settled)";
+      else if (m.steady === false && m.reason === "time") s += " (it kept changing during the test: the last 3 seconds)";
+      if (plan && v) s += `. Your plan: ${+plan.toFixed(2)} Mbit/s. ${v.label}.`;
+      out.push({ text: s, level: v && v.level !== null ? ["good", "info", "warn", "bad"][v.level] : "info" });
+    };
+    one("Download", sp.down, sp.planDown, sp.verdictDown);
+    one("Upload", sp.up, sp.planUp, sp.verdictUp);
+    if (out.length && sp.used > 0) out.push({ text: `Data used by the speed test: about ${(sp.used / 1e6).toFixed(1)} MB.`, level: "info" });
+    return out;
+  }
+  const speedLines = sp => speedItems(sp).map(x => x.text);
+  // the big words of the Speed card: the figures (with "at least" when capped); coloured only when there is a plan to judge against
+  function speedHeadline(sp) {
+    if (!sp || !sp.measured) return { label: "Not measured", cls: "" };
+    const label = [sp.down && Number.isFinite(sp.down.mbps) ? speedPart(sp.down) + " down" : "", sp.up && Number.isFinite(sp.up.mbps) ? speedPart(sp.up) + " up" : ""].filter(Boolean).join(" / ") || "Not measured";
+    return { label, cls: sp.worst === null || sp.worst === undefined ? "" : "l" + sp.worst };
   }
 
   /* ---------- a text report to copy ---------- */
@@ -418,9 +470,8 @@
     if (meta.colo) L.push(`${meta.edgeName ? upFirst(meta.edgeName) : "CDN"} data centre: ${meta.colo}`);
     L.push(`Duration: ${meta.seconds ? Math.round(meta.seconds) + " s" : "?"}, probes: ${r.counts.sent}`);
     L.push("", `SUMMARY: ${r.sentence}`);
-    L.push(`Speed (distance): ${r.speed.label}. Delay: median ${ms(r.speed.median)}, best ${ms(r.speed.min)}, 95% under ${ms(r.speed.p95)}, worst ${ms(r.speed.max)}.`);
-    if (Number.isFinite(r.speed.down)) L.push(`Download: ${r.speed.down.toFixed(1)} Mbit/s`);
-    if (Number.isFinite(r.speed.up)) L.push(`Upload: ${r.speed.up.toFixed(1)} Mbit/s`);
+    L.push(`Latency (distance): ${r.latency.label}. Delay: median ${ms(r.latency.median)}, best ${ms(r.latency.min)}, 95% under ${ms(r.latency.p95)}, worst ${ms(r.latency.max)}.`);
+    L.push(...speedLines(r.speed));
     L.push(`Quality (stability): ${r.quality.label}. No answer: ${r.origin.timeouts} of ${r.origin.n} (${(r.origin.timeoutPct || 0).toFixed(1)}%). Slow probes (more than ${r.origin.spikeFloor || 40} ms or 50% above normal): ${r.origin.spikes || 0}. Jitter: ${ms(r.origin.jitter)}. Longest silence: ${ms(r.origin.longestStall)}.`);
     L.push("", "FINDINGS:");
     for (const f of r.findings) L.push(`- ${f.level === "bad" ? "[PROBLEM] " : f.level === "warn" ? "[WARNING] " : ""}${f.text}`);
@@ -428,5 +479,5 @@
     return L.join("\n");
   }
 
-  window.NetAnalysis = { analyze, report, speedLabel, measure, series, LEVELS, DEVICE_LAG, pct, median, ms, mmss };
+  window.NetAnalysis = { analyze, report, speedLabel, speedVerdict, speedLines, speedHeadline, mbit, measure, series, LEVELS, DEVICE_LAG, pct, median, ms, mmss };
 })();

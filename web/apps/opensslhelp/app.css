@@ -1,0 +1,8 @@
+/* OpenSSL Command Helper: shared look is in xp.css (.tk, .ct-*). */
+.osh { display: flex; gap: 12px; align-items: flex-start; }
+.osh-side { flex: 0 0 15rem; max-height: 100%; overflow: auto; }
+.osh-side h4 { margin: 10px 0 4px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.osh-side button { display: block; width: 100%; text-align: left; margin: 0 0 3px; }
+.osh-side button[aria-current="true"] { font-weight: 700; background: #FFF6DC; border-color: #8A6D00; }
+.osh-main { flex: 1 1 auto; min-width: 0; }
+@media (max-width: 699px) { .osh { flex-direction: column; } .osh-side { flex-basis: auto; width: 100%; } }

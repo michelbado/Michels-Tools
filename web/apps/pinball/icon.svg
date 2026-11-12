@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4B3FC0"/>
+      <stop offset="1" stop-color="#15124F"/>
+    </linearGradient>
+    <radialGradient id="ball" cx="0.35" cy="0.35" r="0.7">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#7C879C"/>
+    </radialGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="8" fill="url(#bg)" stroke="#0B0933" stroke-width="1.5"/>
+  <rect x="6" y="6" width="36" height="12" rx="4" fill="#FFFFFF" opacity="0.14"/>
+  <circle cx="15" cy="15" r="5.5" fill="#FFD23C" stroke="#B36B00" stroke-width="1.5"/>
+  <circle cx="33" cy="17" r="5.5" fill="#FF5A5A" stroke="#8A1010" stroke-width="1.5"/>
+  <circle cx="26" cy="26" r="4.5" fill="url(#ball)" stroke="#39414F" stroke-width="1"/>
+  <g stroke-linecap="round" stroke-width="5"><path d="M9 34l11 6" stroke="#FF4A4A"/><path d="M39 34l-11 6" stroke="#FF4A4A"/></g>
+  <g stroke-linecap="round" stroke-width="1.6" stroke="#FFFFFF" opacity="0.8"><path d="M10 34l9 5"/><path d="M38 34l-9 5"/></g>
+</svg>
