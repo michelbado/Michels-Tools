@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"path"
 	"strconv"
@@ -158,7 +159,8 @@ func (g *lockGate) wait(ip string) time.Duration {
 	return 0
 }
 
-func (g *lockGate) fail(ip string) {
+// fail records a wrong code and returns how many wrong codes this address and all addresses together have in the window now.
+func (g *lockGate) fail(ip string) (perAddress, overall int) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
 	now := g.now()
@@ -170,6 +172,7 @@ func (g *lockGate) fail(ip string) {
 	}
 	g.fails[ip] = append(g.fails[ip], now)
 	g.total = append(g.total, now)
+	return len(g.fails[ip]), len(g.total)
 }
 
 func (g *lockGate) ok(ip string) { g.mu.Lock(); delete(g.fails, ip); g.mu.Unlock() }
@@ -199,7 +202,9 @@ func registerLock(mux *http.ServeMux, cfg config) {
 	}
 	mux.HandleFunc("POST /api/unlock", func(w http.ResponseWriter, r *http.Request) {
 		ip := diagIP(cfg, r)
+		who := fmt.Sprintf("%s, browser %q", ip, cleanForLog(r.Header.Get("User-Agent"), 120)) // the address is parsed, the browser text is cleaned: safe for a log line
 		if d := gate.wait(ip); d > 0 {
+			events.say("unlock-turned-away", time.Minute, "unlock: attempts are being turned away because of too many wrong codes (latest from %s)", who)
 			secs := int(d.Seconds()) + 1
 			w.Header().Set("Retry-After", strconv.Itoa(secs))
 			reply(w, http.StatusTooManyRequests, map[string]any{"error": "Too many wrong codes. Try again in " + waitText(secs) + ".", "retry": secs})
@@ -214,12 +219,21 @@ func registerLock(mux *http.ServeMux, cfg config) {
 		}
 		given := sha256.Sum256([]byte(strings.TrimSpace(body.Code)))
 		if subtle.ConstantTimeCompare(given[:], code[:]) != 1 {
-			gate.fail(ip)
+			n, all := gate.fail(ip)
+			// who is guessing: the address and browser, and how many wrong codes that address has used; the code that was typed is never written down
+			log.Printf("unlock: wrong code from %s (%d of %d allowed in %s)", who, n, lockFailPerIP, lockFailWindow)
+			if n == lockFailPerIP {
+				log.Printf("unlock: %s is blocked for up to %s after %d wrong codes", ip, lockFailWindow, n)
+			}
+			if all == lockFailTotal {
+				log.Printf("unlock: %d wrong codes from all addresses together in %s: unlocking is paused for everybody until the window passes", all, lockFailWindow)
+			}
 			time.Sleep(lockFailDelay)
 			reply(w, http.StatusForbidden, map[string]any{"error": "That is not the code."})
 			return
 		}
 		gate.ok(ip)
+		log.Printf("unlock: code accepted from %s", who)
 		tok, exp := t.newLockToken(time.Now())
 		setLockCookie(w, r, tok, exp, t.lockHours()*3600)
 		reply(w, http.StatusOK, map[string]any{"ok": true, "hours": t.lockHours()})

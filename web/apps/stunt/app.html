@@ -1,0 +1,22 @@
+<div class="gm">
+  <div class="gm-bar">
+    <button type="button" class="xp-btn small is-default" id="stunt-new">Restart</button>
+    <label for="stunt-track">Track <select id="stunt-track" class="xp-select"></select></label>
+    <button type="button" class="xp-btn small" id="stunt-edit">Edit track</button>
+    <button type="button" class="xp-btn small" id="stunt-view">View: behind</button>
+    <label for="stunt-code">Track code <input type="text" id="stunt-code" class="xp-field stunt-code" maxlength="400" autocomplete="off" spellcheck="false" aria-label="Track code"></label>
+    <button type="button" class="xp-btn small" id="stunt-load">Load code</button>
+    <button type="button" class="xp-btn small" id="stunt-copy">Copy code</button>
+    <button type="button" class="xp-btn small" id="stunt-pause">Pause</button>
+    <button type="button" class="xp-btn small gm-sound" id="stunt-sound" aria-pressed="false">Sound: off</button>
+    <span class="gm-info" id="stunt-info"></span>
+  </div>
+  <div class="gm-stage" id="stunt-stage"><canvas class="gm-canvas" id="stunt-gl" aria-hidden="true"></canvas><canvas class="gm-canvas" id="stunt-canvas" tabindex="0" aria-label="Stunt Track game"></canvas></div>
+  <div class="gm-pad">
+    <button type="button" class="xp-btn" data-key="ArrowLeft" aria-label="Steer left">&#9664;</button>
+    <button type="button" class="xp-btn gm-wide" data-key="ArrowDown">Brake</button>
+    <button type="button" class="xp-btn gm-wide" data-key="ArrowUp">Gas</button>
+    <button type="button" class="xp-btn" data-key="ArrowRight" aria-label="Steer right">&#9654;</button>
+  </div>
+  <footer class="statusbar" role="status"><span class="cell msg" id="stunt-status">Up arrow: gas. Down: brake and reverse. Left and Right: steer. V changes the view, R restarts.</span></footer>
+</div>

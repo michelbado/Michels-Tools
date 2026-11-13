@@ -44,6 +44,7 @@ type config struct {
 	Limits     *ipLimits     // optional: per-visitor rate limits (nil = off)
 	IPs        *ipResolver   // finds the visitor's real address (nil = use the connection)
 	Tools      *toolSet      // which tools are switched off (nil = all on)
+	Lim        *limiter      // optional: the aggregation slots; main makes it so that the memory watcher can count the running ones (nil = made here)
 }
 
 // limiter runs at most Jobs requests at once; up to Queue more may wait.
@@ -89,7 +90,10 @@ func newHandler(cfg config) (http.Handler, error) {
 		return nil, err
 	}
 	mime.AddExtensionType(".webmanifest", "application/manifest+json")
-	lim := newLimiter(cfg.Jobs, cfg.Queue, cfg.QueueWait)
+	lim := cfg.Lim
+	if lim == nil {
+		lim = newLimiter(cfg.Jobs, cfg.Queue, cfg.QueueWait)
+	}
 	mux := http.NewServeMux()
 	files := http.FileServerFS(sub)
 	tools := cfg.Tools
@@ -127,6 +131,7 @@ func newHandler(cfg config) (http.Handler, error) {
 		release := lim.acquire(r.Context().Done())
 		if release == nil {
 			if r.Context().Err() == nil {
+				events.say("aggregate-busy", time.Minute, "aggregate: turned a request away, all %d slots are busy and the queue is full or the wait ran out", cap(lim.slots))
 				w.Header().Set("Retry-After", "10")
 				http.Error(w, "Server busy, try again in a moment.", http.StatusServiceUnavailable)
 			}
@@ -141,9 +146,16 @@ func newHandler(cfg config) (http.Handler, error) {
 		if err := c.Feed(r.Body); err != nil {
 			var mbe *http.MaxBytesError
 			if errors.As(err, &mbe) {
+				events.say("aggregate-big", time.Minute, "aggregate: refused, the input is over the %d MB limit", cfg.MaxBytes>>20)
 				http.Error(w, "Input too large.", http.StatusRequestEntityTooLarge)
 				return
 			}
+			if errors.Is(err, errTooManyRanges) {
+				events.say("aggregate-ranges", time.Minute, "aggregate: refused, too many separate ranges after merging (read %d MB, found %d IPv4 and %d IPv6 addresses)", c.Bytes>>20, c.Found4, c.Found6)
+				http.Error(w, msgTooManyRanges, http.StatusRequestEntityTooLarge)
+				return
+			}
+			events.say("aggregate-read", time.Minute, "aggregate: could not read the input after %d MB: %v", c.Bytes>>20, err)
 			http.Error(w, "Could not read input.", http.StatusBadRequest)
 			return
 		}
@@ -196,6 +208,7 @@ func main() {
 	ipJobs := flag.Int("ip-jobs", 2, "aggregations one visitor may run at the same time (0 = no limit)")
 	rateDiag := flag.Int("rate-diag", 1800, "Connection Quality probes per visitor per minute (0 = no limit); fine-detail Monitor mode sends 1200 a minute")
 	rateHeavy := flag.Int("rate-heavy", 6, "Connection Quality download/upload transfers per visitor per minute, one at a time (0 = no limit)")
+	heavyMax := flag.Int("heavy-max", 8, "Connection Quality download/upload transfers allowed at the same time on the whole server, whoever starts them (0 = no limit)")
 	netScale := flag.Int("rate-net-scale", 50, "how many times one visitor's budget a whole IPv6 /48 network may use together (a /48 is normally one site; raise it for big shared networks)")
 	trusted := flag.String("trusted-proxies", "", "addresses/CIDRs allowed to set that header (default: this machine, 127.0.0.0/8 and ::1)")
 	flag.Parse()
@@ -222,17 +235,21 @@ func main() {
 	if *ipHeader != "" {
 		log.Printf("visitor IP taken from header %s when the connection comes from a trusted proxy", *ipHeader)
 	}
-	visits, err := newVisitLogger(*dataDir, *retention, ips)
+	visits, err := newVisitLogger(*dataDir, *retention, int64(tools.intSetting("log.max_mb"))<<20, ips)
 	if err != nil {
 		log.Fatalf("visit log: %v", err)
 	}
 	if visits != nil {
-		log.Printf("visit log on: %s (kept %d days)", *dataDir, *retention)
+		if mb := tools.intSetting("log.max_mb"); mb > 0 {
+			log.Printf("visit log on: %s (kept %d days, at most %d MB)", *dataDir, *retention, mb)
+		} else {
+			log.Printf("visit log on: %s (kept %d days, no size limit)", *dataDir, *retention)
+		}
 	} else {
 		log.Printf("visit log off")
 	}
 
-	limits := newIPLimits(rateConfig{APIPerMin: *rateAPI, PagePerMin: *ratePage, IPJobs: *ipJobs, NetScale: *netScale, DiagPerMin: *rateDiag, HeavyPerMin: *rateHeavy})
+	limits := newIPLimits(rateConfig{APIPerMin: *rateAPI, PagePerMin: *ratePage, IPJobs: *ipJobs, NetScale: *netScale, DiagPerMin: *rateDiag, HeavyPerMin: *rateHeavy, HeavyTotal: *heavyMax})
 	if limits != nil {
 		log.Printf("per-visitor limits on: %d aggregations/min, %d requests/min, %d aggregations at once (0 = off)", *rateAPI, *ratePage, *ipJobs)
 		go func() { // a count only, never addresses
@@ -244,9 +261,13 @@ func main() {
 		}()
 	}
 
+	lim := newLimiter(*jobs, *queue, *wait)
+	if mem > 0 {
+		go watchMemory(mem, func() int { return len(lim.slots) })
+	}
 	h, err := newHandler(config{
 		MaxBytes: *maxMB << 20, Jobs: *jobs, Queue: *queue,
-		QueueWait: *wait, UploadTime: 5 * time.Minute, Visits: visits, Limits: limits, IPs: ips, Tools: tools,
+		QueueWait: *wait, UploadTime: 5 * time.Minute, Visits: visits, Limits: limits, IPs: ips, Tools: tools, Lim: lim,
 	})
 	if err != nil {
 		log.Fatal(err)

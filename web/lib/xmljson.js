@@ -111,7 +111,8 @@
       if (kids.length && texts.length) mixed = true;
       const groups = new Map();
       for (const k of kids) { const nm = k.nodeName; if (!groups.has(nm)) groups.set(nm, []); groups.get(nm).push(conv(k, depth + 1)); }
-      for (const [nm, list] of groups) obj[nm] = list.length > 1 || opts.arrays ? list : list[0];
+      // defineProperty, not obj[nm] = ...: an element named __proto__ is a legal XML name, and plain assignment would change the object's prototype and drop it from the result
+      for (const [nm, list] of groups) Object.defineProperty(obj, nm, { value: list.length > 1 || opts.arrays ? list : list[0], enumerable: true, writable: true, configurable: true });
       if (texts.length) obj["#text"] = typed(text, opts.types);
       // an element name that clashes with an attribute-style key cannot happen (XML names cannot start with @), but #text can clash with nothing
       return obj;

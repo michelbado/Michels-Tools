@@ -68,6 +68,16 @@ type holdSeen struct {
 	at map[string]time.Time
 }
 
+// peek says whether an id is already known, and how long ago it was first seen, without remembering anything.
+func (h *holdSeen) peek(id string, now time.Time) (time.Duration, bool) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if t, ok := h.at[id]; ok {
+		return now.Sub(t), true
+	}
+	return 0, false
+}
+
 // first returns (0, false) the first time an id is seen (and remembers it), or (age, true) afterwards.
 func (h *holdSeen) first(id string, now time.Time) (time.Duration, bool) {
 	h.mu.Lock()
@@ -119,25 +129,36 @@ func registerHold(mux *http.ServeMux, cfg config) {
 				return
 			}
 		}
-		if id := q.Get("id"); id != "" {
+		retry := func(age time.Duration) { // the browser repeated a request that a network path had cut
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(map[string]any{"retry": true, "age": age.Milliseconds()})
+		}
+		id := q.Get("id")
+		if id != "" {
 			if !holdID.MatchString(id) {
 				http.Error(w, "id must be 6 to 32 letters or digits", http.StatusBadRequest)
 				return
 			}
-			if age, dup := seen.first(id, time.Now()); dup {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusConflict)
-				json.NewEncoder(w).Encode(map[string]any{"retry": true, "age": age.Milliseconds()})
+			if age, dup := seen.peek(id, time.Now()); dup {
+				retry(age)
 				return
 			}
 		}
-		ip := diagIP(cfg, r)
+		ip := diagNet(cfg, r)
 		if !gate.acquire(ip) {
+			// not remembered: a request that was refused never ran, so asking again with the same id is a new try, not a repeat
 			w.Header().Set("Retry-After", holdRetryWait)
 			http.Error(w, "Too many waiting tests right now. Try again in a few seconds.", http.StatusTooManyRequests)
 			return
 		}
 		defer gate.release(ip)
+		if id != "" { // remembered only now that the hold really starts (also settles two arrivals of one id at the same moment)
+			if age, dup := seen.first(id, time.Now()); dup {
+				retry(age)
+				return
+			}
+		}
 
 		total := time.Duration(secs) * time.Second
 		end := time.NewTimer(total)

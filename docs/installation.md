@@ -33,7 +33,7 @@ Take ten minutes for a short risk assessment first:
 4. **What will you log, and are you allowed to?** The visit log stores each visitor's IP address and browser string, which is personal data in
    many places (for example under the GDPR). It is off when you run the program by hand and on in the systemd service. Decide whether you want it,
    for how long (`-retention-days`), or turn it off (`-data-dir ""`). The page shows a privacy notice on every visit; it says that IP address and
-   browser type are collected, so if your setup logs something else, edit the notice in `web/index.html` before you build.
+   browser type are collected, so if your setup logs something else, edit the notice in `web/index.html` before you build. Servers that lock tools also note the address and browser string of every wrong access code in the system log (never the code); the notice says so too.
 5. **Nothing here reaches other machines.** No tool makes the server contact anything else: no scanning, no proxying, no outgoing requests. The
    tools cannot be turned into a relay against a third party.
 

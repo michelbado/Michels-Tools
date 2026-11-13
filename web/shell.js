@@ -12,7 +12,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "63"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "64"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -84,6 +84,8 @@
     { id: "racer", title: "Road Racer", base: "apps/racer/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 1040, h: 740 } },
     { id: "pool", title: "Pool", base: "apps/pool/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 1100, h: 780 } },
     { id: "birdhunt", title: "Bird Hunt", base: "apps/birdhunt/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 1040, h: 740 } },
+    { id: "stunt", title: "Stunt Track", base: "apps/stunt/", folder: "games", deps: ["lib/gamekit.js", "lib/stunttrack.js"], size: { w: 1100, h: 800 } },
+    { id: "gemmaze", title: "Gem Maze", base: "apps/gemmaze/", folder: "games", deps: ["lib/gamekit.js", "lib/gemmaze.js", "lib/gemmaze-levels.js"], size: { w: 940, h: 740 } },
   ];
   APPS.forEach(a => { a.icon = a.base + "icon.svg"; });
 

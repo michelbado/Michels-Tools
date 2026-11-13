@@ -126,10 +126,14 @@ func TestLockTokens(t *testing.T) {
 		t.Error("an expired token must be refused")
 	}
 	p, sig, _ := strings.Cut(tok, ".")
+	flipTo := "A" // a different last character than the real one (the last of 43 only carries 4 bits, so it is "A" one time in sixteen)
+	if strings.HasSuffix(sig, "A") {
+		flipTo = "B"
+	}
 	for name, bad := range map[string]string{
 		"later expiry":    "9999999999." + sig,
 		"changed payload": p + "0." + sig,
-		"changed sig":     p + "." + sig[:len(sig)-1] + "A",
+		"changed sig":     p + "." + sig[:len(sig)-1] + flipTo,
 		"empty":           "",
 		"no dot":          p,
 		"just a dot":      ".",
@@ -324,7 +328,7 @@ func TestLockedToolPathMapping(t *testing.T) {
 
 // Games are tools like any other: a game, or the whole Games folder, can be locked. The games make no server calls, so the lock is their files.
 func TestLockedGames(t *testing.T) {
-	games := []string{"blocks", "mines", "pinball", "racer", "pool", "birdhunt"}
+	games := []string{"blocks", "mines", "pinball", "racer", "pool", "birdhunt", "stunt", "gemmaze"}
 	ts := mustParse(t, "games = locked\nlock.code = abcdef\n")
 	for _, g := range games {
 		if !ts.appLocked(g) {
@@ -372,5 +376,52 @@ func TestLockedGames(t *testing.T) {
 	}
 	if js := lget(h2, "/tools-config.js", nil).Body.String(); !strings.Contains(js, `window.TOOLS_LOCKED=["pool"]`) {
 		t.Errorf("tools-config.js: %q", js)
+	}
+}
+
+// ---- the log of wrong and accepted codes: who, never what was typed ----
+
+func TestWrongCodesAreLoggedWithWhoButNotWhat(t *testing.T) {
+	buf := captureLog(t)
+	h := lockHandler(t, "qrcode = locked\nlock.code = open sesame\n")
+	lpost(h, "/api/unlock", `{"code":"hunter2"}`, nil, "User-Agent", "TestBrowser/1.0")
+	out := buf.String()
+	if !strings.Contains(out, `unlock: wrong code from 192.0.2.1, browser "TestBrowser/1.0" (1 of 8 allowed in 10m0s)`) {
+		t.Errorf("who is guessing must be in the log: %q", out)
+	}
+	if strings.Contains(out, "hunter2") || strings.Contains(out, "open sesame") {
+		t.Errorf("the code that was typed (or the real one) must never be written down: %q", out)
+	}
+	for i := 0; i < lockFailPerIP-1; i++ {
+		lpost(h, "/api/unlock", `{"code":"nope"}`, nil)
+	}
+	if out = buf.String(); !strings.Contains(out, "unlock: 192.0.2.1 is blocked for up to 10m0s after 8 wrong codes") {
+		t.Errorf("the start of a block is logged: %q", out)
+	}
+	for i := 0; i < 5; i++ { // a blocked address keeps trying: one throttled line, not five
+		lpost(h, "/api/unlock", `{"code":"nope"}`, nil)
+	}
+	if n := strings.Count(buf.String(), "attempts are being turned away"); n != 1 {
+		t.Errorf("turned-away attempts must be one throttled line, got %d", n)
+	}
+}
+
+func TestAcceptedCodeIsLoggedAndHostileBrowserTextCannotForgeLines(t *testing.T) {
+	buf := captureLog(t)
+	h := lockHandler(t, "qrcode = locked\nlock.code = open sesame\n")
+	ua := "Evil\nunlock: code accepted from 6.6.6.6 (forged)"
+	lpost(h, "/api/unlock", `{"code":"wrong"}`, nil, "User-Agent", ua)
+	lpost(h, "/api/unlock", `{"code":"open sesame"}`, nil, "User-Agent", "Good/1.0")
+	out := buf.String()
+	if !strings.Contains(out, `unlock: code accepted from 192.0.2.1, browser "Good/1.0"`) {
+		t.Errorf("an accepted code is logged: %q", out)
+	}
+	for _, line := range strings.Split(strings.TrimSpace(out), "\n") {
+		if strings.Contains(line, "6.6.6.6") && !strings.Contains(line, "unlock: wrong code from 192.0.2.1") {
+			t.Errorf("a browser string made a line of its own: %q", line)
+		}
+	}
+	if n := strings.Count(strings.TrimSpace(out), "\n") + 1; n != 2 {
+		t.Errorf("two attempts must make exactly two lines, got %d: %q", n, out)
 	}
 }

@@ -1,0 +1,19 @@
+<div class="gm">
+  <div class="gm-bar">
+    <button type="button" class="xp-btn small is-default" id="gemmaze-new">Restart level</button>
+    <label for="gemmaze-level">Level <select id="gemmaze-level" class="xp-select"></select></label>
+    <label for="gemmaze-code">Code <input type="text" id="gemmaze-code" class="xp-field gemmaze-code" maxlength="4" autocomplete="off" spellcheck="false" aria-label="Level code"></label>
+    <button type="button" class="xp-btn small" id="gemmaze-go">Go</button>
+    <button type="button" class="xp-btn small" id="gemmaze-pause">Pause</button>
+    <button type="button" class="xp-btn small gm-sound" id="gemmaze-sound" aria-pressed="false">Sound: off</button>
+    <span class="gm-info" id="gemmaze-info"></span>
+  </div>
+  <div class="gm-stage" id="gemmaze-stage"><canvas class="gm-canvas" id="gemmaze-canvas" tabindex="0" aria-label="Gem Maze game"></canvas></div>
+  <div class="gm-pad">
+    <button type="button" class="xp-btn" data-key="ArrowLeft" aria-label="Left">&#9664;</button>
+    <button type="button" class="xp-btn" data-key="ArrowUp" aria-label="Up">&#9650;</button>
+    <button type="button" class="xp-btn" data-key="ArrowDown" aria-label="Down">&#9660;</button>
+    <button type="button" class="xp-btn" data-key="ArrowRight" aria-label="Right">&#9654;</button>
+  </div>
+  <footer class="statusbar" role="status"><span class="cell msg" id="gemmaze-status">Arrow keys move the robot. Collect every gem, then reach the exit before the time runs out.</span></footer>
+</div>

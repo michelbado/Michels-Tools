@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -19,7 +20,7 @@ func newTestLogger(t *testing.T, header string) (*visitLogger, string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	l, err := newVisitLogger(dir, 90, rv)
+	l, err := newVisitLogger(dir, 90, 0, rv)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +110,7 @@ func TestVisitsAreRecordedAndInputIsNot(t *testing.T) {
 }
 
 func TestLoggingOffByDefault(t *testing.T) {
-	l, err := newVisitLogger("", 90, nil)
+	l, err := newVisitLogger("", 90, 0, nil)
 	if err != nil || l != nil {
 		t.Fatalf("empty dir must turn logging off, got %v %v", l, err)
 	}
@@ -203,7 +204,7 @@ func TestNewFileEachDay(t *testing.T) {
 	dir := t.TempDir()
 	var clock atomic.Int64
 	clock.Store(time.Date(2026, 11, 7, 23, 59, 59, 0, time.UTC).Unix())
-	l, _ := startVisitLogger(dir, 90, nil, func() time.Time { return time.Unix(clock.Load(), 0).UTC() })
+	l, _ := startVisitLogger(dir, 90, 0, nil, func() time.Time { return time.Unix(clock.Load(), 0).UTC() })
 	r := httptest.NewRequest("GET", "/", nil)
 	r.RemoteAddr = "192.0.2.7:1"
 	l.record(r, "visit", "")
@@ -252,5 +253,76 @@ func TestClassify(t *testing.T) {
 		if ev, app := classify(r); ev != c.ev || app != c.app {
 			t.Errorf("%s %s -> (%q,%q), want (%q,%q)", c.method, c.path, ev, app, c.ev, c.app)
 		}
+	}
+}
+
+// ---- the size limit of the log folder (log.max_mb) ----
+
+func writeDay(t *testing.T, dir, day string, size int) {
+	t.Helper()
+	if err := os.WriteFile(filepath.Join(dir, "visits-"+day+".jsonl"), []byte(strings.Repeat("x", size)), 0o600); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestSizeLimitDeletesTheOldestDaysFirstAndKeepsToday(t *testing.T) {
+	dir := t.TempDir()
+	for _, d := range []string{"2026-11-01", "2026-11-02", "2026-11-03", "2026-11-04"} {
+		writeDay(t, dir, d, 400)
+	}
+	clock := time.Date(2026, 11, 4, 12, 0, 0, 0, time.UTC)
+	l, err := startVisitLogger(dir, 90, 1000, nil, func() time.Time { return clock })
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer l.Close()
+	var left []string
+	entries, _ := os.ReadDir(dir)
+	for _, e := range entries {
+		left = append(left, e.Name())
+	}
+	// 4 x 400 = 1600 bytes over a limit of 1000: the two oldest go, and 800 fit
+	if want := []string{"visits-2026-11-03.jsonl", "visits-2026-11-04.jsonl"}; !reflect.DeepEqual(left, want) {
+		t.Errorf("left %v, want %v", left, want)
+	}
+}
+
+func TestSizeLimitNeverDeletesTodayAndThenStopsRecording(t *testing.T) {
+	dir := t.TempDir()
+	writeDay(t, dir, "2026-11-04", 2000) // today alone is already over the limit
+	clock := time.Date(2026, 11, 4, 12, 0, 0, 0, time.UTC)
+	l, _ := startVisitLogger(dir, 90, 1000, nil, func() time.Time { return clock })
+	r := httptest.NewRequest("GET", "/", nil)
+	r.RemoteAddr = "192.0.2.7:1"
+	l.record(r, "visit", "")
+	l.Close()
+	fi, err := os.Stat(filepath.Join(dir, "visits-2026-11-04.jsonl"))
+	if err != nil || fi.Size() != 2000 {
+		t.Errorf("today's file must be kept untouched and nothing added: %v %v", fi, err)
+	}
+	if l.dropped.Load() != 1 {
+		t.Errorf("the visit that does not fit must be counted as dropped: %d", l.dropped.Load())
+	}
+}
+
+func TestNoSizeLimitMeansNothingIsDeletedForSize(t *testing.T) {
+	dir := t.TempDir()
+	for _, d := range []string{"2026-11-01", "2026-11-02", "2026-11-03"} {
+		writeDay(t, dir, d, 5000)
+	}
+	clock := time.Date(2026, 11, 3, 12, 0, 0, 0, time.UTC)
+	l, _ := startVisitLogger(dir, 90, 0, nil, func() time.Time { return clock })
+	l.Close()
+	if entries, _ := os.ReadDir(dir); len(entries) != 3 {
+		t.Errorf("limit 0 = no limit: %d files left", len(entries))
+	}
+}
+
+func TestSizeLimitSettingIsOneGigabyteByDefault(t *testing.T) {
+	if got := mustParse(t, "").intSetting("log.max_mb"); got != 1024 {
+		t.Errorf("default %d MB, want 1024", got)
+	}
+	if got := mustParse(t, "log.max_mb = 0\n").intSetting("log.max_mb"); got != 0 {
+		t.Errorf("0 must be accepted (no limit): %d", got)
 	}
 }

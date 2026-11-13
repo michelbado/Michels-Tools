@@ -64,6 +64,7 @@ program at startup.
 | `idletest.max_seconds` | `300` | 30 to 600 | The longest a single held request of the Idle-timeout Finder may last. |
 | `lock.code` | empty | 4 or more characters | The shared access code for tools marked `locked` (see [Locking tools](#locking-tools)). Required when anything is locked. No comment may follow it on its line. |
 | `lock.hours` | `12` | 1 to 168 | How long an entered code stays valid in the visitor's browser. |
+| `log.max_mb` | `1024` | 0 to 1048576 | The most the visit log files may take together, in MB (1024 = 1 GB). When they take more, the oldest days are deleted first; today's file is never deleted, and if it alone reaches the limit, further visits are not recorded until room is free. `0` = no size limit (`-retention-days` still applies). |
 
 ## Flags
 
@@ -101,6 +102,9 @@ What is logged is described in [Server behaviour](server.md#the-visit-log).
 | `-queue` | `20` | Requests allowed to wait for a free slot; beyond that the answer is "Server busy". |
 | `-queue-wait` | `60s` | How long a request may wait for a slot. |
 | `-mem-percent` | `80` | Soft memory limit for the program as a percent of the memory available to it. `0` = leave it to the Go runtime or `GOMEMLIMIT`. |
+| `-heavy-max` | `8` | Connection Quality download/upload transfers allowed at the same time on the **whole server**, whoever starts them (each carries up to 100 MB, so this bounds the bandwidth the speed test can use). A transfer over the limit gets `429` and the page asks the visitor to try again. `0` = no limit. |
+
+How much memory an aggregation needs depends on how many **separate ranges** are left once the addresses are merged, not on how long the text is: addresses are merged while the text is being read, so a list that repeats or overlaps itself costs almost nothing. Input that still holds more than about 2 million separate IPv4 ranges or 1 million IPv6 ranges after merging is refused with `413` and a message that asks for the list to be split. These two numbers are fixed; they are far above real lists (the whole public IPv4 routing table is about 1 million prefixes, the IPv6 one about a quarter of a million).
 
 ### Per-visitor limits
 

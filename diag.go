@@ -60,11 +60,21 @@ type lease struct {
 
 const leaseIdle = 20 * time.Second // a monitoring page sends a probe every 200 ms; 20 s of silence means it is gone
 
+// leaseCooldown: a claim that was kept alive until the longest run ended (a page that never lets go, or one that claims again with a new run id every few seconds)
+// stops its network from claiming again for this long, so that other visitors get their turn: the monitoring pages of the others look every 8 seconds.
+const leaseCooldown = time.Minute
+
+type cooldown struct {
+	ip    string
+	until time.Time
+}
+
 type diagStore struct {
 	mu    sync.Mutex
 	runs  map[string]*diagRun
 	now   func() time.Time
 	lease *lease
+	cool  *cooldown // a network that held Monitor mode up to the longest run may not claim it again for a little while
 }
 
 func newDiagStore() *diagStore { return &diagStore{runs: map[string]*diagRun{}, now: time.Now} }
@@ -184,19 +194,41 @@ func leaseExpired(l *lease, now time.Time, max time.Duration) bool {
 	return now.Sub(l.touched) > leaseIdle || now.Sub(l.since) > max+time.Minute
 }
 
+// expireLocked drops a claim that has ended. When it ended because it reached the longest run while its page was still renewing it, the network that held it
+// must wait leaseCooldown before it may claim again (a claim that simply went quiet, or was let go, costs nothing). The caller holds the lock.
+func (d *diagStore) expireLocked(now time.Time, max time.Duration) {
+	l := d.lease
+	if l == nil || !leaseExpired(l, now, max) {
+		return
+	}
+	if now.Sub(l.touched) <= leaseIdle {
+		d.cool = &cooldown{ip: l.ip, until: now.Add(leaseCooldown)}
+	}
+	d.lease = nil
+}
+
+// coolingDown: this network held Monitor mode up to the longest run a moment ago and must let others have a turn first.
+func (d *diagStore) coolingDown(ip string, now time.Time) bool {
+	if d.cool != nil && !now.Before(d.cool.until) {
+		d.cool = nil
+	}
+	return d.cool != nil && d.cool.ip == ip
+}
+
 // acquire: the visitor may monitor if nobody else does (the same address may take over its own claim, for example after a page reload).
 func (d *diagStore) acquire(ip, run string, max time.Duration) bool {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	now := d.now()
-	if d.lease != nil && leaseExpired(d.lease, now, max) {
-		d.lease = nil
+	d.expireLocked(now, max)
+	if d.coolingDown(ip, now) {
+		return false
 	}
 	if d.lease != nil && d.lease.ip != ip {
 		return false
 	}
 	since := now
-	if d.lease != nil && d.lease.run == run {
+	if d.lease != nil { // the same network again, with whatever run id: the time already held counts, so claiming again does not start the longest run over
 		since = d.lease.since
 	}
 	d.lease = &lease{run: run, ip: ip, since: since, touched: now}
@@ -208,8 +240,9 @@ func (d *diagStore) renew(ip, run string, max time.Duration) bool {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	now := d.now()
+	d.expireLocked(now, max)
 	l := d.lease
-	if l == nil || l.run != run || l.ip != ip || leaseExpired(l, now, max) {
+	if l == nil || l.run != run || l.ip != ip {
 		return false
 	}
 	l.touched = now
@@ -228,13 +261,25 @@ func (d *diagStore) release(ip, run string) {
 func (d *diagStore) busy(ip string, max time.Duration) bool {
 	d.mu.Lock()
 	defer d.mu.Unlock()
+	now := d.now()
+	d.expireLocked(now, max)
+	if d.coolingDown(ip, now) {
+		return true // for this network the option stays greyed out for a minute: it must let others have their turn
+	}
 	l := d.lease
-	return l != nil && !leaseExpired(l, d.now(), max) && l.ip != ip
+	return l != nil && l.ip != ip
 }
 
 func (d *diagStore) count() int { d.mu.Lock(); defer d.mu.Unlock(); return len(d.runs) }
 
 var randomBlock = func() []byte { b := make([]byte, diagChunk); rand.Read(b); return b }()
+
+// diagNet says whose a test run, a Monitor claim or an Idle Test place is. An IPv4 visitor is told apart by the address; an IPv6 visitor by the /64
+// network, the same as in the rate limits. One /64 holds billions of addresses, so counting addresses would let a single network fill every
+// place alone, while a household or an office normally shares one /64 anyway.
+func diagNet(cfg config, r *http.Request) string {
+	return limitKeys(diagIP(cfg, r))[0].key
+}
 
 func diagIP(cfg config, r *http.Request) string {
 	if cfg.IPs != nil {
@@ -283,7 +328,7 @@ func registerDiag(mux *http.ServeMux, cfg config) {
 			http.Error(w, "bad probe", http.StatusBadRequest)
 			return
 		}
-		ip := diagIP(cfg, r)
+		ip := diagNet(cfg, r)
 		if !store.noteSized(ip, run, uint32(seq), a, q.Get("f") == "1") {
 			http.Error(w, "too many test runs from this address", http.StatusTooManyRequests)
 			return
@@ -312,7 +357,7 @@ func registerDiag(mux *http.ServeMux, cfg config) {
 			return
 		}
 		out := make(map[string]int64, len(parts))
-		ip := diagIP(cfg, r)
+		ip := diagNet(cfg, r)
 		for _, p := range parts {
 			if p == "" {
 				continue
@@ -335,7 +380,7 @@ func registerDiag(mux *http.ServeMux, cfg config) {
 			return
 		}
 		mc := cfg.Tools.monitor()
-		busy := mc.Enabled && mc.Exclusive && store.busy(diagIP(cfg, r), time.Duration(mc.Minutes)*time.Minute)
+		busy := mc.Enabled && mc.Exclusive && store.busy(diagNet(cfg, r), time.Duration(mc.Minutes)*time.Minute)
 		noStore(w, "application/json")
 		fmt.Fprintf(w, `{"enabled":%t,"exclusive":%t,"minutes":%d,"busy":%t,"fine":%t}`, mc.Enabled, mc.Exclusive, mc.Minutes, busy, mc.Fine)
 	})
@@ -350,7 +395,7 @@ func registerDiag(mux *http.ServeMux, cfg config) {
 			http.Error(w, "bad run", http.StatusBadRequest)
 			return
 		}
-		ip := diagIP(cfg, r)
+		ip := diagNet(cfg, r)
 		noStore(w, "application/json")
 		if q.Get("release") == "1" {
 			store.release(ip, run)
@@ -406,7 +451,7 @@ func registerDiag(mux *http.ServeMux, cfg config) {
 		_ = rc.SetReadDeadline(time.Now().Add(diagTransferMax))
 		run := r.URL.Query().Get("run")
 		count := validRunID(run)
-		ip := diagIP(cfg, r)
+		ip := diagNet(cfg, r)
 		buf := make([]byte, 32<<10)
 		var n int64
 		body := http.MaxBytesReader(w, r.Body, maxUploadBytes)

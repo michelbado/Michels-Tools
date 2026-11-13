@@ -7,7 +7,7 @@
   `facts.go` / `hold.go` (the Troubleshooting endpoints), `resources.go` (memory and job sizing), `tools.go` (`tools.conf`), `web/lib/derkit.js`, `oldcrypto.js`, `keyfmt.js`, `pkcs12.js`, `certkit.js`, `certconv.js`, `certgen.js`, `certui.js`, `sslcmds.js` (the Certificates folder: a small DER reader/writer; DES, RC2, RC4, AES, HMAC and PBKDF2 written out so old PFX files and old encrypted keys open on every browser, even plain http; the readers and writers for keys and PFX; the package analysis; the converter; the CSR generator; the shared input box; the openssl command data. All of it is pure code tested against a real `openssl`; none of it touches the network or storage), `web/lib/speedcalc.js` (Connection Quality: when a speed measurement is steady or has hit its data limit; pure, tested on simulated lines), `web/lib/toolsearch.js` (the Tools menu search; every tool id needs an entry in its `KEYS`, a Go test checks), `lock.go` (locked tools: the access-code cookie, the guard that refuses a locked tool's files and API, the unlock calls).
   Tests are the `*_test.go` files.
 - `web/`: the page (`index.html`, `shell.js` = window manager, taskbar and menu, `shell.css`, `xp.css`), `apps/<id>/` (one folder per tool:
-  `app.html`, `app.css`, `app.js`, `icon.svg`), `lib/` (shared code, mostly pure functions that run in the browser and in tests; `gamekit.js` is what the games share: a canvas that fits its window, the frame loop, input, pause, sound and best scores),
+  `app.html`, `app.css`, `app.js`, `icon.svg`), `lib/` (shared code, mostly pure functions that run in the browser and in tests; `gamekit.js` is what the games share: a canvas that fits its window, the frame loop, input, pause, sound and best scores; `stunttrack.js` holds the stunt game's track pieces, track check and track code; `gemmaze.js` and `gemmaze-levels.js` hold the puzzle's rules and levels),
   `vendor/` (third-party libraries, see below), `brand/` (logo files). The whole folder is embedded in the program.
 - `deploy/`: the service file and `tools.conf.example`.
 - `docs/`: this guide.
@@ -36,7 +36,7 @@ library at load time, only on first use.
 ## Rules the project keeps
 
 - **Privacy:** the page shows a privacy notice on every visit; it must stay true. Nothing typed, pasted or uploaded is collected; only
-  the visitor's IP address and browser string are logged. PDFs never leave the browser.
+  the visitor's IP address and browser string are logged (in the visit log, and for a wrong access code in the system log; never the code itself). PDFs never leave the browser.
 - **Strict Content-Security-Policy** (`default-src 'self'`): no inline scripts or styles, no `eval`, no outside code, no `data:`/`blob:`
   images. Set styles from CSS classes or `element.style`, draw images on a canvas. Anything from a file, certificate or visitor is shown with `textContent`.
 - **Honest wording:** Verify Signatures must keep saying what it does not check; Add Image / Signature must keep saying it is a picture and not a

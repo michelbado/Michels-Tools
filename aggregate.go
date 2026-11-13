@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"io"
 	"math/bits"
 	"net/netip"
@@ -111,6 +112,22 @@ type range6 struct{ start, end u128 }
 
 const maxInvalidSamples = 10
 
+// Memory is bounded by the number of SEPARATE ranges, not by the number of addresses read. Text such as "::1" repeated twelve million times is 4 bytes
+// of input per address but 32 bytes held per address, so without merging on the way one 50 MB request needed more than 1 GB. The collected ranges are
+// therefore sorted and merged whenever compactMin of them are waiting (and again when they have doubled since), and the input is refused when more than
+// maxRanges4 / maxRanges6 separate ranges remain after merging: far above any real list (the whole public IPv4 routing table is about 1 million
+// prefixes, the IPv6 one about a quarter of a million). They are variables only so that tests can use small numbers.
+var (
+	compactMin = 1 << 20
+	maxRanges4 = 2 << 20
+	maxRanges6 = 1 << 20
+)
+
+// errTooManyRanges: the input holds more separate ranges than maxRanges4 / maxRanges6 (see above).
+var errTooManyRanges = errors.New("too many separate address ranges")
+
+const msgTooManyRanges = "Too many separate address ranges: after merging, more than about 2 million IPv4 or 1 million IPv6 ranges are left. Split the list into smaller parts."
+
 type Collector struct {
 	v4             []uint64 // start<<32 | end
 	v6             []range6
@@ -119,6 +136,83 @@ type Collector struct {
 	Invalid        int
 	InvalidSamples []string
 	Bytes          int64
+
+	at4, at6 int   // merge the list again when it has this many entries (0 = compactMin)
+	err      error // errTooManyRanges once a limit was passed: reading stops
+}
+
+// mergeV4 sorts the ranges and joins those that overlap or touch, in place. Merging early gives the same final answer as merging at the end.
+func mergeV4(l []uint64) []uint64 {
+	if len(l) < 2 {
+		return l
+	}
+	slices.Sort(l)
+	out := l[:1]
+	curS, curE := uint32(l[0]>>32), uint32(l[0])
+	for _, v := range l[1:] { // out never gets ahead of the element being read, so writing into l is safe
+		s, e := uint32(v>>32), uint32(v)
+		if uint64(s) <= uint64(curE)+1 {
+			if e > curE {
+				curE = e
+			}
+			continue
+		}
+		out[len(out)-1] = uint64(curS)<<32 | uint64(curE)
+		out = append(out, v)
+		curS, curE = s, e
+	}
+	out[len(out)-1] = uint64(curS)<<32 | uint64(curE)
+	return out
+}
+
+func mergeV6(l []range6) []range6 {
+	if len(l) < 2 {
+		return l
+	}
+	slices.SortFunc(l, func(a, b range6) int {
+		if r := a.start.cmp(b.start); r != 0 {
+			return r
+		}
+		return a.end.cmp(b.end)
+	})
+	out := l[:1]
+	cur := l[0]
+	for _, r := range l[1:] {
+		if cur.end == max128 || r.start.cmp(cur.end.add1()) <= 0 {
+			if r.end.cmp(cur.end) > 0 {
+				cur.end = r.end
+			}
+			continue
+		}
+		out[len(out)-1] = cur
+		out = append(out, r)
+		cur = r
+	}
+	out[len(out)-1] = cur
+	return out
+}
+
+func (c *Collector) settle4() {
+	c.v4 = mergeV4(c.v4)
+	if len(c.v4) > maxRanges4 {
+		c.err = errTooManyRanges
+	}
+	c.at4 = 2 * len(c.v4)
+}
+
+func (c *Collector) settle6() {
+	c.v6 = mergeV6(c.v6)
+	if len(c.v6) > maxRanges6 {
+		c.err = errTooManyRanges
+	}
+	c.at6 = 2 * len(c.v6)
+}
+
+// settle merges everything collected and reports whether the input stayed within the limits.
+func (c *Collector) settle() error {
+	c.settle4()
+	c.settle6()
+	return c.err
 }
 
 // isRun reports whether c can be part of an IP-looking token.
@@ -153,9 +247,12 @@ func (c *Collector) Feed(r io.Reader) error {
 			}
 		}
 		c.scan(buf[:end])
+		if c.err != nil {
+			return c.err
+		}
 		have = copy(buf, buf[end:have])
 		if eof {
-			return nil
+			return c.settle()
 		}
 	}
 }
@@ -166,6 +263,9 @@ func (c *Collector) FeedBytes(b []byte) { c.Bytes += int64(len(b)); c.scan(b) }
 func (c *Collector) scan(b []byte) {
 	i, n := 0, len(b)
 	for i < n {
+		if c.err != nil {
+			return // over the limit: the rest is not read
+		}
 		if !isRun(b[i]) {
 			i++
 			continue
@@ -237,6 +337,9 @@ func (c *Collector) tryV4(tok []byte) {
 	end := start | ^mask
 	c.v4 = append(c.v4, uint64(start)<<32|uint64(end))
 	c.Found4++
+	if len(c.v4) >= max(c.at4, compactMin) {
+		c.settle4()
+	}
 }
 
 func parseV4(tok []byte) (ip uint32, plen int, ok bool) {
@@ -321,6 +424,9 @@ func (c *Collector) tryV6(tok []byte) bool {
 			end := u128{start.hi | ^m.hi, start.lo | ^m.lo}
 			c.v6 = append(c.v6, range6{start, end})
 			c.Found6++
+			if len(c.v6) >= max(c.at6, compactMin) {
+				c.settle6()
+			}
 			return true
 		}
 		// "ip:2001:db8::1" -> strip one leading ':' (not "::") and retry once
@@ -343,10 +449,10 @@ func (c *Collector) Result() (v4, v6 []string) {
 }
 
 func (c *Collector) result4() []string {
+	c.v4 = mergeV4(c.v4)
 	if len(c.v4) == 0 {
 		return nil
 	}
-	slices.Sort(c.v4)
 	out := make([]string, 0, len(c.v4)/2+1)
 	emit := func(s, e uint32) {
 		cur := uint64(s)
@@ -367,19 +473,9 @@ func (c *Collector) result4() []string {
 			}
 		}
 	}
-	curS, curE := uint32(c.v4[0]>>32), uint32(c.v4[0])
-	for _, v := range c.v4[1:] {
-		s, e := uint32(v>>32), uint32(v)
-		if uint64(s) <= uint64(curE)+1 {
-			if e > curE {
-				curE = e
-			}
-			continue
-		}
-		emit(curS, curE)
-		curS, curE = s, e
+	for _, v := range c.v4 { // already merged: disjoint and not touching
+		emit(uint32(v>>32), uint32(v))
 	}
-	emit(curS, curE)
 	return out
 }
 
@@ -409,15 +505,10 @@ func appendInt(b []byte, v int) []byte {
 }
 
 func (c *Collector) result6() []string {
+	c.v6 = mergeV6(c.v6)
 	if len(c.v6) == 0 {
 		return nil
 	}
-	slices.SortFunc(c.v6, func(a, b range6) int {
-		if r := a.start.cmp(b.start); r != 0 {
-			return r
-		}
-		return a.end.cmp(b.end)
-	})
 	var out []string
 	emit := func(s, e u128) {
 		cur := s
@@ -441,17 +532,8 @@ func (c *Collector) result6() []string {
 			cur = next
 		}
 	}
-	cur := c.v6[0]
-	for _, r := range c.v6[1:] {
-		if cur.end == max128 || r.start.cmp(cur.end.add1()) <= 0 {
-			if r.end.cmp(cur.end) > 0 {
-				cur.end = r.end
-			}
-			continue
-		}
-		emit(cur.start, cur.end)
-		cur = r
+	for _, r := range c.v6 { // already merged: disjoint and not touching
+		emit(r.start, r.end)
 	}
-	emit(cur.start, cur.end)
 	return out
 }

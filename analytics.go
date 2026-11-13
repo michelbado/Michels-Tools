@@ -19,6 +19,8 @@ import (
 type visitLogger struct {
 	dir       string
 	retention int         // days to keep daily files
+	maxBytes  int64       // most the log files may take together (0 = no limit); the oldest days are deleted first, and when today alone reaches it, visits are not recorded
+	size      int64       // what the log files take now (only the logger goroutine touches it)
 	ips       *ipResolver // finds the visitor's real address (may be nil: use the connection)
 	ch        chan []byte
 	quit      chan struct{}
@@ -43,12 +45,12 @@ var (
 )
 
 // newVisitLogger returns nil (logging off) when dir is empty.
-func newVisitLogger(dir string, retentionDays int, ips *ipResolver) (*visitLogger, error) {
-	return startVisitLogger(dir, retentionDays, ips, time.Now)
+func newVisitLogger(dir string, retentionDays int, maxBytes int64, ips *ipResolver) (*visitLogger, error) {
+	return startVisitLogger(dir, retentionDays, maxBytes, ips, time.Now)
 }
 
 // startVisitLogger is newVisitLogger with an injectable clock (for tests).
-func startVisitLogger(dir string, retentionDays int, ips *ipResolver, now func() time.Time) (*visitLogger, error) {
+func startVisitLogger(dir string, retentionDays int, maxBytes int64, ips *ipResolver, now func() time.Time) (*visitLogger, error) {
 	if dir == "" {
 		return nil, nil
 	}
@@ -59,7 +61,7 @@ func startVisitLogger(dir string, retentionDays int, ips *ipResolver, now func()
 		retentionDays = 1
 	}
 	l := &visitLogger{
-		dir: dir, retention: retentionDays, ips: ips,
+		dir: dir, retention: retentionDays, maxBytes: maxBytes, ips: ips,
 		ch:   make(chan []byte, 4096),
 		quit: make(chan struct{}),
 		done: make(chan struct{}),
@@ -98,6 +100,9 @@ func (l *visitLogger) run() {
 			if f != nil {
 				f.Close()
 			}
+			if name != "" {
+				l.cleanup() // a new day: old days may now be due, which also frees room under the size limit
+			}
 			var err error
 			f, err = os.OpenFile(filepath.Join(l.dir, "visits-"+day+".jsonl"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o600)
 			if err != nil {
@@ -107,7 +112,12 @@ func (l *visitLogger) run() {
 			}
 			w, name = bufio.NewWriter(f), day
 		}
+		if l.maxBytes > 0 && l.size+int64(len(line)) > l.maxBytes {
+			l.dropped.Add(1) // the folder is full and nothing older can go: never grow past the limit
+			return
+		}
 		w.Write(line)
+		l.size += int64(len(line))
 	}
 	tick := time.NewTicker(time.Second)
 	clean := time.NewTicker(time.Hour)
@@ -138,14 +148,21 @@ func (l *visitLogger) run() {
 	}
 }
 
-// cleanup deletes daily files older than the retention period.
+// cleanup deletes daily files older than the retention period and then, when the files together take more than maxBytes, the oldest days
+// until they fit (today's file is never deleted). It also measures what the files take now.
 func (l *visitLogger) cleanup() {
 	entries, err := os.ReadDir(l.dir)
 	if err != nil {
 		return
 	}
 	cutoff := l.now().UTC().AddDate(0, 0, -l.retention)
-	for _, e := range entries {
+	type dayFile struct {
+		name string
+		size int64
+	}
+	var keep []dayFile
+	var total int64
+	for _, e := range entries { // ReadDir lists by name, and the names start with the date: oldest first
 		m := fileName.FindStringSubmatch(e.Name())
 		if m == nil {
 			continue
@@ -153,8 +170,25 @@ func (l *visitLogger) cleanup() {
 		day, err := time.Parse("2006-01-02", m[1])
 		if err == nil && day.Before(cutoff.Truncate(24*time.Hour)) {
 			os.Remove(filepath.Join(l.dir, e.Name()))
+			continue
+		}
+		if info, err := e.Info(); err == nil {
+			keep = append(keep, dayFile{e.Name(), info.Size()})
+			total += info.Size()
 		}
 	}
+	if l.maxBytes > 0 {
+		today := "visits-" + l.now().UTC().Format("2006-01-02") + ".jsonl"
+		for _, f := range keep {
+			if total <= l.maxBytes || f.name >= today {
+				break
+			}
+			if os.Remove(filepath.Join(l.dir, f.name)) == nil {
+				total -= f.size
+			}
+		}
+	}
+	l.size = total
 }
 
 // clientIP is the visitor's real address (see ipResolver).

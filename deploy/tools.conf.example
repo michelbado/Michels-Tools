@@ -102,6 +102,8 @@ pinball = true         # Pinball (one table, three balls)
 racer = true           # Road Racer (arcade driving against the clock)
 pool = true            # Pool (8-ball against the computer or a second player on the same screen)
 birdhunt = true        # Bird Hunt (birds burst out of the grass; three shots for each flight)
+stunt = true           # Stunt Track (3D stunt driving against the clock: loops, jumps, a track editor)
+gemmaze = true         # Gem Maze (puzzle levels: keys, doors, crates, ice, conveyors, creatures)
 
 # ---- Locking ----
 # Instead of "true" or "false", a tool or a whole folder can say "locked": it stays visible, but its files and server calls are refused until the
@@ -123,3 +125,5 @@ netquality.monitor_minutes = 10      # the longest a monitoring run may last, 1 
 netquality.monitor_fine = true       # allow "fine detail" (20 probes a second instead of 5) in Monitor mode; it catches 50 ms hiccups but sends 4x the requests
 # The Idle-timeout finder asks the server to hold a request open without sending anything. It also keeps at most 4 such tests per visitor and 40 on the whole server:
 idletest.max_seconds = 300           # the longest a single held request may last, 30 to 600 (Cloudflare gives up after 100, many load balancers after 60)
+# The visit log (IP address and browser type of each visit) may take at most this much disk, in MB (1024 = 1 GB). When it grows past it, the oldest days are deleted first. 0 = no limit:
+log.max_mb = 1024

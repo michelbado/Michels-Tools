@@ -74,6 +74,8 @@
     racer: "game driving car racing arcade",
     pool: "game billiards eight ball snooker",
     birdhunt: "game shooting birds hunt",
+    stunt: "game driving car 3d loop jump stunts track editor racing",
+    gemmaze: "game puzzle maze keys doors levels robot gems",
   };
   const STOP = new Set(["and", "the", "a", "an", "of", "to", "for", "in", "on", "my", "with", "or", "how", "what", "is", "do", "i", "can", "are", "me", "find", "make"]);
 

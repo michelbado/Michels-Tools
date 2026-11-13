@@ -35,6 +35,7 @@ type rateConfig struct {
 	NetScale    int // a whole IPv6 /48 may use this many times one visitor's budget (0 = 50)
 	DiagPerMin  int // Connection Quality probes per visitor per minute (0 = no limit)
 	HeavyPerMin int // Connection Quality download/upload transfers per visitor per minute, one at a time (0 = no limit)
+	HeavyTotal  int // Connection Quality transfers running at once on the WHOLE server, whoever starts them (0 = no limit)
 }
 
 type bucket struct {
@@ -90,6 +91,7 @@ type ipLimits struct {
 	now        func() time.Time
 	capacity   int // visitors remembered at once
 	refused    atomic.Int64
+	heavyNow   atomic.Int64 // speed-test transfers running now, whoever started them (see rateConfig.HeavyTotal)
 }
 
 const (
@@ -102,12 +104,13 @@ const (
 	overflowShards  = 64               // overflow budgets, one per hashed network
 	msgTooFast      = "Too many requests. Please wait a moment and try again."
 	msgTooMany      = "You already have the maximum number of aggregations running. Please wait for one to finish."
+	msgHeavyBusy    = "The server is busy with other speed tests. Please try again in a few seconds."
 	apiPath         = "/api/aggregate"
 )
 
 // newIPLimits returns nil when every limit is off.
 func newIPLimits(cfg rateConfig) *ipLimits {
-	if cfg.APIPerMin <= 0 && cfg.PagePerMin <= 0 && cfg.IPJobs <= 0 && cfg.DiagPerMin <= 0 && cfg.HeavyPerMin <= 0 {
+	if cfg.APIPerMin <= 0 && cfg.PagePerMin <= 0 && cfg.IPJobs <= 0 && cfg.DiagPerMin <= 0 && cfg.HeavyPerMin <= 0 && cfg.HeavyTotal <= 0 {
 		return nil
 	}
 	ns := float64(cfg.NetScale)
@@ -205,9 +208,33 @@ type target struct {
 	fresh bool // not in the table yet: inserted only if the request is admitted
 }
 
-// admit decides about one request. On success release (maybe nil) must be called when it ends.
-// Every budget that applies must have room; only then is anything used up or remembered.
+// admitClass decides about one request. On success release (maybe nil) must be called when it ends.
+// Speed-test transfers first need a place in the server-wide cap (HeavyTotal): each carries up to 100 MB, so without a cap many different
+// visitors could together use all of the server's bandwidth. The cap is only a counter, so a refusal remembers nobody.
 func (l *ipLimits) admitClass(keys []keyScale, class int) (ok bool, retry time.Duration, msg string, release func()) {
+	if class != clsHeavy || l.cfg.HeavyTotal <= 0 {
+		return l.admitOne(keys, class)
+	}
+	if l.heavyNow.Add(1) > int64(l.cfg.HeavyTotal) {
+		l.heavyNow.Add(-1)
+		return false, 5 * time.Second, msgHeavyBusy, nil
+	}
+	ok, retry, msg, own := l.admitOne(keys, class) // not "release": that is this function's own result, and the closure below would call itself for ever
+	if !ok {
+		l.heavyNow.Add(-1)
+		return false, retry, msg, nil
+	}
+	return true, 0, "", func() {
+		if own != nil {
+			own()
+		}
+		l.heavyNow.Add(-1)
+	}
+}
+
+// admitOne decides about one request against the visitor's own budgets.
+// Every budget that applies must have room; only then is anything used up or remembered.
+func (l *ipLimits) admitOne(keys []keyScale, class int) (ok bool, retry time.Duration, msg string, release func()) {
 	useBucket := l.cfg.PagePerMin > 0
 	useJobs := false
 	perMin, burst := float64(l.cfg.PagePerMin), l.pageBurst

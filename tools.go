@@ -33,7 +33,7 @@ var toolFolders = map[string][]string{
 	"engineering": {"urlparse", "jwtdecode", "basicauth", "xmljson", "crontab", "chmodcalc", "colorconv", "jsonfmt", "textdiff", "encodetool", "hashcalc", "timeconv", "passgen", "regextest", "qrcode"},
 	"images":      {"imgexif", "imgresize", "imgblur", "imgconvert", "imgwatermark", "imgbatch", "imgfavicon"},
 	"reference":   {"portref", "dscp", "httpstatus", "dnstypes", "icmptypes", "tcpref", "ipsecref"},
-	"games":       {"blocks", "mines", "pinball", "racer", "pool", "birdhunt"},
+	"games":       {"blocks", "mines", "pinball", "racer", "pool", "birdhunt", "stunt", "gemmaze"},
 }
 
 func isToolApp(name string) bool {
@@ -84,7 +84,8 @@ var toolSettings = map[string]settingSpec{
 	"netquality.monitor_minutes":   {kind: 'i', min: 1, max: 60, defInt: 10},
 	"idletest.max_seconds":         {kind: 'i', min: 30, max: 600, defInt: 300},
 	"lock.hours":                   {kind: 'i', min: 1, max: 168, defInt: 12},
-	"lock.code":                    {kind: 's'}, // no default: locked tools need one
+	"log.max_mb":                   {kind: 'i', min: 0, max: 1048576, defInt: 1024}, // visit log size limit; 0 = none
+	"lock.code":                    {kind: 's'},                                     // no default: locked tools need one
 }
 
 func settingNames() []string {

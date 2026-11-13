@@ -1,0 +1,3 @@
+/* Stunt Track: the shared game layout is in xp.css (.gm). The 3D picture is one canvas, the dials and menus a second one on top of it. */
+.gm-bar .stunt-code { width: 9rem; font-family: Consolas, "Courier New", monospace; }
+#stunt-stage { background: #0B1026; }

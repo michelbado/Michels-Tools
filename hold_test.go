@@ -2,12 +2,48 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
+
+// A request that was refused for lack of a free place never ran: asking again with the same id must be a fresh try, not "a repeat".
+func TestHoldRefusedRequestIsNotRememberedAsARetry(t *testing.T) {
+	s := holdServer(t, "")
+	ctx, cancel := context.WithCancel(context.Background())
+	var wg sync.WaitGroup
+	for i := 0; i < holdMaxPerIP; i++ { // this visitor's places are all taken
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			req, _ := http.NewRequestWithContext(ctx, "GET", s.URL+"/api/hold?secs=30", nil)
+			if r, err := http.DefaultClient.Do(req); err == nil {
+				r.Body.Close()
+			}
+		}()
+	}
+	time.Sleep(400 * time.Millisecond)
+	r1, err := http.Get(s.URL + "/api/hold?secs=1&id=refused12345")
+	if err != nil || r1.StatusCode != 429 {
+		t.Fatalf("with every place taken the request must be refused with 429: %v %v", err, r1)
+	}
+	r1.Body.Close()
+	cancel() // the four holds end
+	wg.Wait()
+	time.Sleep(300 * time.Millisecond)
+	r2, err := http.Get(s.URL + "/api/hold?secs=1&id=refused12345")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer r2.Body.Close()
+	if r2.StatusCode != 200 {
+		t.Errorf("the same id after a refusal must run normally, got %d (409 means the refused request was remembered)", r2.StatusCode)
+	}
+}
 
 func holdServer(t *testing.T, conf string) *httptest.Server {
 	t.Helper()

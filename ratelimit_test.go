@@ -625,3 +625,65 @@ func TestNetworkBudgetDefaultsToFifty(t *testing.T) {
 		t.Fatalf("one /48 got %d requests through in a burst, want 500 (50 x 10)", pass)
 	}
 }
+
+// ---- the server-wide cap on speed-test transfers (rateConfig.HeavyTotal) ----
+
+func TestHeavyTransfersHaveAServerWideCap(t *testing.T) {
+	l, _ := limitsWith(rateConfig{HeavyPerMin: 600, HeavyTotal: 2})
+	okA, _, _, relA := l.admitClass(limitKeys("192.0.2.1"), clsHeavy)
+	okB, _, _, relB := l.admitClass(limitKeys("192.0.2.2"), clsHeavy)
+	if !okA || !okB {
+		t.Fatal("two different visitors fit in a cap of two")
+	}
+	known := len(l.m)
+	ok, retry, msg, _ := l.admitClass(limitKeys("192.0.2.3"), clsHeavy)
+	if ok || msg != msgHeavyBusy || retry <= 0 {
+		t.Fatalf("a third transfer must be refused with a wait time: ok=%v retry=%v msg=%q", ok, retry, msg)
+	}
+	if len(l.m) != known {
+		t.Error("a visitor refused by the server-wide cap must not be remembered")
+	}
+	relA()
+	okC, _, _, relC := l.admitClass(limitKeys("192.0.2.3"), clsHeavy)
+	if !okC {
+		t.Fatal("a place freed by a finished transfer must be usable at once")
+	}
+	relB()
+	relC()
+	if n := l.heavyNow.Load(); n != 0 {
+		t.Fatalf("every place must be given back, %d still counted", n)
+	}
+}
+
+func TestHeavyCapIsNotUsedUpByRefusalsOrOtherClasses(t *testing.T) {
+	l, _ := limitsWith(rateConfig{HeavyPerMin: 600, HeavyTotal: 2, PagePerMin: 600})
+	ok1, _, _, rel1 := l.admitClass(limitKeys("192.0.2.1"), clsHeavy)
+	ok2, _, _, _ := l.admitClass(limitKeys("192.0.2.1"), clsHeavy) // the same visitor: refused by its own one-at-a-time rule
+	if !ok1 || ok2 {
+		t.Fatalf("one transfer at a time per visitor: %v %v", ok1, ok2)
+	}
+	if n := l.heavyNow.Load(); n != 1 {
+		t.Errorf("a refused transfer must not keep a place in the cap: %d counted", n)
+	}
+	for i := 0; i < 20; i++ { // ordinary page requests do not touch it
+		if ok, _, _, _ := l.admitClass(limitKeys("192.0.2.9"), clsPage); !ok {
+			t.Fatal("page requests are not limited by the transfer cap")
+		}
+	}
+	rel1()
+	if n := l.heavyNow.Load(); n != 0 {
+		t.Errorf("%d still counted", n)
+	}
+}
+
+func TestHeavyCapOffWhenZero(t *testing.T) {
+	l, _ := limitsWith(rateConfig{HeavyPerMin: 600})
+	for i := 0; i < 20; i++ {
+		if ok, _, _, _ := l.admitClass(limitKeys("192.0.2."+strconvI(i+1)), clsHeavy); !ok {
+			t.Fatalf("with no server-wide cap, visitor %d must pass", i)
+		}
+	}
+	if l2 := newIPLimits(rateConfig{HeavyTotal: 3}); l2 == nil {
+		t.Error("a server-wide cap alone is a limit: the limiter must exist")
+	}
+}
