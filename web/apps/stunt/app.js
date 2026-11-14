@@ -3,6 +3,10 @@
  * The pieces, the track check and the track code are in lib/stunttrack.js. Best times and "My track" are kept in this browser only. */
 (window.DesktopApps = window.DesktopApps || {}).stunt = (() => {
   const W = 800, H = 500, G = 9.8, VMAX = 62, ACC = 11, BRAKE = 24, CRASH_V = 14, STORE = "michels-tools-stunt-track";
+  // Steering. The car turns by (steer) x min(TURN_MAX, grip / speed): at low speed a fixed turn rate, above GRIP / TURN_MAX m/s the most sideways
+  // acceleration the tyres give (metres per second squared). The corner piece is a quarter circle of only 15 m radius, so the grip decides how fast
+  // a corner can be taken: sqrt(grip x radius), about 21 m/s on the plain corner and 25 m/s on the banked one (it was 15 and 18).
+  const GRIP_ROAD = 24, GRIP_GRASS = 10, GRIP_BANK = 8, TURN_MAX = 1.5;
   const CRASH_TEXT = { wall: "You drove into a wall.", hard: "You landed too hard.", water: "Splash! You drove into the water.", tree: "You hit a tree.", loop: "You hit the stunt piece: enter it straight and on the road.", slow: "Too slow: the car fell off." };
 
   /* ---- small vector and matrix helpers (matrices are 16 numbers, column by column) ---- */
@@ -260,8 +264,8 @@
         car.v = GK.clamp(car.v + acc * dt, -9, VMAX);
         if (!gas && !brake && Math.abs(car.v) < 0.15) car.v = 0;
         car.steer += (steer - car.steer) * Math.min(1, dt * 9);
-        const grip = (a0.road ? 15 : 8) + (a0.p === "k" ? 7 : 0);
-        car.psi += car.steer * Math.min(1.7, grip / Math.max(6, Math.abs(car.v))) * dt * (car.v >= 0 ? 1 : -1) * Math.min(1, Math.abs(car.v) / 3);
+        const grip = (a0.road ? GRIP_ROAD : GRIP_GRASS) + (a0.p === "k" ? GRIP_BANK : 0);
+        car.psi += car.steer * Math.min(TURN_MAX, grip / Math.max(6, Math.abs(car.v))) * dt * (car.v >= 0 ? 1 : -1) * Math.min(1, Math.abs(car.v) / 3);
       }
       const hv = car.air ? car.hv : car.v, cs = Math.cos(car.psi), sn = Math.sin(car.psi);
       let nx = car.x + cs * hv * dt, nz = car.z + sn * hv * dt;

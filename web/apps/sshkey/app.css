@@ -1,0 +1,4 @@
+/* SSH Key Inspector: shared look is in xp.css (.tk). */
+.sshkey-art { font-family: Consolas, "Courier New", monospace; font-size: 12px; line-height: 1.15; margin: 4px 0; white-space: pre; overflow-x: auto; }
+.sshkey-key { margin-bottom: 12px; }
+.sshkey-key h3 { margin: 4px 0; font-size: 13px; overflow-wrap: anywhere; }

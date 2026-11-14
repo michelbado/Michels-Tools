@@ -26,12 +26,13 @@ import (
 
 // toolFolders: folder id -> the tools inside it.
 var toolFolders = map[string][]string{
-	"network":     {"aggregator", "subnet", "splitter", "checker", "ipv6calc", "ipconv", "maclookup", "mailhdr", "mailauth", "mtucalc"},
+	"network":     {"aggregator", "subnet", "splitter", "checker", "ipv6calc", "ipconv", "maclookup", "mailhdr", "mailauth", "mtucalc", "cgnat", "dhcpopt"},
 	"pdf":         {"pdfinfo", "pdfverify", "pdfmeta", "pdfstamp", "pdfwatermark", "pdfpages", "pdfmerge", "pdforganize", "pdfcrop", "pdfredact", "pdfimages", "pdfextract"},
-	"trouble":     {"netquality", "connfacts", "idletest", "pathread", "browsercaps", "httphdr"},
-	"certs":       {"certcheck", "certconvert", "certcsr", "certdecode", "opensslhelp"},
+	"trouble":     {"netquality", "connfacts", "idletest", "pathread", "browsercaps", "httphdr", "pktdecode", "tputcalc"},
+	"certs":       {"certcheck", "certconvert", "certcsr", "certdecode", "opensslhelp", "sshkey"},
+	"builders":    {"tcpdump", "nmap", "sshtunnel", "curlconv", "iproute", "nftables", "systemdunit"},
 	"engineering": {"urlparse", "jwtdecode", "basicauth", "xmljson", "crontab", "chmodcalc", "colorconv", "jsonfmt", "textdiff", "encodetool", "hashcalc", "timeconv", "passgen", "regextest", "qrcode"},
-	"images":      {"imgexif", "imgresize", "imgblur", "imgconvert", "imgwatermark", "imgbatch", "imgfavicon"},
+	"images":      {"imgexif", "imgresize", "imgblur", "imgconvert", "imgwatermark", "imgbatch", "imgfavicon", "imgannotate"},
 	"reference":   {"portref", "dscp", "httpstatus", "dnstypes", "icmptypes", "tcpref", "ipsecref"},
 	"games":       {"blocks", "mines", "pinball", "racer", "pool", "birdhunt", "stunt", "gemmaze"},
 }

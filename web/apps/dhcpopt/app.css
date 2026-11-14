@@ -1,0 +1,17 @@
+/* DHCP Option Helper. Shared widgets live in xp.css. */
+.dho { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.dho .tabs { display: flex; gap: 2px; padding: 8px 12px 0; flex-wrap: wrap; }
+.dho .tab { font: inherit; color: #000; min-height: 30px; padding: 4px 16px; border: 1px solid #919B9C; border-bottom: 0; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, #FFFFFF 0%, #ECEBE5 100%); cursor: pointer; }
+.dho .tab:hover:not(.on) { box-shadow: inset 0 2px 0 var(--hover-glow); }
+.dho .tab.on { background: #FCFCFE; font-weight: 700; z-index: 1; box-shadow: inset 0 2px 0 #FFC73C; }
+.dho .tab:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+.dho .panel { flex: 1 1 auto; min-height: 0; overflow: auto; margin: 0 12px 12px; padding: 14px; border: 1px solid #919B9C; background: #FCFCFE; }
+.dho .panel fieldset { margin: 0 0 10px; border: 1px solid #919B9C; background: #fff; padding: 4px 10px 8px; }
+.dho .panel legend { font-weight: 700; padding: 0 4px; }
+.dho [role="tabpanel"][hidden] { display: none; }
+.dho .dho-wide { max-width: 100%; min-width: 18rem; }
+.dho .dho-val { width: 100%; box-sizing: border-box; min-height: 60px; }
+.dho .dho-conf { display: block; margin: 4px 0 8px; padding: 6px 8px; border: 1px solid #919B9C; background: #fff; font-family: Consolas, "Courier New", monospace; font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dho .dho-conf-head { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-weight: 700; }
+.dho .tk-fld { align-items: flex-start; }
+@media (max-width: 699px) { .dho .dho-wide { min-width: 0; width: 100%; } .dho .tk-fld, .dho .tk-fld .xp-select { max-width: 100%; box-sizing: border-box; } .dho .tk-fld { width: 100%; } .dho .tk-fld .xp-select { width: 100%; } }

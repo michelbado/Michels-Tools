@@ -1,0 +1,68 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Subscribers: the private addresses behind the NAT</legend>
+      <textarea class="xp-text tk-in cgnat-small" id="cgnat-subs" rows="3" spellcheck="false" autocomplete="off" autocapitalize="off">100.64.0.0/22</textarea>
+      <p class="tk-muted">Networks (100.64.0.0/22), ranges (100.64.0.1-100.64.3.254) or single addresses, one per line or separated by commas. Subscribers are numbered in the order you type them.</p>
+    </fieldset>
+    <fieldset>
+      <legend>Public pool: the addresses they share</legend>
+      <textarea class="xp-text tk-in cgnat-small" id="cgnat-pool" rows="3" spellcheck="false" autocomplete="off" autocapitalize="off">203.0.113.0/27</textarea>
+      <p class="tk-muted">Every address of the pool is used, including the first and last of a network.</p>
+    </fieldset>
+    <fieldset>
+      <legend>Ports</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="cgnat-mode"><b>I know</b>
+          <select id="cgnat-mode" class="xp-select"><option value="ports">ports per subscriber</option><option value="perip">subscribers per public address</option></select></label>
+        <label class="tk-fld" for="cgnat-amount"><b id="cgnat-amountlabel">Ports per subscriber</b>
+          <input type="text" id="cgnat-amount" class="xp-field tk-narrow" inputmode="numeric" maxlength="6" value="2016" autocomplete="off"></label>
+        <label class="tk-fld" for="cgnat-first"><b>First port used</b>
+          <input type="text" id="cgnat-first" class="xp-field tk-narrow" inputmode="numeric" maxlength="5" value="1024" autocomplete="off"></label>
+        <label class="tk-fld" for="cgnat-last"><b>Last port used</b>
+          <input type="text" id="cgnat-last" class="xp-field tk-narrow" inputmode="numeric" maxlength="5" value="65535" autocomplete="off"></label>
+      </div>
+      <p class="tk-muted">Ports below 1024 are normally kept for the NAT itself. This is the plain layout: subscriber 1 gets the first block of the first public address, subscriber 2 the next block, and so on. Your equipment may lay blocks out in its own order, so check the result against its own deterministic-NAT tool or log before you rely on it.</p>
+    </fieldset>
+    <div class="tk-summary" id="cgnat-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="cgnat-notes" hidden></ul>
+    <div id="cgnat-sections"></div>
+    <fieldset id="cgnat-findbox" hidden>
+      <legend>Who is behind a public address and port? (the question a complaint or a legal request asks)</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="cgnat-rip"><b>Public address</b><input type="text" id="cgnat-rip" class="xp-field" inputmode="decimal" maxlength="15" placeholder="203.0.113.5" autocomplete="off"></label>
+        <label class="tk-fld" for="cgnat-rport"><b>Port</b><input type="text" id="cgnat-rport" class="xp-field tk-narrow" inputmode="numeric" maxlength="5" placeholder="20000" autocomplete="off"></label>
+      </div>
+      <div id="cgnat-rout"></div>
+      <p class="tk-muted">The answer is only right for the date the layout was in force: write down the layout, and the date it started and ended, together with the time of the event you are tracing. A different layout on that day gives a different subscriber.</p>
+    </fieldset>
+    <fieldset id="cgnat-fwdbox" hidden>
+      <legend>Which public address and ports does a subscriber use?</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="cgnat-fip"><b>Subscriber's private address</b><input type="text" id="cgnat-fip" class="xp-field" inputmode="decimal" maxlength="15" placeholder="100.64.0.37" autocomplete="off"></label>
+      </div>
+      <div id="cgnat-fout"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Size a pool</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="cgnat-sn"><b>Subscribers</b><input type="text" id="cgnat-sn" class="xp-field tk-narrow" inputmode="numeric" maxlength="9" value="10000" autocomplete="off"></label>
+        <label class="tk-fld" for="cgnat-sp"><b>Ports per subscriber</b><input type="text" id="cgnat-sp" class="xp-field tk-narrow" inputmode="numeric" maxlength="6" value="2016" autocomplete="off"></label>
+        <label class="tk-fld" for="cgnat-sa"><b>Or: public addresses available</b><input type="text" id="cgnat-sa" class="xp-field tk-narrow" inputmode="numeric" maxlength="7" value="256" autocomplete="off"></label>
+      </div>
+      <div id="cgnat-sizeout"></div>
+      <p class="tk-muted">Uses the port range above. Every subscriber needs a block of ports in the worst case, so this is the pool that never runs a subscriber out of ports.</p>
+    </fieldset>
+    <fieldset id="cgnat-tablebox" hidden>
+      <legend>The table</legend>
+      <div id="cgnat-table"></div>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="cgnat-csv" disabled>Save the whole table (CSV)</button>
+        <button type="button" class="xp-btn" id="cgnat-copy" disabled>Copy these rows</button>
+      </div>
+      <p class="tk-muted" id="cgnat-tablenote"></p>
+    </fieldset>
+    <p class="tk-muted">Everything is worked out in your browser from what you type; nothing is sent anywhere. Related standards: RFC 6598 (100.64.0.0/10), RFC 6888 (requirements for CGNs), RFC 7422 (deterministic port ranges, which is what makes the question above answerable without logging every connection).</p>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="cgnat-status">Ready</span></footer>
+</div>

@@ -1,0 +1,22 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>The bytes of one packet, in hex</legend>
+      <textarea class="xp-text tk-in" id="pktdecode-in" rows="8" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste hex from tcpdump -XX, Wireshark (Copy as Hex Stream or Hex Dump), tshark -x, or plain bytes:&#10;&#10;0x0000:  4500 003c 1c46 4000 4006 b1e6 ac10 0a63&#10;0x0010:  ac10 0a0c 0050 d3e8 ..."></textarea>
+      <div class="tk-row">
+        <label class="tk-fld" for="pktdecode-link"><b>The bytes start with</b>
+          <select id="pktdecode-link" class="xp-select"><option value="auto">Detect it</option><option value="eth">An Ethernet header</option><option value="ip4">An IPv4 header</option><option value="ip6">An IPv6 header</option><option value="sll">A Linux cooked header (tcpdump -i any)</option><option value="ppp">A PPP header</option></select></label>
+        <label class="tk-fld" for="pktdecode-example"><b>Try an example</b>
+          <select id="pktdecode-example" class="xp-select"></select></label>
+        <button type="button" class="xp-btn" id="pktdecode-clear">Clear</button>
+        <button type="button" class="xp-btn" id="pktdecode-copy" disabled>Copy as text</button>
+        <button type="button" class="xp-btn" id="pktdecode-save" disabled>Save text</button>
+      </div>
+      <p class="tk-muted">Copy the bytes of one packet from a capture (tcpdump, Wireshark, a switch's capture, a log) and paste them here. The decoder names every header field, checks the checksums it can, and points out what looks wrong. Click a row to see its bytes. Everything happens in your browser: the bytes are never sent anywhere. A capture shows only what the capture saw: encrypted data (ESP, TLS) stays unreadable.</p>
+    </fieldset>
+    <div class="tk-summary" id="pktdecode-summary" role="status" aria-live="polite"></div>
+    <ul class="tk-notes" id="pktdecode-notes" hidden></ul>
+    <div id="pktdecode-out"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="pktdecode-status">Ready</span><span class="cell wide" id="pktdecode-chain"></span></footer>
+</div>

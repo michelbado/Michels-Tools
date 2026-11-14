@@ -305,7 +305,7 @@ func TestToolSwitchOffCoversTheNewTool(t *testing.T) {
 	if c := serve(handlerWith(t, "pdf = false\n"), "GET", "/api/ping?run=abcdef123456&seq=1").Code; c != 200 {
 		t.Errorf("switching off an unrelated folder must leave the test endpoints on, got %d", c)
 	}
-	if got := mustParse(t, "trouble = false\n").hidden(); strings.Join(got, ",") != "browsercaps,connfacts,httphdr,idletest,netquality,pathread,trouble" {
+	if got := mustParse(t, "trouble = false\n").hidden(); strings.Join(got, ",") != "browsercaps,connfacts,httphdr,idletest,netquality,pathread,pktdecode,tputcalc,trouble" {
 		t.Errorf("trouble = false hides the folder and its tool: %v", got)
 	}
 }

@@ -1,0 +1,50 @@
+/* tcpdump & Wireshark Filters. Shared widgets live in xp.css. */
+.tdf { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+
+.tdf .tabs { display: flex; gap: 2px; padding: 8px 12px 0; flex-wrap: wrap; }
+.tdf .tab { font: inherit; color: #000; min-height: 30px; padding: 4px 18px; border: 1px solid #919B9C; border-bottom: 0; border-radius: 3px 3px 0 0; background: linear-gradient(180deg, #FFFFFF 0%, #ECEBE5 100%); cursor: pointer; position: relative; top: 1px; }
+.tdf .tab:hover:not(.on) { box-shadow: inset 0 2px 0 var(--hover-glow); }
+.tdf .tab.on { background: #FCFCFE; font-weight: 700; z-index: 1; box-shadow: inset 0 2px 0 #FFC73C; }
+.tdf .tab:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+.tdf .panel { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 12px; margin: 0 12px 12px; padding: 0 14px 14px; overflow: auto; border: 1px solid #919B9C; background: #FCFCFE; }
+.tdf .panel > [role="tabpanel"] { padding-top: 14px; }
+.tdf [role="tabpanel"][hidden], .tdf [hidden] { display: none; }
+
+.tdf-row { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; padding: 8px 10px; margin: 0 0 8px; border: 1px solid #C9CEC0; border-left: 4px solid #5A8DF7; background: #fff; }
+.tdf-row.is-not { border-left-color: #C23A14; }
+.tdf-group { margin: 0 0 8px; padding: 8px 10px; border: 1px solid #919B9C; border-left: 4px solid #3F7A2E; background: #F4F8F0; }
+.tdf-group > .tdf-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; margin-bottom: 8px; }
+.tdf-group .tdf-row { margin-left: 12px; }
+.tdf-chk { display: inline-flex; align-items: center; gap: 5px; min-height: 28px; font-weight: 700; color: #7A1F06; }
+.tk-chk { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; }
+.tdf-flags { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 6px 10px; width: 100%; }
+.tdf-flags label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.tdf-problem { flex: 1 1 100%; margin: 0; padding: 4px 8px; border: 1px solid #C23A14; background: #FFF1EC; color: #7A1F06; }
+.tdf-text { font-family: Consolas, "Courier New", monospace; font-size: 13px; resize: vertical; }
+
+.tdf-live { position: sticky; top: 0; z-index: 3; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin: 0 -14px; padding: 8px 14px; border-bottom: 1px solid #919B9C; background: #ECEBE5; }
+.tdf-live .tdf-code { flex: 1 1 260px; padding: 4px 8px; }
+.tdf-out { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
+.tdf-code { flex: 1 1 320px; min-width: 0; padding: 7px 9px; border: 1px solid #919B9C; background: #fff; font-family: Consolas, "Courier New", monospace; font-size: 13px; overflow-wrap: anywhere; white-space: pre-wrap; }
+.tdf-words { line-height: 1.45; }
+.tdf-line { padding: 1px 0; overflow-wrap: anywhere; }
+.tdf-line.head { font-weight: 700; margin-bottom: 2px; }
+.tdf-line.d1 { padding-left: 20px; } .tdf-line.d2 { padding-left: 40px; } .tdf-line.d3 { padding-left: 60px; } .tdf-line.d4 { padding-left: 80px; } .tdf-line.d5 { padding-left: 100px; } .tdf-line.d6 { padding-left: 120px; }
+.tdf-line.lead { font-weight: 700; color: #1C4FD9; }
+.tdf-err { margin: 8px 0 0; padding: 8px 10px; border: 1px solid #C23A14; background: #FFF1EC; color: #7A1F06; font-family: Consolas, "Courier New", monospace; font-size: 13px; white-space: pre; overflow-x: auto; }
+.tdf-opts { margin: 0 0 8px; }
+.tdf-opts summary { cursor: pointer; font-weight: 700; margin-bottom: 8px; }
+
+.tdf-group-title { margin: 14px 0 6px; font-size: 14px; color: #0B2F8A; border-bottom: 1px solid #C9CEC0; }
+.tdf-card { margin: 0 0 8px; padding: 8px 10px; border: 1px solid #C9CEC0; background: #fff; }
+.tdf-card h4 { margin: 0 0 3px; font-size: 13px; }
+.tdf-card p { margin: 0 0 6px; line-height: 1.4; }
+.tdf-card .tdf-code { margin-bottom: 6px; font-size: 12px; }
+.tdf-card .tk-row { gap: 8px; }
+
+@media (max-width: 700px) {
+  .tdf .tab { padding: 4px 10px; }
+  .tdf .panel { margin: 0 6px 8px; padding: 0 10px 10px; }
+  .tdf-live { margin: 0 -10px; padding: 8px 10px; }
+  .tdf-group .tdf-row { margin-left: 4px; }
+}

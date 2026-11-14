@@ -1,0 +1,72 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>One TCP connection: what limits it?</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="tputcalc-rtt"><b>Round-trip time (ms)</b><input type="text" id="tputcalc-rtt" class="xp-field tk-narrow" inputmode="decimal" maxlength="8" value="40" autocomplete="off"></label>
+        <label class="tk-fld" for="tputcalc-win"><b>Window</b>
+          <span class="tput-pair"><input type="text" id="tputcalc-win" class="xp-field tk-narrow" inputmode="decimal" maxlength="10" value="64" autocomplete="off"><select id="tputcalc-winu" class="xp-select" aria-label="Window unit"><option value="1">bytes</option><option value="1024" selected>KiB</option><option value="1048576">MiB</option></select></span></label>
+        <label class="tk-fld" for="tputcalc-link"><b>Line speed (optional)</b>
+          <span class="tput-pair"><input type="text" id="tputcalc-link" class="xp-field tk-narrow" inputmode="decimal" maxlength="10" value="1" autocomplete="off"><select id="tputcalc-linku" class="xp-select" aria-label="Line speed unit"></select></span></label>
+        <label class="tk-fld" for="tputcalc-loss"><b>Packet loss % (optional)</b><input type="text" id="tputcalc-loss" class="xp-field tk-narrow" inputmode="decimal" maxlength="8" placeholder="0.01" autocomplete="off"></label>
+        <label class="tk-fld" for="tputcalc-mss"><b>MSS (bytes)</b><input type="text" id="tputcalc-mss" class="xp-field tk-narrow" inputmode="numeric" maxlength="5" value="1460" autocomplete="off"></label>
+      </div>
+      <p class="tk-muted">A TCP connection can only have one window of data in flight per round trip, so the window and the delay cap its speed however fast the line is. The default 64 KiB window is the largest one without window scaling. Packet loss lowers the speed further (the Mathis formula, an estimate).</p>
+      <div class="tk-row">
+        <label class="tk-fld" for="tputcalc-km"><b>Or estimate the round trip from a distance (km of cable)</b><input type="text" id="tputcalc-km" class="xp-field tk-narrow" inputmode="decimal" maxlength="7" placeholder="1000" autocomplete="off"></label>
+        <button type="button" class="xp-btn" id="tputcalc-usekm" disabled>Use it as round-trip time</button>
+      </div>
+      <div id="tputcalc-kmout" class="tk-muted"></div>
+      <div class="tk-summary" id="tputcalc-tcpsum" role="status" aria-live="polite"></div>
+      <ul class="tk-notes" id="tputcalc-tcpnotes" hidden></ul>
+      <div id="tputcalc-tcpout"></div>
+    </fieldset>
+    <fieldset>
+      <legend>How long does a transfer take?</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="tputcalc-size"><b>Size</b>
+          <span class="tput-pair"><input type="text" id="tputcalc-size" class="xp-field tk-narrow" inputmode="decimal" maxlength="12" value="10" autocomplete="off"><select id="tputcalc-sizeu" class="xp-select" aria-label="Size unit"></select></span></label>
+        <label class="tk-fld" for="tputcalc-speed"><b>Speed</b>
+          <span class="tput-pair"><input type="text" id="tputcalc-speed" class="xp-field tk-narrow" inputmode="decimal" maxlength="12" value="100" autocomplete="off"><select id="tputcalc-speedu" class="xp-select" aria-label="Speed unit"></select></span></label>
+        <label class="tk-fld" for="tputcalc-eff"><b>Share that is real data (%)</b><input type="text" id="tputcalc-eff" class="xp-field tk-narrow" inputmode="decimal" maxlength="6" value="94" autocomplete="off"></label>
+        <label class="tk-fld" for="tputcalc-time"><b>Or: time available</b>
+          <span class="tput-pair"><input type="text" id="tputcalc-time" class="xp-field tk-narrow" inputmode="decimal" maxlength="9" placeholder="30" autocomplete="off"><select id="tputcalc-timeu" class="xp-select" aria-label="Time unit"><option value="1">seconds</option><option value="60" selected>minutes</option><option value="3600">hours</option></select></span></label>
+      </div>
+      <p class="tk-muted">Headers, acknowledgements and gaps use part of the line: about 94 to 95 % of a gigabit Ethernet line is data. Use 100 if the speed you typed is already the real data speed (for example a measured result).</p>
+      <div class="tk-summary" id="tputcalc-trsum" role="status" aria-live="polite"></div>
+      <div id="tputcalc-trout"></div>
+    </fieldset>
+    <fieldset>
+      <legend>How much of the line is real data? Packets per second</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="tputcalc-mtu"><b>IP packet size / MTU</b><input type="text" id="tputcalc-mtu" class="xp-field tk-narrow" inputmode="numeric" maxlength="5" value="1500" autocomplete="off"></label>
+        <label class="tk-fld" for="tputcalc-ipv"><b>IP version</b><select id="tputcalc-ipv" class="xp-select"><option value="4">IPv4</option><option value="6">IPv6</option></select></label>
+        <label class="tk-fld" for="tputcalc-proto"><b>Carrying</b><select id="tputcalc-proto" class="xp-select"><option value="tcp">TCP</option><option value="udp">UDP</option></select></label>
+        <label class="tk-fld" for="tputcalc-extra"><b>Other overhead (bytes)</b><input type="text" id="tputcalc-extra" class="xp-field tk-narrow" inputmode="numeric" maxlength="4" value="0" autocomplete="off"></label>
+        <label class="tk-fld" for="tputcalc-line"><b>Line speed</b>
+          <span class="tput-pair"><input type="text" id="tputcalc-line" class="xp-field tk-narrow" inputmode="decimal" maxlength="10" value="1" autocomplete="off"><select id="tputcalc-lineu" class="xp-select" aria-label="Line speed unit"></select></span></label>
+      </div>
+      <div class="tk-row">
+        <label class="tk-chk"><input type="checkbox" class="xp-check" id="tputcalc-vlan"> VLAN tag (+4 bytes)</label>
+        <label class="tk-chk"><input type="checkbox" class="xp-check" id="tputcalc-pppoe"> PPPoE (+8 bytes; the MTU is then normally 1492)</label>
+        <label class="tk-chk"><input type="checkbox" class="xp-check" id="tputcalc-ts"> TCP timestamps (+12 bytes)</label>
+      </div>
+      <div class="tk-summary" id="tputcalc-effsum" role="status" aria-live="polite"></div>
+      <ul class="tk-notes" id="tputcalc-effnotes" hidden></ul>
+      <div id="tputcalc-effout"></div>
+    </fieldset>
+    <fieldset>
+      <legend>Speed and data per month</legend>
+      <div class="tk-row">
+        <label class="tk-fld" for="tputcalc-vrate"><b>Average speed</b>
+          <span class="tput-pair"><input type="text" id="tputcalc-vrate" class="xp-field tk-narrow" inputmode="decimal" maxlength="12" value="20" autocomplete="off"><select id="tputcalc-vrateu" class="xp-select" aria-label="Average speed unit"></select></span></label>
+        <label class="tk-fld" for="tputcalc-vdata"><b>Or: data per month</b>
+          <span class="tput-pair"><input type="text" id="tputcalc-vdata" class="xp-field tk-narrow" inputmode="decimal" maxlength="12" placeholder="500" autocomplete="off"><select id="tputcalc-vdatau" class="xp-select" aria-label="Data unit"></select></span></label>
+      </div>
+      <p class="tk-muted">A month is 30 days. Providers measure the busy period or the 95th percentile, not the average: use this to convert, not to predict a bill.</p>
+      <div id="tputcalc-vout"></div>
+    </fieldset>
+    <p class="tk-muted">Everything is arithmetic on the numbers you type: nothing is measured here and nothing is sent anywhere. Units are decimal (1 MB = 1,000,000 bytes) unless written KiB, MiB, GiB.</p>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="tputcalc-status">Ready</span></footer>
+</div>

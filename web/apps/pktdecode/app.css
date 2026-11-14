@@ -1,0 +1,18 @@
+/* Packet Header Decoder: shared look is in xp.css (.tk). */
+.pd-hex { margin: 0 0 10px; padding: 8px 10px; border: 1px solid #919B9C; background: #fff; font-family: Consolas, "Courier New", monospace; font-size: 12px; line-height: 1.55; overflow-x: auto; white-space: pre; }
+.pd-hex .pd-off { color: var(--muted); user-select: none; }
+.pd-hex .pd-b { padding: 0 1px; }
+.pd-hex .pd-b.l0 { background: #DCE8FF; } .pd-hex .pd-b.l1 { background: #FFF1C2; } .pd-hex .pd-b.l2 { background: #D8F2D2; } .pd-hex .pd-b.l3 { background: #F8D9D4; } .pd-hex .pd-b.l4 { background: #E6DAF5; } .pd-hex .pd-b.l5 { background: #D6F0F0; }
+.pd-hex .pd-b.sel { background: #1C4FD9; color: #fff; }
+.pd-layer { margin: 0 0 10px; border: 1px solid #919B9C; background: #fff; padding: 4px 10px 8px; }
+.pd-layer > legend { font-weight: 700; padding: 0 4px; }
+.pd-layer .pd-sw { display: inline-block; width: 11px; height: 11px; margin-right: 6px; border: 1px solid #919B9C; vertical-align: -1px; }
+.pd-layer .pd-sw.l0 { background: #DCE8FF; } .pd-layer .pd-sw.l1 { background: #FFF1C2; } .pd-layer .pd-sw.l2 { background: #D8F2D2; } .pd-layer .pd-sw.l3 { background: #F8D9D4; } .pd-layer .pd-sw.l4 { background: #E6DAF5; } .pd-layer .pd-sw.l5 { background: #D6F0F0; }
+.pd-table { border-collapse: collapse; width: 100%; }
+.pd-table th { text-align: left; font-weight: 400; color: var(--muted); padding: 3px 12px 3px 0; vertical-align: top; width: 26%; }
+.pd-table td { padding: 3px 0; vertical-align: top; overflow-wrap: anywhere; }
+.pd-table td.pd-bytes { width: 9rem; color: var(--muted); font-family: Consolas, "Courier New", monospace; font-size: 11px; text-align: right; padding-left: 8px; white-space: nowrap; }
+.pd-table tr.pd-row { cursor: pointer; }
+.pd-table tr.pd-row:hover { background: #F1F6FF; }
+.pd-table tr.pd-row.sel { background: #DCE8FF; }
+@media (max-width: 699px) { .pd-table th { width: 38%; } .pd-table td.pd-bytes { display: none; } }

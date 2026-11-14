@@ -1,0 +1,3 @@
+/* Throughput Calculator: shared look is in xp.css (.tk). */
+.tput-pair { display: inline-flex; gap: 4px; align-items: center; }
+.tput-pair .xp-select { min-width: 5.5rem; }

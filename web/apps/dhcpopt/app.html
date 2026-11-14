@@ -1,0 +1,57 @@
+<div class="dho">
+  <div class="tabs" role="tablist" aria-label="DHCP option helper sections">
+    <button type="button" role="tab" class="tab on" id="dhcpopt-tab-build" aria-selected="true" aria-controls="dhcpopt-panel-build">Build an option</button>
+    <button type="button" role="tab" class="tab" id="dhcpopt-tab-read" aria-selected="false" aria-controls="dhcpopt-panel-read" tabindex="-1">Read option bytes</button>
+    <button type="button" role="tab" class="tab" id="dhcpopt-tab-msg" aria-selected="false" aria-controls="dhcpopt-panel-msg" tabindex="-1">Read a DHCP message</button>
+    <button type="button" role="tab" class="tab" id="dhcpopt-tab-ref" aria-selected="false" aria-controls="dhcpopt-panel-ref" tabindex="-1">Option list</button>
+  </div>
+  <div class="panel">
+    <div role="tabpanel" id="dhcpopt-panel-build" aria-labelledby="dhcpopt-tab-build">
+      <fieldset>
+        <legend>Which option, and what value?</legend>
+        <div class="tk-row">
+          <label class="tk-fld" for="dhcpopt-bopt"><b>Option</b><select id="dhcpopt-bopt" class="xp-select dho-wide"></select></label>
+          <label class="tk-fld" for="dhcpopt-bpreset"><b>Start from an example</b><select id="dhcpopt-bpreset" class="xp-select"></select></label>
+        </div>
+        <label class="tk-fld" for="dhcpopt-bval"><b id="dhcpopt-bvallabel">Value</b>
+          <textarea class="xp-text tk-in dho-val" id="dhcpopt-bval" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea></label>
+        <p class="tk-muted" id="dhcpopt-bhelp"></p>
+      </fieldset>
+      <ul class="tk-notes" id="dhcpopt-bnotes" hidden></ul>
+      <div id="dhcpopt-bout"></div>
+    </div>
+    <div role="tabpanel" id="dhcpopt-panel-read" aria-labelledby="dhcpopt-tab-read" hidden>
+      <fieldset>
+        <legend>The value bytes of one option, in hex</legend>
+        <div class="tk-row">
+          <label class="tk-fld" for="dhcpopt-ropt"><b>Option</b><select id="dhcpopt-ropt" class="xp-select dho-wide"></select></label>
+        </div>
+        <textarea class="xp-text tk-in dho-val" id="dhcpopt-rhex" rows="4" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="18 0a 01 02 c0 a8 01 01"></textarea>
+        <p class="tk-muted">Paste only the value (not the option number and length). Spaces, colons, 0x and dotted groups (f104.c0a8) are all fine.</p>
+      </fieldset>
+      <ul class="tk-notes" id="dhcpopt-rnotes" hidden></ul>
+      <div id="dhcpopt-rout"></div>
+    </div>
+    <div role="tabpanel" id="dhcpopt-panel-msg" aria-labelledby="dhcpopt-tab-msg" hidden>
+      <fieldset>
+        <legend>A DHCP message or a whole packet, in hex</legend>
+        <textarea class="xp-text tk-in dho-val" id="dhcpopt-mhex" rows="8" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste the hex of the DHCP message (starting 01 01 06 00 ...), or of the whole packet from a capture (tcpdump -XX, Wireshark Copy as Hex Stream)."></textarea>
+        <p class="tk-muted">If the paste is a whole Ethernet or IP packet, the DHCP message inside it is found for you. Nothing is sent anywhere.</p>
+      </fieldset>
+      <div class="tk-summary" id="dhcpopt-msum" role="status" aria-live="polite"></div>
+      <ul class="tk-notes" id="dhcpopt-mnotes" hidden></ul>
+      <div id="dhcpopt-mout"></div>
+    </div>
+    <div role="tabpanel" id="dhcpopt-panel-ref" aria-labelledby="dhcpopt-tab-ref" hidden>
+      <fieldset>
+        <legend>Find an option</legend>
+        <div class="tk-row">
+          <label class="tk-fld" for="dhcpopt-fsearch"><b>Number or words</b><input type="text" id="dhcpopt-fsearch" class="xp-field" maxlength="60" placeholder="82, routes, tftp, dns ..." autocomplete="off"></label>
+          <label class="tk-fld" for="dhcpopt-fver"><b>Protocol</b><select id="dhcpopt-fver" class="xp-select"><option value="4">DHCP for IPv4</option><option value="6">DHCPv6</option></select></label>
+        </div>
+      </fieldset>
+      <div id="dhcpopt-fout"></div>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="dhcpopt-status">Ready</span></footer>
+</div>

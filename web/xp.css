@@ -320,3 +320,17 @@ fieldset > label { line-height: 1.4; }
 .tk-side { flex: 1 1 14rem; align-self: center; }
 .tk-fld textarea.xp-text { width: 24rem; max-width: 100%; box-sizing: border-box; }
 @media (max-width: 699px) { .ct-unlock .xp-field { width: 100%; } .ct-cmd { flex-direction: column; } }
+
+/* Command builders (lib/cmdkit.js): a form on the left, the result on the right; one column on phones */
+.cmdkit-grid { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.cmdkit-form { flex: 1 1 340px; min-width: 0; }
+.cmdkit-out { flex: 1.4 1 420px; min-width: 0; }
+.cmdkit-form fieldset, .cmdkit-out fieldset { margin-bottom: 8px; }
+.cmdkit-fld { margin-bottom: 8px; }
+.cmdkit-fld[hidden] { display: none; }
+.cmdkit-fld > label { display: block; margin-bottom: 2px; }
+.cmdkit-fld .xp-field, .cmdkit-fld .xp-select, .cmdkit-fld .xp-text { width: 100%; box-sizing: border-box; }
+.cmdkit-fld .xp-text { font-family: Consolas, "Courier New", monospace; font-size: 12px; resize: vertical; }
+.cmdkit-check { display: block; }
+.cmdkit-pre { margin: 0 0 6px; padding: 8px 10px; background: #fff; border: 1px solid #919B9C; font-family: Consolas, "Courier New", monospace; font-size: 12px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; user-select: text; }
+.cmdkit-pre:focus-visible { outline: 2px solid #0831D9; outline-offset: 1px; }

@@ -1,0 +1,117 @@
+<div class="tdf">
+  <div class="tabs" role="tablist" aria-label="Filter tool sections">
+    <button type="button" role="tab" class="tab on" id="tcpdump-tab-build" aria-selected="true" aria-controls="tcpdump-panel-build">Build a filter</button>
+    <button type="button" role="tab" class="tab" id="tcpdump-tab-explain" aria-selected="false" aria-controls="tcpdump-panel-explain" tabindex="-1">Explain a filter</button>
+    <button type="button" role="tab" class="tab" id="tcpdump-tab-recipes" aria-selected="false" aria-controls="tcpdump-panel-recipes" tabindex="-1">Recipes</button>
+  </div>
+  <div class="panel">
+    <div class="tdf-live" id="tcpdump-live" hidden>
+      <b>Filter</b><code class="tdf-code" id="tcpdump-livebpf"></code><button type="button" class="xp-btn small" id="tcpdump-copylive">Copy</button>
+    </div>
+    <div role="tabpanel" id="tcpdump-panel-build" aria-labelledby="tcpdump-tab-build">
+      <fieldset>
+        <legend>What should the filter catch?</legend>
+        <div class="tk-row">
+          <label class="tk-fld" for="tcpdump-op"><b>A packet is caught when it matches</b>
+            <select id="tcpdump-op" class="xp-select"><option value="and">ALL of the conditions below</option><option value="or">ANY ONE of the conditions below</option></select></label>
+          <button type="button" class="xp-btn" id="tcpdump-reset">Start over</button>
+        </div>
+        <div id="tcpdump-rows"></div>
+        <div class="tk-row">
+          <label class="tk-fld" for="tcpdump-addtype"><b>Add</b>
+            <select id="tcpdump-addtype" class="xp-select"></select></label>
+          <button type="button" class="xp-btn" id="tcpdump-add">Add condition</button>
+          <button type="button" class="xp-btn" id="tcpdump-addgroup">Add a group (A or B) ...</button>
+        </div>
+        <p class="tk-muted">Leave a condition out of the filter by removing it. Tick <b>NOT</b> in front of a condition to catch everything except it. A group has its own ALL / ANY choice, so you can say "(this host or that host) and port 443".</p>
+      </fieldset>
+    </div>
+    <div role="tabpanel" id="tcpdump-panel-explain" aria-labelledby="tcpdump-tab-explain" hidden>
+      <fieldset>
+        <legend>A tcpdump filter to read</legend>
+        <div class="tk-row">
+          <label class="tk-fld" for="tcpdump-filter"><b>Paste the filter (the part in quotes after the options)</b>
+            <textarea id="tcpdump-filter" class="xp-field tk-wide tdf-text" rows="3" maxlength="2000" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="tcp port 80 or 443"></textarea></label>
+        </div>
+        <div class="tk-row">
+          <label class="tk-fld" for="tcpdump-example"><b>Examples</b>
+            <select id="tcpdump-example" class="xp-select"></select></label>
+          <button type="button" class="xp-btn" id="tcpdump-tobuilder">Use it in the builder</button>
+        </div>
+        <pre class="tdf-err" id="tcpdump-err" hidden></pre>
+        <p class="tk-muted">This reads the capture-filter language that tcpdump, tshark -f, dumpcap and Wireshark's capture box all use. It does not run anything; it only tells you what the filter means and where it is easy to misread.</p>
+      </fieldset>
+    </div>
+    <div role="tabpanel" id="tcpdump-panel-recipes" aria-labelledby="tcpdump-tab-recipes" hidden>
+      <div class="tk-row">
+        <label class="tk-fld" for="tcpdump-rsearch"><b>Search the recipes</b>
+          <input type="text" id="tcpdump-rsearch" class="xp-field tk-wide" maxlength="60" placeholder="ping, syn, ipsec, dhcp ..." autocomplete="off" spellcheck="false"></label>
+      </div>
+      <div id="tcpdump-recipes"></div>
+    </div>
+
+    <div id="tcpdump-result" hidden>
+      <fieldset>
+        <legend>The capture filter</legend>
+        <div class="tdf-out"><code class="tdf-code" id="tcpdump-bpf"></code><button type="button" class="xp-btn small" id="tcpdump-copybpf">Copy</button></div>
+        <p class="tk-muted">For tcpdump, tshark -f, dumpcap and the capture-filter box of Wireshark. It decides what is captured at all.</p>
+      </fieldset>
+      <ul class="tk-notes" id="tcpdump-notes" hidden></ul>
+      <fieldset>
+        <legend>In plain words</legend>
+        <div id="tcpdump-words" class="tdf-words"></div>
+      </fieldset>
+      <fieldset>
+        <legend>The same as a Wireshark display filter</legend>
+        <div class="tdf-out" id="tcpdump-wshrow"><code class="tdf-code" id="tcpdump-wsh"></code><button type="button" class="xp-btn small" id="tcpdump-copywsh">Copy</button></div>
+        <ul class="tk-notes" id="tcpdump-wshnotes" hidden></ul>
+      </fieldset>
+      <fieldset>
+        <legend>The command line</legend>
+        <details class="tdf-opts" id="tcpdump-opts">
+          <summary>Options</summary>
+          <div class="tk-row">
+            <label class="tk-fld" for="tcpdump-iface"><b>Interface</b>
+              <input type="text" id="tcpdump-iface" class="xp-field tk-narrow" value="any" maxlength="40" list="tcpdump-ifaces" autocomplete="off" spellcheck="false"></label>
+            <datalist id="tcpdump-ifaces"><option value="any"></option><option value="eth0"></option><option value="ens3"></option><option value="enp0s3"></option><option value="wlan0"></option><option value="br0"></option><option value="bond0"></option><option value="lo"></option></datalist>
+            <label class="tk-fld" for="tcpdump-count"><b>Stop after (packets)</b>
+              <input type="text" id="tcpdump-count" class="xp-field tk-narrow" maxlength="9" placeholder="no limit" autocomplete="off" inputmode="numeric"></label>
+            <label class="tk-fld" for="tcpdump-dir"><b>Direction</b>
+              <select id="tcpdump-dir" class="xp-select"><option value="both">Both</option><option value="in">Incoming only</option><option value="out">Outgoing only</option></select></label>
+            <label class="tk-fld" for="tcpdump-verbose"><b>Detail</b>
+              <select id="tcpdump-verbose" class="xp-select"><option value="">Normal</option><option value="v">More (-v)</option><option value="vv">Most (-vv)</option></select></label>
+          </div>
+          <div class="tk-row">
+            <label class="tk-fld" for="tcpdump-dump"><b>Show packet contents</b>
+              <select id="tcpdump-dump" class="xp-select"><option value="">No</option><option value="X">Hex and text (-X)</option><option value="A">Text only (-A)</option></select></label>
+            <label class="tk-fld" for="tcpdump-time"><b>Time stamps</b>
+              <select id="tcpdump-time" class="xp-select"><option value="">Time of day</option><option value="tttt">Date and time (-tttt)</option></select></label>
+            <label class="tk-chk"><input type="checkbox" class="xp-check" id="tcpdump-nn" checked> Do not look up names or services (-nn)</label>
+            <label class="tk-chk"><input type="checkbox" class="xp-check" id="tcpdump-snap0" checked> Whole packets, not the first bytes (-s0)</label>
+            <label class="tk-chk"><input type="checkbox" class="xp-check" id="tcpdump-link"> Show MAC addresses (-e)</label>
+            <label class="tk-chk"><input type="checkbox" class="xp-check" id="tcpdump-line"> Show each line at once (-l)</label>
+            <label class="tk-chk"><input type="checkbox" class="xp-check" id="tcpdump-sudo" checked> Start the command with sudo</label>
+            <label class="tk-chk"><input type="checkbox" class="xp-check" id="tcpdump-tsd"> Also add the display filter to tshark (-Y)</label>
+          </div>
+          <div class="tk-row">
+            <label class="tk-fld" for="tcpdump-out"><b>Result</b>
+              <select id="tcpdump-out" class="xp-select"><option value="screen">Show on the screen</option><option value="save">Save to a file</option><option value="read">Read a saved file</option></select></label>
+            <label class="tk-fld" for="tcpdump-file"><b>File name</b>
+              <input type="text" id="tcpdump-file" class="xp-field tk-wide" maxlength="120" placeholder="capture.pcap" autocomplete="off" spellcheck="false"></label>
+          </div>
+          <div class="tk-row" id="tcpdump-rotrow">
+            <label class="tk-fld" for="tcpdump-rot"><b>Start a new file</b>
+              <select id="tcpdump-rot" class="xp-select"><option value="none">Never (one file)</option><option value="size">When it reaches a size</option><option value="time">Every few seconds</option></select></label>
+            <label class="tk-fld" for="tcpdump-rotsize"><b>Size (MB)</b><input type="text" id="tcpdump-rotsize" class="xp-field tk-narrow" value="100" maxlength="7" autocomplete="off" inputmode="numeric"></label>
+            <label class="tk-fld" for="tcpdump-rotsecs"><b>Seconds</b><input type="text" id="tcpdump-rotsecs" class="xp-field tk-narrow" value="3600" maxlength="8" autocomplete="off" inputmode="numeric"></label>
+            <label class="tk-fld" for="tcpdump-rotfiles"><b>Keep at most (files)</b><input type="text" id="tcpdump-rotfiles" class="xp-field tk-narrow" value="10" maxlength="5" placeholder="all" autocomplete="off" inputmode="numeric"></label>
+          </div>
+        </details>
+        <ul class="tk-notes" id="tcpdump-cmderr" hidden></ul>
+        <div id="tcpdump-cmds"></div>
+        <p class="tk-muted">Quote the filter exactly as shown (single quotes): the parentheses and the ! would otherwise be read by the shell. Capturing needs root, which is what sudo is for.</p>
+      </fieldset>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="tcpdump-status">Ready</span></footer>
+</div>

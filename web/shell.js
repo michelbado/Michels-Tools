@@ -12,7 +12,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "64"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "68"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -29,9 +29,12 @@
     { id: "certcsr", title: "CSR & Key Generator", base: "apps/certcsr/", folder: "certs", deps: ["lib/tk.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/hashcalc.js", "lib/ipv6.js", "lib/derkit.js", "lib/oldcrypto.js", "lib/keyfmt.js", "lib/pkcs12.js", "lib/certinfo.js", "lib/certkit.js", "lib/certgen.js"], size: { w: 980, h: 780 } },
     { id: "certdecode", title: "Certificate Decoder", base: "apps/certdecode/", folder: "certs", deps: ["lib/tk.js", "lib/ipv6.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/certinfo.js"], size: { w: 980, h: 760 } },
     { id: "opensslhelp", title: "OpenSSL Command Helper", base: "apps/opensslhelp/", folder: "certs", deps: ["lib/tk.js", "lib/sslcmds.js"], size: { w: 980, h: 720 } },
+    { id: "sshkey", title: "SSH Key Inspector", base: "apps/sshkey/", folder: "certs", deps: ["lib/tk.js", "lib/softcrypto.js", "lib/hashcalc.js", "lib/sshkey.js"], size: { w: 980, h: 780 } },
     { id: "mailhdr", title: "Email Header Analyser", base: "apps/mailhdr/", folder: "network", deps: ["lib/tk.js", "lib/mailhdr.js"], size: { w: 1000, h: 760 } },
     { id: "mailauth", title: "SPF, DKIM & DMARC Reader", base: "apps/mailauth/", folder: "network", deps: ["lib/tk.js", "lib/mailauth.js"], size: { w: 1000, h: 760 } },
     { id: "mtucalc", title: "MTU & MSS Calculator", base: "apps/mtucalc/", folder: "network", deps: ["lib/tk.js", "lib/mtucalc.js"], size: { w: 960, h: 760 } },
+    { id: "cgnat", title: "CGNAT Port Calculator", base: "apps/cgnat/", folder: "network", deps: ["lib/tk.js", "lib/cgnat.js"], size: { w: 960, h: 800 } },
+    { id: "dhcpopt", title: "DHCP Option Helper", base: "apps/dhcpopt/", folder: "network", deps: ["lib/tk.js", "lib/dhcpopt.js", "lib/pktdecode.js"], size: { w: 1000, h: 800 } },
     { id: "pdfinfo", title: "PDF Info", base: "apps/pdfinfo/", folder: "pdf", deps: ["lib/pdfcommon.js"], size: { w: 880, h: 680 } },
     { id: "pdfverify", title: "Verify Signatures", base: "apps/pdfverify/", folder: "pdf", deps: ["lib/pdfcommon.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/pdfsig.js"], size: { w: 980, h: 720 } },
     { id: "pdfmeta", title: "Metadata", base: "apps/pdfmeta/", folder: "pdf", deps: ["lib/pdfcommon.js", "vendor/pdf-lib.min.js"], size: { w: 920, h: 740 } },
@@ -50,6 +53,8 @@
     { id: "pathread", title: "Ping & Traceroute Reader", base: "apps/pathread/", folder: "trouble", deps: ["lib/tk.js", "lib/pathread.js"], size: { w: 1000, h: 760 } },
     { id: "browsercaps", title: "Browser Capability Report", base: "apps/browsercaps/", folder: "trouble", deps: ["lib/tk.js", "lib/browsercaps.js"], size: { w: 860, h: 760 } },
     { id: "httphdr", title: "HTTP Header Reader", base: "apps/httphdr/", folder: "trouble", deps: ["lib/tk.js", "lib/cdn.js", "lib/httphdr.js"], size: { w: 1000, h: 760 } },
+    { id: "pktdecode", title: "Packet Header Decoder", base: "apps/pktdecode/", folder: "trouble", deps: ["lib/tk.js", "lib/dhcpopt.js", "lib/pktdecode.js"], size: { w: 1100, h: 820 } },
+    { id: "tputcalc", title: "Throughput Calculator", base: "apps/tputcalc/", folder: "trouble", deps: ["lib/tk.js", "lib/tputcalc.js"], size: { w: 960, h: 840 } },
     { id: "urlparse", title: "URL Parser", base: "apps/urlparse/", folder: "engineering", deps: ["lib/tk.js", "lib/urlparse.js"], size: { w: 1000, h: 760 } },
     { id: "jwtdecode", title: "JWT Decoder", base: "apps/jwtdecode/", folder: "engineering", deps: ["lib/tk.js", "lib/jwtdecode.js"], size: { w: 1000, h: 780 } },
     { id: "basicauth", title: "Basic Auth Generator", base: "apps/basicauth/", folder: "engineering", deps: ["lib/tk.js", "lib/basicauth.js"], size: { w: 900, h: 720 } },
@@ -72,6 +77,7 @@
     { id: "imgwatermark", title: "Watermark", base: "apps/imgwatermark/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js", "lib/imgproc.js"], size: { w: 1100, h: 800 } },
     { id: "imgbatch", title: "Batch Pictures", base: "apps/imgbatch/", folder: "images", deps: ["lib/tk.js", "lib/exif.js", "lib/imgmath.js", "lib/imgproc.js", "vendor/fflate.js"], size: { w: 1100, h: 800 } },
     { id: "imgfavicon", title: "Favicon & Icon Generator", base: "apps/imgfavicon/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js", "lib/imgproc.js", "lib/imgicon.js", "vendor/fflate.js"], size: { w: 1100, h: 800 } },
+    { id: "imgannotate", title: "Screenshot Annotator", base: "apps/imgannotate/", folder: "images", deps: ["lib/tk.js", "lib/imgmath.js", "lib/imgproc.js", "lib/imgannot.js"], size: { w: 1100, h: 800 } },
     { id: "dscp", title: "DSCP & QoS Values", base: "apps/dscp/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-dscp.js"], size: { w: 1000, h: 720 } },
     { id: "httpstatus", title: "HTTP Status Codes", base: "apps/httpstatus/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-http.js"], size: { w: 1000, h: 720 } },
     { id: "dnstypes", title: "DNS Record Types", base: "apps/dnstypes/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-dns.js"], size: { w: 1000, h: 720 } },
@@ -86,6 +92,13 @@
     { id: "birdhunt", title: "Bird Hunt", base: "apps/birdhunt/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 1040, h: 740 } },
     { id: "stunt", title: "Stunt Track", base: "apps/stunt/", folder: "games", deps: ["lib/gamekit.js", "lib/stunttrack.js"], size: { w: 1100, h: 800 } },
     { id: "gemmaze", title: "Gem Maze", base: "apps/gemmaze/", folder: "games", deps: ["lib/gamekit.js", "lib/gemmaze.js", "lib/gemmaze-levels.js"], size: { w: 940, h: 740 } },
+    { id: "tcpdump", title: "tcpdump & Wireshark Filters", base: "apps/tcpdump/", folder: "builders", deps: ["lib/tk.js", "lib/pcapfilter.js"], size: { w: 1060, h: 860 } },
+    { id: "nmap", title: "nmap Command Builder", base: "apps/nmap/", folder: "builders", deps: ["lib/tk.js", "lib/cmdkit.js", "lib/nmapbuild.js"], size: { w: 1100, h: 800 } },
+    { id: "sshtunnel", title: "SSH Tunnel Builder", base: "apps/sshtunnel/", folder: "builders", deps: ["lib/tk.js", "lib/cmdkit.js", "lib/sshtunnel.js"], size: { w: 1100, h: 800 } },
+    { id: "curlconv", title: "curl Converter", base: "apps/curlconv/", folder: "builders", deps: ["lib/tk.js", "lib/curlconv.js"], size: { w: 1000, h: 820 } },
+    { id: "iproute", title: "iproute2 Command Builder", base: "apps/iproute/", folder: "builders", deps: ["lib/tk.js", "lib/cmdkit.js", "lib/iproute.js"], size: { w: 1100, h: 780 } },
+    { id: "nftables", title: "nftables Firewall Builder", base: "apps/nftables/", folder: "builders", deps: ["lib/tk.js", "lib/cmdkit.js", "lib/nftbuild.js"], size: { w: 1100, h: 820 } },
+    { id: "systemdunit", title: "systemd Service & Timer Builder", base: "apps/systemdunit/", folder: "builders", deps: ["lib/tk.js", "lib/cmdkit.js", "lib/systemdunit.js"], size: { w: 1100, h: 820 } },
   ];
   APPS.forEach(a => { a.icon = a.base + "icon.svg"; });
 
@@ -96,6 +109,7 @@
     { id: "trouble", title: "Troubleshooting", size: { w: 640, h: 440 } },
     { id: "certs", title: "Certificates", size: { w: 640, h: 440 } },
     { id: "engineering", title: "Engineering Tools", size: { w: 640, h: 440 } },
+    { id: "builders", title: "Command Builders", size: { w: 640, h: 440 } },
     { id: "images", title: "Image Tools", size: { w: 640, h: 440 } },
     { id: "reference", title: "Reference", size: { w: 640, h: 440 } },
     { id: "games", title: "Games", size: { w: 640, h: 440 } },

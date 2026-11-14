@@ -1,0 +1,20 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>An SSH public key, certificate or key file</legend>
+      <textarea class="xp-text tk-in" id="sshkey-in" rows="6" spellcheck="false" autocomplete="off" autocapitalize="off" placeholder="Paste one or more lines, for example the contents of id_ed25519.pub, authorized_keys or known_hosts:&#10;&#10;ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... me@laptop"></textarea>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="sshkey-open">Open a file…</button>
+        <input type="file" id="sshkey-file" hidden>
+        <button type="button" class="xp-btn" id="sshkey-clear">Clear</button>
+        <button type="button" class="xp-btn" id="sshkey-copy" disabled>Copy as text</button>
+        <button type="button" class="xp-btn" id="sshkey-save" disabled>Save text</button>
+      </div>
+      <p class="tk-muted">Shows the key type and size, the SHA-256 and MD5 fingerprints exactly as <code>ssh-keygen -l</code> prints them, the picture <code>ssh-keygen -lv</code> draws, and what looks weak. It reads public keys (<code>.pub</code>), OpenSSH certificates (<code>-cert.pub</code>), <code>authorized_keys</code> and <code>known_hosts</code> lines with their options, and RFC 4716 files. Everything is read in your browser and nothing is sent.</p>
+      <p class="tk-muted"><b>Private keys:</b> please do not paste one anywhere you do not have to. If you give this tool an OpenSSH private key file it reads only the public key that the file stores in clear text at its start; the private part is never decoded or shown. A private key in the older PEM form is refused: run <code>ssh-keygen -y -f yourkey</code> to print its public key.</p>
+    </fieldset>
+    <div class="tk-summary" id="sshkey-summary" role="status" aria-live="polite"></div>
+    <div id="sshkey-out"></div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="sshkey-status">Ready</span></footer>
+</div>

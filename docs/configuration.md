@@ -18,7 +18,7 @@ Rules:
 
 - **A tool you do not list is on.** With no `tools.conf` at all, everything is on.
 - **Off means gone:** no icon, no menu entry, and the tool's files and server API answer `404 Not Found`.
-- **Folders:** `network`, `pdf`, `trouble`, `certs`, `engineering`, `images`, `reference` and `games` switch a whole folder. If a folder says `false`, every tool inside it is off whatever the
+- **Folders:** `network`, `pdf`, `trouble`, `certs`, `engineering`, `builders`, `images`, `reference` and `games` switch a whole folder. If a folder says `false`, every tool inside it is off whatever the
   tool's own line says. A folder whose tools are all off disappears from the desktop.
 - **A typo stops the program at startup** with the line number, so a misspelled name can never leave a tool switched on by accident.
 - **A third choice, `locked`:** see [Locking tools](#locking-tools) below.

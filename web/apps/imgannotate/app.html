@@ -1,0 +1,56 @@
+<div class="tk">
+  <div class="tk-body">
+    <fieldset>
+      <legend>Picture</legend>
+      <div class="tk-row">
+        <button type="button" class="xp-btn is-default" id="imgannotate-open">Open a picture…</button>
+        <button type="button" class="xp-btn" id="imgannotate-paste">Paste from clipboard</button>
+        <input type="file" id="imgannotate-file" accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,.jpg,.jpeg,.png,.webp,.gif,.bmp" hidden>
+        <span class="tk-muted" id="imgannotate-name">Open a screenshot, drop one onto this window, or press Ctrl+V to paste one.</span>
+      </div>
+      <p class="tk-muted imgannotate-intro" id="imgannotate-intro">Mark up a screenshot for a ticket, a manual or a chat: arrows, boxes, numbered steps, text, highlights, and areas that are really blacked out or pixelated. It all happens in your browser: nothing is uploaded and your original file is never touched. The saved picture carries no hidden camera or screen data.</p>
+    </fieldset>
+    <ul class="tk-notes" id="imgannotate-notes" hidden></ul>
+    <div id="imgannotate-work" hidden>
+      <div class="imgannotate-bar" role="toolbar" aria-label="Drawing tools">
+        <div class="imgannotate-tools" id="imgannotate-tools"></div>
+        <div class="imgannotate-colors" id="imgannotate-colors" role="radiogroup" aria-label="Colour"></div>
+        <label class="imgannotate-lab">Custom <input type="color" id="imgannotate-custom" value="#e5202e" aria-label="Custom colour"></label>
+        <label class="imgannotate-lab">Size
+          <select id="imgannotate-size" class="xp-select"><option value="s">Thin</option><option value="m" selected>Medium</option><option value="l">Thick</option></select></label>
+        <label class="imgannotate-lab"><input type="checkbox" id="imgannotate-fill"> Filled</label>
+      </div>
+      <div class="imgannotate-bar" id="imgannotate-textbar">
+        <label class="imgannotate-lab imgannotate-textlab">Text <textarea id="imgannotate-text" class="xp-text" rows="2" maxlength="500" spellcheck="false" placeholder="Type the text, then click the picture to place it"></textarea></label>
+        <label class="imgannotate-lab">Style
+          <select id="imgannotate-tstyle" class="xp-select"><option value="plain">Plain with outline</option><option value="label">On a coloured label</option></select></label>
+      </div>
+      <div class="imgannotate-bar" id="imgannotate-hidebar" hidden>
+        <label class="imgannotate-lab">Hide by
+          <select id="imgannotate-hmode" class="xp-select"><option value="black">Solid black (cannot be undone)</option><option value="pixelate">Pixelate</option><option value="blur">Blur</option></select></label>
+        <span class="tk-muted">Pixelate and blur leave a little of the detail; for text or numbers use solid black.</span>
+      </div>
+      <div class="imgannotate-stage"><canvas id="imgannotate-canvas" class="imgtk-canvas imgannotate-canvas" width="10" height="10" tabindex="0" aria-label="The picture. Choose a tool and drag on it to draw. In Select mode, click an item to move or resize it; press Delete to remove it."></canvas></div>
+      <p class="tk-muted" id="imgannotate-hint">Pick a tool and drag on the picture. Use Select to move, resize or delete an item (Delete key).</p>
+      <div class="tk-row">
+        <button type="button" class="xp-btn" id="imgannotate-undo" disabled>Undo</button>
+        <button type="button" class="xp-btn" id="imgannotate-redo" disabled>Redo</button>
+        <button type="button" class="xp-btn" id="imgannotate-del" disabled>Delete selected</button>
+        <button type="button" class="xp-btn" id="imgannotate-clear" disabled>Remove all marks</button>
+        <span class="tk-muted" id="imgannotate-count"></span>
+      </div>
+      <fieldset>
+        <legend>Save</legend>
+        <div class="tk-row">
+          <label class="tk-fld" for="imgannotate-fmt"><b>Type</b><select id="imgannotate-fmt" class="xp-field"><option value="png">PNG (best for screenshots)</option><option value="jpeg">JPEG</option><option value="webp">WebP</option></select></label>
+          <label class="tk-fld" for="imgannotate-q" id="imgannotate-qlab"><b>Quality <span id="imgannotate-qv">92</span></b><input type="range" id="imgannotate-q" min="40" max="100" step="1" value="92"></label>
+          <button type="button" class="xp-btn is-default" id="imgannotate-save">Save picture</button>
+          <button type="button" class="xp-btn" id="imgannotate-copy">Copy to clipboard</button>
+          <span class="tk-muted" id="imgannotate-done"></span>
+        </div>
+        <ul class="tk-notes" id="imgannotate-check" hidden></ul>
+      </fieldset>
+    </div>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="imgannotate-status">Ready</span></footer>
+</div>

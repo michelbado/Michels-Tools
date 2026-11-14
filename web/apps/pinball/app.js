@@ -47,14 +47,14 @@
       { px: 314, py: 712, len: 74, rest: Math.PI - 0.5, act: Math.PI + 0.55, a: Math.PI - 0.5, w: 0, on: false },
     ];
     const ball = { x: 444, y: 761, vx: 0, vy: 0, held: 0, live: false, trail: [] };
-    let state = "ready", score = 0, balls = 3, mult = 1, power = 0, charging = false, saveT = 0, saveUsed = false, holeCool = 0, stillT = 0;
+    let state = "ready", score = 0, balls = 3, mult = 1, power = 0, charging = false, saveT = 0, saveUsed = false, holeCool = 0, stillT = 0, heat = 0;
     let lanes = [false, false, false], targets = new Array(8).fill(false), msg = "", msgT = 0, lampT = 0, holeT = 0;
     const ptr = new Map();
 
     const say = (t, secs) => { msg = t; msgT = secs || 2; };
     const add = n => { score += n * mult; };
     function showInfo() { const b = g.best(); g.info("Score " + fmt(score) + (b != null ? "   Best " + fmt(b) : "")); }
-    function placeBall() { ball.x = 444; ball.y = 772 - R; ball.vx = ball.vy = 0; ball.held = 0; ball.live = false; ball.trail.length = 0; power = 0; charging = false; stillT = 0; }
+    function placeBall() { ball.x = 444; ball.y = 772 - R; ball.vx = ball.vy = 0; ball.held = 0; ball.live = false; ball.trail.length = 0; power = 0; charging = false; stillT = 0; heat = 0; }
     function newGame() {
       state = "play"; g.playing = true; g.setPaused(false);
       score = 0; balls = 3; mult = 1; saveT = 0; saveUsed = false; lanes = [false, false, false]; targets.fill(false);
@@ -122,7 +122,15 @@
       const e = vn > -40 ? 0 : s.e;
       ball.vx -= (1 + e) * vn * nx; ball.vy -= (1 + e) * vn * ny;
       if (vn < -70) {
-        if (s.kick) { ball.vx += nx * s.kick; ball.vy += ny * s.kick; slings[s.sling].t = 0.14; add(20); g.sfx.noise(0.06, { freq: 900, vol: 0.3 }); g.sfx.tone(180, 0.07, { to: 90, vol: 0.12 }); }
+        if (s.kick) {
+          // A slingshot coil needs a moment before it fires again, and it weakens when it fires too often without a flipper playing the ball (heat).
+          // Without this the ball could bounce between the two slingshots, or juggle on one, for ever: each kick gave back what the bounce took away.
+          const sl = slings[s.sling], power = Math.max(0, Math.min(1, 1 - (heat - 3) / 3));
+          if (sl.t <= 0 && power > 0) {
+            ball.vx += nx * s.kick * power; ball.vy += ny * s.kick * power; sl.t = 0.14; heat += 1; add(20);
+            g.sfx.noise(0.06, { freq: 900, vol: 0.3 * power }); g.sfx.tone(180, 0.07, { to: 90, vol: 0.12 * power });
+          }
+        }
         else if (s.target != null) hitTarget(s.target);
         else if (vn < -260 && !s.plunger) g.sfx.noise(0.03, { freq: 500, vol: Math.min(0.2, -vn / 6000) });
       }
@@ -169,6 +177,7 @@
       const svx = -f.w * (qy - f.py), svy = f.w * (qx - f.px);       // how fast this point of the flipper is moving
       const vn = (ball.vx - svx) * nx + (ball.vy - svy) * ny;
       if (vn >= 0) return;
+      heat = 0;                                                      // a flipper has the ball: the slingshots are fresh again
       const e = vn > -60 ? 0 : 0.32;
       ball.vx -= (1 + e) * vn * nx; ball.vy -= (1 + e) * vn * ny;
     }
@@ -213,7 +222,7 @@
       msgT = Math.max(0, msgT - dt); lampT = Math.max(0, lampT - dt); holeT = Math.max(0, holeT - dt);
       syncInputs();
       if (state !== "play") { const n = Math.ceil(dt * 240), h = dt / n; for (let i = 0; i < n; i++) for (const f of flips) { const tgt = f.on ? f.act : f.rest, dir = Math.sign(tgt - f.a); if (dir) { f.a += dir * FLIP_UP * h; if ((tgt - f.a) * dir < 0) f.a = tgt; } } return; }
-      saveT = Math.max(0, saveT - dt); holeCool = Math.max(0, holeCool - dt);
+      saveT = Math.max(0, saveT - dt); holeCool = Math.max(0, holeCool - dt); heat = Math.max(0, heat - 0.8 * dt);
       if (charging) power = Math.min(1, power + dt / 1.1);
       const before = score;
       const n = Math.max(1, Math.ceil(dt * 720)), h = dt / n;
