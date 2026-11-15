@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7DB8FF"/><stop offset="1" stop-color="#2F6BD8"/></linearGradient></defs>
+  <rect x="2" y="2" width="44" height="44" rx="10" fill="url(#bg)" stroke="#1B4DB0" stroke-width="1.5"/>
+  <rect x="6" y="6" width="36" height="12" rx="5" fill="#FFFFFF" opacity="0.22"/>
+  <path d="M9 12 H39 V37 H15 V23 H29 V30 M22 30 V37" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="11" cy="37" r="4" fill="#FB8C00" stroke="#FFF" stroke-width="1.2"/>
+  <polygon points="34,17 35.6,21 40,21 36.5,23.6 37.8,28 34,25.4 30.2,28 31.5,23.6 28,21 32.4,21" fill="#FDD835" stroke="#E0B000" stroke-width="0.8"/>
+</svg>

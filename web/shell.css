@@ -456,3 +456,33 @@ body {
 .startmenu .smnone { padding: 10px; color: #555; line-height: 1.4; }
 .sronly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (max-width: 699px) { .startmenu .smsearch input { min-height: 44px; font-size: 16px; } }
+
+/* ---- the person's own files on the desktop (desktopfiles.js, lib/minimd.js) ---- */
+.dfile-body { flex: 1 1 auto; min-height: 0; overflow: auto; background: #fff; padding: 14px 18px; }
+.dfile-txt { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.5 var(--mono, Consolas, "Courier New", monospace); color: #111; }
+.dfile-err { color: #7A1F06; margin: 12px; }
+.dlist { flex: 1 1 auto; min-height: 0; overflow: auto; background: #fff; border: 1px solid var(--bevel, #ACA899); margin: 6px; }
+.drow { display: grid; grid-template-columns: 24px minmax(0, 1fr) 90px 110px; gap: 8px; align-items: center; padding: 6px 10px; min-height: 36px; color: #000; text-decoration: none; border-bottom: 1px solid #F0EEE4; cursor: pointer; }
+.drow:hover { background: #EAF1FC; }
+.drow:focus-visible { outline: 1px dotted #000; outline-offset: -2px; background: #EAF1FC; }
+.drow img { width: 22px; height: 22px; }
+.drow .dname { overflow-wrap: anywhere; }
+.drow .dsize, .drow .ddate { color: #4D4D4D; font-size: 12px; text-align: right; }
+@media (max-width: 560px) { .drow { grid-template-columns: 24px minmax(0, 1fr); } .drow .dsize, .drow .ddate { grid-column: 2; text-align: left; } }
+.dmd { font: 15px/1.55 Tahoma, Verdana, "Segoe UI", system-ui, sans-serif; color: #1A1A1A; max-width: 780px; overflow-wrap: anywhere; }
+.dmd > :first-child { margin-top: 0; }
+.dmd h1, .dmd h2, .dmd h3, .dmd h4, .dmd h5, .dmd h6 { color: #0B2F8A; line-height: 1.25; margin: 1.1em 0 .45em; }
+.dmd h1 { font-size: 1.7em; border-bottom: 2px solid #D6DEEF; padding-bottom: .2em; } .dmd h2 { font-size: 1.4em; border-bottom: 1px solid #E3E8F3; padding-bottom: .15em; } .dmd h3 { font-size: 1.2em; } .dmd h4, .dmd h5, .dmd h6 { font-size: 1em; }
+.dmd p { margin: .6em 0; }
+.dmd a { color: #0B5ED7; text-decoration: underline; }
+.dmd code { font-family: var(--mono, Consolas, "Courier New", monospace); font-size: .92em; background: #F1F3F8; padding: .1em .35em; border-radius: 4px; }
+.dmd pre { background: #F4F6FA; border: 1px solid #DDE3EE; border-radius: 6px; padding: 10px 12px; overflow: auto; white-space: pre; }
+.dmd pre code { background: none; padding: 0; font-size: .9em; }
+.dmd pre.dmd-plain { white-space: pre-wrap; overflow-wrap: anywhere; }
+.dmd blockquote { margin: .8em 0; padding: .1em 1em; border-left: 4px solid #9DB6E6; background: #F5F8FF; color: #333; }
+.dmd ul, .dmd ol { padding-left: 1.6em; margin: .5em 0; } .dmd li { margin: .2em 0; }
+.dmd li.dmd-task { list-style: none; margin-left: -1.2em; } .dmd .dmd-box { font-size: 1.1em; }
+.dmd hr { border: 0; border-top: 2px solid #D6DEEF; margin: 1.2em 0; }
+.dmd table { border-collapse: collapse; margin: .8em 0; display: block; overflow-x: auto; max-width: 100%; }
+.dmd th, .dmd td { border: 1px solid #CBD5E8; padding: 5px 10px; text-align: left; } .dmd th { background: #EEF2FA; }
+.dmd .dmd-right { text-align: right; } .dmd .dmd-center { text-align: center; }

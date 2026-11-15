@@ -334,3 +334,123 @@ fieldset > label { line-height: 1.4; }
 .cmdkit-check { display: block; }
 .cmdkit-pre { margin: 0 0 6px; padding: 8px 10px; background: #fff; border: 1px solid #919B9C; font-family: Consolas, "Courier New", monospace; font-size: 12px; line-height: 1.4; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 420px; overflow: auto; user-select: text; }
 .cmdkit-pre:focus-visible { outline: 2px solid #0831D9; outline-offset: 1px; }
+
+/* ---- Kids games (Shape Friends, Count and Pop, Memory Pairs, Robot Path): big touch targets, soft colours, nothing to lose. Shared kit: lib/kidskit.js ---- */
+.kd { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; position: relative; background: #EAF4FF; --kd-cell: 96px; }
+.kd-bar { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 8px 10px; background: #D8EBFF; border-bottom: 1px solid #9CC3EC; }
+.kd-modes { display: flex; gap: 8px; flex-wrap: wrap; }
+.kd-mode { display: flex; align-items: center; justify-content: center; gap: 4px; min-width: 72px; min-height: 64px; padding: 6px 10px; border-radius: 16px; border: 3px solid #90B4E0; background: #fff; cursor: pointer; font: inherit; font-weight: 700; font-size: 20px; color: #1F4A8A; touch-action: manipulation; }
+.kd-mode.on { border-color: #2F6BD8; background: #E3EEFF; box-shadow: 0 0 0 3px rgba(47,107,216,.25); }
+.kd-mode:focus-visible { outline: 3px solid #0055E5; outline-offset: 2px; }
+.kd-stars { margin-left: auto; display: flex; align-items: center; gap: 4px; font-size: 22px; font-weight: 700; color: #8A5A00; }
+.kd-stage { flex: 1 1 auto; min-height: 0; position: relative; overflow: auto; padding: 12px; -webkit-user-select: none; user-select: none; }
+.kd svg { display: block; }
+.kd-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; margin: 8px 0 14px; }
+.kd-hole, .kd-piece, .kd-obj, .kd-basket { width: var(--kd-cell); height: var(--kd-cell); }
+.kd-hole { display: grid; place-items: center; border-radius: 20px; background: #fff; border: 4px dashed #B7C7DD; }
+.kd-hole.full { border-style: solid; border-color: #7FC77F; background: #F3FFF3; }
+.kd-hole svg, .kd-piece svg { width: 78%; height: 78%; margin: auto; }
+.kd-tray { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; padding: 12px; background: #fff7e0; border-radius: 22px; border: 3px solid #F2D58A; min-height: calc(var(--kd-cell) + 24px); }
+.kd-piece { display: grid; place-items: center; border: 0; background: transparent; padding: 0; cursor: grab; touch-action: none; transition: transform .25s ease; position: relative; z-index: 1; }
+.kd-piece.drag { transition: none; z-index: 10; cursor: grabbing; filter: drop-shadow(0 8px 10px rgba(0,0,0,.3)); }
+.kd-piece.sel { outline: 4px solid #2F6BD8; outline-offset: 2px; border-radius: 18px; }
+.kd-piece:focus-visible { outline: 4px solid #0055E5; border-radius: 18px; }
+.kd-basket { position: relative; display: grid; place-items: end center; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.kd-basket svg { width: 100%; height: 100%; }
+.kd-basket .kd-in { position: absolute; left: 0; right: 0; top: 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 0; max-height: 40%; overflow: hidden; }
+.kd-basket .kd-in svg { width: 26px; height: 26px; }
+.kd-field { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: center; padding: 8px; }
+.kd-obj { position: relative; display: grid; place-items: center; border: 0; background: transparent; padding: 0; cursor: pointer; transition: transform .2s ease, opacity .2s ease; touch-action: manipulation; }
+.kd-obj svg { width: 86%; height: 86%; }
+.kd-obj.done { transform: scale(.82); opacity: .55; cursor: default; }
+.kd-obj .kd-badge { position: absolute; right: 2px; top: 2px; min-width: 34px; height: 34px; border-radius: 17px; background: #1F4A8A; color: #fff; font-weight: 700; font-size: 20px; display: none; place-items: center; padding: 0 6px; }
+.kd-obj.done .kd-badge { display: grid; }
+.kd-obj:focus-visible, .kd-group:focus-visible, .kd-card:focus-visible, .kd-cmd:focus-visible { outline: 4px solid #0055E5; outline-offset: 2px; }
+.kd-big { text-align: center; font-size: 64px; line-height: 1.1; font-weight: 700; color: #1F4A8A; min-height: 72px; }
+.kd-dots { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; min-height: 22px; margin-bottom: 6px; }
+.kd-dots i { width: 18px; height: 18px; border-radius: 50%; background: #2F6BD8; display: block; }
+.kd-groups { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; }
+.kd-group { flex: 1 1 200px; max-width: 320px; min-height: 180px; padding: 12px; border: 4px solid #90B4E0; border-radius: 22px; background: #fff; cursor: pointer; display: flex; flex-wrap: wrap; gap: 6px; align-content: center; justify-content: center; font: inherit; touch-action: manipulation; }
+.kd-group svg { width: 54px; height: 54px; }
+.kd-group.right { border-color: #3F9A3F; background: #F3FFF3; }
+.kd-group.shake { animation: kd-shake .45s; }
+.kd-group .kd-num { flex: 1 1 100%; text-align: center; font-size: 40px; font-weight: 700; color: #1F4A8A; min-height: 0; }
+@keyframes kd-shake { 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-6px); } 80% { transform: translateX(6px); } }
+.kd-cards { display: grid; gap: 12px; margin: 6px auto; max-width: 560px; }
+.kd-card { position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 18px; cursor: pointer; background: transparent; perspective: 600px; touch-action: manipulation; }
+.kd-card .kd-face { position: absolute; inset: 0; border-radius: 18px; display: grid; place-items: center; backface-visibility: hidden; transition: transform .35s; }
+.kd-card .kd-back { background: linear-gradient(135deg, #5A8DF7, #1C4FD9); border: 3px solid #fff; box-shadow: 0 3px 6px rgba(0,0,0,.2); }
+.kd-card .kd-back svg { width: 44%; height: 44%; opacity: .75; }
+.kd-card .kd-front { background: #fff; border: 3px solid #F2D58A; transform: rotateY(180deg); }
+.kd-card .kd-front svg { width: 74%; height: 74%; }
+.kd-card.up .kd-back { transform: rotateY(180deg); } .kd-card.up .kd-front { transform: rotateY(0); }
+.kd-card.matched .kd-front { border-color: #3F9A3F; background: #F3FFF3; }
+.kd-card.matched { cursor: default; }
+.kd-bigbtn { min-width: 84px; min-height: 64px; border-radius: 18px; border: 3px solid #3F9A3F; background: #E8F8E8; display: inline-grid; place-items: center; cursor: pointer; padding: 6px 14px; font: inherit; font-weight: 700; font-size: 18px; color: #1F4A12; touch-action: manipulation; }
+.kd-bigbtn svg { width: 40px; height: 40px; }
+.kd-bigbtn:focus-visible { outline: 4px solid #0055E5; outline-offset: 2px; }
+.kd-conf { position: absolute; top: -30px; z-index: 15; pointer-events: none; animation: kd-fall 1.9s ease-in forwards; }
+@keyframes kd-fall { to { transform: translateY(560px) rotate(300deg); opacity: 0; } }
+.kd-break { position: absolute; inset: 0; z-index: 30; background: rgba(15, 30, 60, .6); display: grid; place-items: center; padding: 16px; }
+.kd-breakbox { background: #fff; border-radius: 24px; padding: 22px 26px; text-align: center; max-width: 420px; box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+.kd-breakpic { display: flex; gap: 10px; justify-content: center; margin-bottom: 8px; }
+.kd-breakbox p { font-size: 20px; line-height: 1.4; margin: 6px 0 14px; color: #1F4A8A; font-weight: 700; }
+/* Robot Path */
+.kd-rob { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; align-items: flex-start; }
+.kd-levels { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 8px; width: 100%; }
+.kd-lv { min-width: 40px; min-height: 40px; border-radius: 12px; border: 3px solid #90B4E0; background: #fff; font: inherit; font-weight: 700; color: #1F4A8A; cursor: pointer; position: relative; touch-action: manipulation; }
+.kd-lv.on { border-color: #2F6BD8; background: #E3EEFF; } .kd-lv.won { background: #FFF3C4; border-color: #E0B000; }
+.kd-board { position: relative; display: grid; border: 4px solid #5A8DF7; border-radius: 14px; background: #fff; overflow: hidden; flex: 0 0 auto; }
+.kd-cell { background: #F4F8FF; border: 1px solid #DCE6F7; display: grid; place-items: center; }
+.kd-cell:nth-child(even) { background: #EAF1FD; }
+.kd-cell svg { width: 80%; height: 80%; }
+.kd-robot { position: absolute; transition: left .4s, top .4s; display: grid; place-items: center; }
+.kd-robot svg { width: 86%; height: 86%; transition: transform .35s; }
+.kd-robot.bump { animation: kd-shake .4s; }
+.kd-side { flex: 1 1 260px; max-width: 420px; display: flex; flex-direction: column; gap: 10px; }
+.kd-prog { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; background: #fff; border: 3px solid #F2D58A; border-radius: 16px; min-height: 62px; }
+.kd-slot { width: 44px; height: 44px; border-radius: 10px; background: #FFF8E1; border: 2px dashed #E7D49A; display: grid; place-items: center; }
+.kd-slot.fill { border-style: solid; background: #fff; border-color: #90B4E0; }
+.kd-slot.now { background: #FFF3C4; border-color: #E0B000; box-shadow: 0 0 0 3px rgba(224,176,0,.4); }
+.kd-slot svg { width: 30px; height: 30px; }
+.kd-cmds { display: flex; flex-wrap: wrap; gap: 8px; }
+.kd-cmd { width: 76px; height: 72px; border-radius: 18px; border: 3px solid #90B4E0; background: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; touch-action: manipulation; }
+.kd-cmd svg { width: 46px; height: 46px; }
+.kd-cmd:disabled { opacity: .45; cursor: default; }
+.kd-cmd.go { border-color: #3F9A3F; background: #E8F8E8; width: 96px; }
+.kd-msg { min-height: 40px; display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 18px; color: #1F4A8A; }
+@media (max-width: 560px) { .kd { --kd-cell: 76px; } .kd-big { font-size: 48px; } .kd-mode { min-width: 60px; font-size: 18px; } .kd-cmd { width: 64px; height: 62px; } .kd-cmd.go { width: 84px; } }
+@media (prefers-reduced-motion: reduce) { .kd-conf { animation-duration: .01s; } .kd-card .kd-face, .kd-piece, .kd-obj, .kd-robot, .kd-robot svg { transition: none; } .kd-group.shake, .kd-robot.bump { animation: none; } }
+/* Colour Mixing, Odd One Out and Maze Walk (more children's games; same .kd-* family as above) */
+.kd-obj.right { transform: scale(1.12); filter: drop-shadow(0 0 10px #3F9A3F); opacity: 1; }
+.kd-obj.dim { opacity: .3; }
+.kd-obj.shake { animation: kd-shake .45s; }
+.kd-obj.hint { animation: kd-pulse 1s infinite; }
+@keyframes kd-pulse { 50% { transform: scale(1.12); } }
+.kd-hintline { text-align: center; margin: 8px 0 0; }
+.kd-target { display: flex; justify-content: center; margin: 4px 0 10px; }
+.kd-swatch { width: 40px; height: 40px; border-radius: 50%; background: #E3E8F0; border: 3px dashed #B7C7DD; flex: 0 0 auto; }
+.kd-swatch.found { border: 3px solid #fff; box-shadow: 0 0 0 2px #7FC77F; }
+.kd-swatch.big { width: 96px; height: 96px; border: 5px solid #fff; box-shadow: 0 0 0 3px #90B4E0; background: #fff; }
+.kd-pot { width: 84px; height: 84px; border: 0; background: transparent; padding: 0; cursor: grab; touch-action: none; transition: transform .25s ease; position: relative; z-index: 1; }
+.kd-pot svg { width: 100%; height: 100%; }
+.kd-pot[data-c="white"] svg { filter: drop-shadow(0 0 1px #6B7690) drop-shadow(0 0 1px #6B7690); }
+.kd-pot.drag { transition: none; z-index: 10; cursor: grabbing; filter: drop-shadow(0 8px 10px rgba(0,0,0,.3)); }
+.kd-pot:focus-visible { outline: 4px solid #0055E5; border-radius: 50%; }
+.kd-mixmid { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 6px 0; }
+.kd-slots { display: flex; gap: 12px; }
+.kd-dotc { width: 26px; height: 26px; border-radius: 50%; background: #E3E8F0; border: 2px solid #fff; box-shadow: 0 0 0 2px #B7C7DD; display: inline-block; }
+.kd-dotc.big { width: 38px; height: 38px; }
+.kd-bowl { width: 190px; height: 190px; border-radius: 50%; border: 8px solid #90B4E0; background: #fff; padding: 12px; box-shadow: inset 0 4px 10px rgba(0,0,0,.12); }
+.kd-bowlfill { width: 100%; height: 100%; border-radius: 50%; background: #F4F8FF; transition: background .35s; }
+.kd-bowl.pop { animation: kd-pop .5s; }
+.kd-bowl.shake { animation: kd-shake .45s; }
+@keyframes kd-pop { 40% { transform: scale(1.12); } }
+.kd-mixcap { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; font-weight: 700; color: #1F4A8A; font-size: 20px; flex-wrap: wrap; }
+.kd-op { font-size: 26px; }
+.kd-name { margin-left: 6px; text-transform: capitalize; }
+.kd-coll { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 10px; padding: 8px; background: #fff; border-radius: 16px; }
+.kd-mazewrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.kd-maze { display: block; border: 4px solid #3D6FD8; border-radius: 12px; background: #fff; touch-action: none; outline: none; max-width: 100%; }
+.kd-maze:focus-visible { box-shadow: 0 0 0 4px #0055E5; }
+@media (prefers-reduced-motion: reduce) { .kd-obj.shake, .kd-obj.hint, .kd-bowl.pop, .kd-bowl.shake { animation: none; } .kd-bowlfill { transition: none; } }

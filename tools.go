@@ -33,8 +33,9 @@ var toolFolders = map[string][]string{
 	"builders":    {"tcpdump", "nmap", "sshtunnel", "curlconv", "iproute", "nftables", "systemdunit"},
 	"engineering": {"urlparse", "jwtdecode", "basicauth", "xmljson", "crontab", "chmodcalc", "colorconv", "jsonfmt", "textdiff", "encodetool", "hashcalc", "timeconv", "passgen", "regextest", "qrcode"},
 	"images":      {"imgexif", "imgresize", "imgblur", "imgconvert", "imgwatermark", "imgbatch", "imgfavicon", "imgannotate"},
+	"regs":        {"doraincident"},
 	"reference":   {"portref", "dscp", "httpstatus", "dnstypes", "icmptypes", "tcpref", "ipsecref"},
-	"games":       {"blocks", "mines", "pinball", "racer", "pool", "birdhunt", "stunt", "gemmaze"},
+	"games":       {"blocks", "mines", "pinball", "racer", "pool", "birdhunt", "stunt", "gemmaze", "kidshapes", "kidcount", "kidmemory", "kidrobot", "kidmix", "kidodd", "kidmaze"},
 }
 
 func isToolApp(name string) bool {
@@ -84,6 +85,7 @@ var toolSettings = map[string]settingSpec{
 	"netquality.monitor_fine":      {kind: 'b', defBool: true},
 	"netquality.monitor_minutes":   {kind: 'i', min: 1, max: 60, defInt: 10},
 	"idletest.max_seconds":         {kind: 'i', min: 30, max: 600, defInt: 300},
+	"desktop":                      {kind: 'b', defBool: true}, // the desktop folder (your own files on the desktop); false = the program ignores it
 	"lock.hours":                   {kind: 'i', min: 1, max: 168, defInt: 12},
 	"log.max_mb":                   {kind: 'i', min: 0, max: 1048576, defInt: 1024}, // visit log size limit; 0 = none
 	"lock.code":                    {kind: 's'},                                     // no default: locked tools need one

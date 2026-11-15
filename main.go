@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/signal"
 	"path"
+	"path/filepath"
 	"runtime/debug"
 	"strings"
 	"sync/atomic"
@@ -44,6 +45,7 @@ type config struct {
 	Limits     *ipLimits     // optional: per-visitor rate limits (nil = off)
 	IPs        *ipResolver   // finds the visitor's real address (nil = use the connection)
 	Tools      *toolSet      // which tools are switched off (nil = all on)
+	DesktopDir string        // the folder whose files appear on the desktop ("" = none; main chooses "desktop" next to the program)
 	Lim        *limiter      // optional: the aggregation slots; main makes it so that the memory watcher can count the running ones (nil = made here)
 }
 
@@ -103,6 +105,9 @@ func newHandler(cfg config) (http.Handler, error) {
 		w.Header().Set("Cache-Control", "no-store")
 		io.WriteString(w, tools.toolsScript())
 		io.WriteString(w, tools.lockScript(r))
+		if cfg.DesktopDir != "" && tools.boolSetting("desktop") { // the page looks for the desktop folder only when the server offers it
+			io.WriteString(w, "window.DESKTOP_FILES=true;\n")
+		}
 	})
 	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		// a tool switched off in tools.conf is not served at all, not just hidden
@@ -123,6 +128,7 @@ func newHandler(cfg config) (http.Handler, error) {
 	registerFacts(mux, cfg)
 	registerHold(mux, cfg)
 	registerLock(mux, cfg)
+	registerDesktop(mux, cfg)
 	mux.HandleFunc("POST /api/aggregate", func(w http.ResponseWriter, r *http.Request) {
 		if tools.appOff("aggregator") {
 			http.NotFound(w, r)
@@ -210,6 +216,7 @@ func main() {
 	rateHeavy := flag.Int("rate-heavy", 6, "Connection Quality download/upload transfers per visitor per minute, one at a time (0 = no limit)")
 	heavyMax := flag.Int("heavy-max", 8, "Connection Quality download/upload transfers allowed at the same time on the whole server, whoever starts them (0 = no limit)")
 	netScale := flag.Int("rate-net-scale", 50, "how many times one visitor's budget a whole IPv6 /48 network may use together (a /48 is normally one site; raise it for big shared networks)")
+	desktopDir := flag.String("desktop-dir", "", "folder whose .md and .txt files and sub-folders appear on the desktop; default: a folder called desktop next to the program (nothing shows if it is missing or empty)")
 	trusted := flag.String("trusted-proxies", "", "addresses/CIDRs allowed to set that header (default: this machine, 127.0.0.0/8 and ::1)")
 	flag.Parse()
 
@@ -261,13 +268,25 @@ func main() {
 		}()
 	}
 
+	// the desktop folder: the one named by the flag, else "desktop" next to the program (tools.conf is found the same way)
+	deskDir := *desktopDir
+	if deskDir == "" {
+		if exe, err := os.Executable(); err == nil {
+			deskDir = filepath.Join(filepath.Dir(exe), "desktop")
+		}
+	}
+	if tools.boolSetting("desktop") {
+		if fi, err := os.Stat(deskDir); err == nil && fi.IsDir() {
+			log.Printf("desktop folder: %s (its .md and .txt files and folders appear on the desktop)", deskDir)
+		}
+	}
 	lim := newLimiter(*jobs, *queue, *wait)
 	if mem > 0 {
 		go watchMemory(mem, func() int { return len(lim.slots) })
 	}
 	h, err := newHandler(config{
 		MaxBytes: *maxMB << 20, Jobs: *jobs, Queue: *queue,
-		QueueWait: *wait, UploadTime: 5 * time.Minute, Visits: visits, Limits: limits, IPs: ips, Tools: tools, Lim: lim,
+		QueueWait: *wait, UploadTime: 5 * time.Minute, Visits: visits, Limits: limits, IPs: ips, Tools: tools, Lim: lim, DesktopDir: deskDir,
 	})
 	if err != nil {
 		log.Fatal(err)

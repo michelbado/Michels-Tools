@@ -1,0 +1,105 @@
+<div class="tk dora">
+  <div class="tk-body">
+    <header class="dora-head">
+      <div class="dora-ttl">Is it a major ICT incident under DORA?</div>
+      <div class="dora-sub">Fill in what you know and leave the rest empty. The tool judges what it can, tells you what is still missing, and shows when the reports are due.</div>
+      <div class="dora-warn" role="note">
+        <b>A decision aid, not a ruling.</b> It is based on the author's reading of the rules, which may be incomplete or wrong. Check the official texts and your competent authority before you decide.
+        <details><summary>Why you should not take it as 100 % certain</summary><p id="doraincident-disc"></p></details>
+      </div>
+    </header>
+
+    <nav class="dora-steps" aria-label="Steps">
+      <button type="button" class="dora-tab on" id="doraincident-tab1" data-go="1"><span class="dora-n">1</span>Critical services</button>
+      <button type="button" class="dora-tab" id="doraincident-tab2" data-go="2"><span class="dora-n">2</span>Thresholds</button>
+      <button type="button" class="dora-tab" id="doraincident-tab3" data-go="3"><span class="dora-n">3</span>Decision</button>
+    </nav>
+    <div class="dora-strip open" id="doraincident-strip" role="status" aria-live="polite"><span class="dora-sdot" id="doraincident-sdot" aria-hidden="true">?</span><span class="dora-stext" id="doraincident-stext"></span></div>
+
+    <section class="dora-panel" id="doraincident-p1">
+      <div class="dora-box">
+        <h3>When did it happen? <span class="dora-opt">all optional</span></h3>
+        <p class="tk-muted">Times are in this browser's time zone: <b id="doraincident-tz"></b>. They give the duration and start the reporting clock.</p>
+        <div class="dora-times">
+          <div class="tk-fld"><label for="doraincident-started"><b>Incident started</b></label><span class="dora-tpair"><input type="datetime-local" id="doraincident-started" class="xp-field"><button type="button" class="xp-btn small" data-now="started">Now</button></span></div>
+          <div class="tk-fld"><label for="doraincident-detected"><b>You became aware</b></label><span class="dora-tpair"><input type="datetime-local" id="doraincident-detected" class="xp-field"><button type="button" class="xp-btn small" data-now="detected">Now</button></span></div>
+          <div class="tk-fld"><label for="doraincident-resolved"><b>Resolved / recovered</b></label><span class="dora-tpair"><input type="datetime-local" id="doraincident-resolved" class="xp-field"><button type="button" class="xp-btn small" data-now="resolved">Now</button></span></div>
+        </div>
+      </div>
+      <div class="dora-box">
+        <h3>Are critical services affected?</h3>
+        <p class="tk-muted">Without a single yes here the incident is not major, however many thresholds it crosses.</p>
+        <div id="doraincident-gate"></div>
+      </div>
+      <div class="dora-nav"><span class="tk-muted" id="doraincident-hint1"></span><button type="button" class="xp-btn is-default" data-go="2">Next: thresholds</button></div>
+    </section>
+
+    <section class="dora-panel" id="doraincident-p2" hidden>
+      <p class="dora-lead">The incident is major when critical services are affected and <b>two or more of these six</b> thresholds are crossed, or when there was <b>malicious access that may cause data loss</b> (on its own). Type what you know; no exact figures? Estimate.</p>
+      <div class="dora-tally" id="doraincident-tally" role="status"></div>
+      <div id="doraincident-cards" class="dora-cards"></div>
+      <div class="dora-nav"><button type="button" class="xp-btn" data-go="1">Back</button><button type="button" class="xp-btn is-default" data-go="3">See the decision</button></div>
+    </section>
+
+    <section class="dora-panel" id="doraincident-p3" hidden>
+      <section class="dora-verdict open" id="doraincident-verdict">
+        <div class="dora-vicon" id="doraincident-vicon" aria-hidden="true">?</div>
+        <div class="dora-vmain">
+          <div class="dora-vkicker">Result of this decision aid</div>
+          <div class="dora-vtitle" id="doraincident-vtitle"></div>
+          <div class="dora-meter" aria-hidden="true"><span id="doraincident-meterfill"></span></div>
+          <div class="dora-vmeta" id="doraincident-vmeta"></div>
+        </div>
+      </section>
+      <div class="dora-box"><h3>Why this result</h3><ul class="dora-list" id="doraincident-why"></ul></div>
+      <div class="dora-box" id="doraincident-flipbox" hidden><h3 id="doraincident-fliptitle">What would settle it</h3><ul class="dora-list" id="doraincident-flip"></ul></div>
+      <div class="dora-box">
+        <h3>Your facts against the limits</h3>
+        <div id="doraincident-limits"></div>
+      </div>
+
+      <div class="dora-box">
+        <h3>When are the reports due?</h3>
+        <p class="tk-muted" id="doraincident-clockintro"></p>
+        <div class="dora-times">
+          <div class="tk-fld"><label for="doraincident-classified"><b>Classified as major</b></label><span class="dora-tpair"><input type="datetime-local" id="doraincident-classified" class="xp-field"><button type="button" class="xp-btn small" data-now="classified">Now</button></span><span class="tk-muted">Starts the 4-hour limit.</span></div>
+          <div class="tk-fld"><label for="doraincident-initialSent"><b>Initial notification sent</b></label><span class="dora-tpair"><input type="datetime-local" id="doraincident-initialSent" class="xp-field"><button type="button" class="xp-btn small" data-now="initialSent">Now</button></span><span class="tk-muted">Gives the intermediate deadline.</span></div>
+          <div class="tk-fld"><label for="doraincident-interimSent"><b>Latest intermediate report sent</b></label><span class="dora-tpair"><input type="datetime-local" id="doraincident-interimSent" class="xp-field"><button type="button" class="xp-btn small" data-now="interimSent">Now</button></span><span class="tk-muted">Gives the final-report date.</span></div>
+        </div>
+        <div class="tk-row">
+          <label class="tk-fld" for="doraincident-entity"><b>Your entity type</b><select id="doraincident-entity" class="xp-select dora-entity"></select></label>
+          <div class="tk-fld"><b>Bank holidays in your country</b>
+            <span class="dora-tpair"><input type="date" id="doraincident-hol" class="xp-field" aria-label="Holiday date"><button type="button" class="xp-btn small" id="doraincident-holadd">Add</button></span>
+            <span class="tk-muted">Only matters for deadlines near one. Weekends always count.</span></div>
+        </div>
+        <div class="dora-chips" id="doraincident-chips"></div>
+        <ul class="tk-notes" id="doraincident-clocknotes" hidden></ul>
+        <ol class="dora-timeline" id="doraincident-timeline"></ol>
+        <p class="tk-muted" id="doraincident-clocknote"></p>
+      </div>
+
+      <div class="dora-box">
+        <h3>Keep a record</h3>
+        <div class="tk-row">
+          <label class="tk-fld" for="doraincident-ref"><b>Incident reference (optional)</b><input type="text" id="doraincident-ref" class="xp-field tk-wide" maxlength="80" placeholder="INC-2026-0142" autocomplete="off"></label>
+          <button type="button" class="xp-btn is-default" id="doraincident-download">Download report (HTML)</button>
+          <button type="button" class="xp-btn" id="doraincident-copy">Copy summary</button>
+          <button type="button" class="xp-btn" id="doraincident-reset">Start again</button>
+        </div>
+        <p class="tk-muted">Nothing you type is saved or sent anywhere; closing this window clears it.</p>
+      </div>
+
+      <div class="dora-box dora-trust">
+        <h3>How far can you trust this?</h3>
+        <ul class="dora-list">
+          <li>The result is only as good as your answers. Several lines are judgement calls, such as "likely to lose clients" or "significant impact".</li>
+          <li>The rules are the author's understanding of Delegated Regulations 2024/1772 and 2025/301. They may be incomplete, may change, and your authority may read them differently.</li>
+          <li>"Does not meet the criteria" is the result to double-check: look again whenever the facts change, for example when the incident lasts longer or more clients turn out to be affected.</li>
+          <li>The tool files nothing and cannot see your other incidents, your contracts or your authority's instructions.</li>
+        </ul>
+      </div>
+      <div class="dora-nav"><button type="button" class="xp-btn" data-go="2">Back to thresholds</button></div>
+    </section>
+  </div>
+  <footer class="statusbar" role="status" aria-live="polite"><span class="cell msg" id="doraincident-status">Ready</span></footer>
+</div>

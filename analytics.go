@@ -35,6 +35,7 @@ type visitEntry struct {
 	Agent string `json:"ua"`
 	Event string `json:"ev"`
 	App   string `json:"app,omitempty"`
+	File  string `json:"file,omitempty"` // for "download": folder/name of the file
 }
 
 const maxAgentLen = 300
@@ -210,13 +211,20 @@ func classify(r *http.Request) (event, app string) {
 	return "", ""
 }
 
-func (l *visitLogger) record(r *http.Request, event, app string) {
+func (l *visitLogger) record(r *http.Request, event, app string) { l.recordEntry(r, event, app, "") }
+
+// recordFile writes one event that names a file (a download from the desktop folder).
+func (l *visitLogger) recordFile(r *http.Request, event, file string) {
+	l.recordEntry(r, event, "", file)
+}
+
+func (l *visitLogger) recordEntry(r *http.Request, event, app, file string) {
 	ua := r.Header.Get("User-Agent")
 	if len(ua) > maxAgentLen {
 		ua = ua[:maxAgentLen]
 	}
 	b, err := json.Marshal(visitEntry{
-		Time: l.now().UTC().Format(time.RFC3339), IP: l.clientIP(r), Agent: ua, Event: event, App: app,
+		Time: l.now().UTC().Format(time.RFC3339), IP: l.clientIP(r), Agent: ua, Event: event, App: app, File: file,
 	})
 	if err != nil {
 		return

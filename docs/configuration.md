@@ -18,7 +18,7 @@ Rules:
 
 - **A tool you do not list is on.** With no `tools.conf` at all, everything is on.
 - **Off means gone:** no icon, no menu entry, and the tool's files and server API answer `404 Not Found`.
-- **Folders:** `network`, `pdf`, `trouble`, `certs`, `engineering`, `builders`, `images`, `reference` and `games` switch a whole folder. If a folder says `false`, every tool inside it is off whatever the
+- **Folders:** `network`, `pdf`, `trouble`, `certs`, `engineering`, `builders`, `images`, `regs`, `reference` and `games` switch a whole folder. If a folder says `false`, every tool inside it is off whatever the
   tool's own line says. A folder whose tools are all off disappears from the desktop.
 - **A typo stops the program at startup** with the line number, so a misspelled name can never leave a tool switched on by accident.
 - **A third choice, `locked`:** see [Locking tools](#locking-tools) below.
@@ -64,6 +64,7 @@ program at startup.
 | `idletest.max_seconds` | `300` | 30 to 600 | The longest a single held request of the Idle-timeout Finder may last. |
 | `lock.code` | empty | 4 or more characters | The shared access code for tools marked `locked` (see [Locking tools](#locking-tools)). Required when anything is locked. No comment may follow it on its line. |
 | `lock.hours` | `12` | 1 to 168 | How long an entered code stays valid in the visitor's browser. |
+| `desktop` | `true` | true/false | Look for the desktop folder (see [Your own files on the desktop](#your-own-files-on-the-desktop)). `false`: the program ignores it and its addresses answer `404`. |
 | `log.max_mb` | `1024` | 0 to 1048576 | The most the visit log files may take together, in MB (1024 = 1 GB). When they take more, the oldest days are deleted first; today's file is never deleted, and if it alone reaches the limit, further visits are not recorded until room is free. `0` = no size limit (`-retention-days` still applies). |
 
 ## Flags
@@ -83,6 +84,8 @@ Flags go on the command line, or on the `ExecStart=` line of the service file.
 | Flag | Default | Meaning |
 |---|---|---|
 | `-tools-config` | `tools.conf` next to the program | Where to read the tool switches from. Missing file: everything on. |
+
+| `-desktop-dir` | a folder called `desktop` next to the program | The folder whose `.md` and `.txt` files and sub-folders appear on the desktop (see [Your own files on the desktop](#your-own-files-on-the-desktop)). Nothing shows if it is missing or empty. |
 
 ### Visit log
 
@@ -118,6 +121,20 @@ Visitors are told apart by their real address (see `-real-ip-header`). `0` turns
 | `-rate-diag` | `1800` | Connection Quality probes per visitor per minute. Fine-detail Monitor mode sends 1200 a minute. |
 | `-rate-heavy` | `6` | Connection Quality download/upload transfers per visitor per minute, one at a time. |
 | `-rate-net-scale` | `50` | How many times one visitor's budget a whole IPv6 /48 network may use together. A /48 is normally one site; raise it for big shared networks. |
+
+## Your own files on the desktop
+
+Every installation can put its own things on the web desktop without touching the code. Make a folder called `desktop` next to the program (or name another with `-desktop-dir`) and put files in it. The program reads it each time the page opens, so **no restart is needed** when you add, change or remove something.
+
+- A **`.md`** or **`.txt`** file directly in it becomes an icon named after the file. Opening it shows the text in a reader window. Markdown is shown formatted (headings, bold and italic, lists, task lists, links, code, quotes, tables). Plain text is shown as it is. HTML is never run: tags in the text are shown as the characters they are, images are not loaded, and a link only works when it starts with `http://`, `https://` or `mailto:`.
+- A **folder** directly in it becomes a normal folder icon, but only when it holds at least one visible file; an empty folder does not appear. Opening it lists the files. **Clicking a file always downloads it**: the server sends every file as a download (never as a page or a picture), so nothing in the folder can run in the visitor's browser, whatever it is.
+- Names that start with `.` or `_` are not listed. Files **inside a folder** can still be downloaded by anyone who knows the exact address (`/desktop-files/<folder>/<file>`), so "hidden" does not mean "secret": do not put confidential files there.
+- Only one level is used: folders inside a folder are ignored. Links (symbolic links) are never followed, and nothing outside the folder can be reached.
+- There is no upload from the website: you add files on the server.
+- Every download is written to the [visit log](server.md#the-visit-log) with the time, the address, the browser and the file name.
+- The folder and its files must be readable by the account the service runs as (with `DynamicUser=yes`, folders `0755` and files `0644` are fine). The folder belongs to this installation: it is not part of the repository (`/desktop/` is in `.gitignore`).
+- Limits: 300 icons on the desktop, 1000 files in a folder, 1 MB for a file that is shown on screen (a bigger one is not shown; it can sit in a folder to be downloaded). Cloudflare may keep a copy of a large download for a while, so give a changed file a new name if people must not get the old one.
+- `desktop = false` in `tools.conf` switches the whole feature off.
 
 ## Sizing: memory and parallel jobs
 

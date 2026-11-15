@@ -33,7 +33,11 @@
     seg(p[0][0], p[0][1], p[1][0], p[1][1]); seg(p[1][0], p[1][1], p[2][0], p[2][1]);
   });
   const TARGET_Y = [340, 385, 430, 475];
-  TARGET_Y.forEach((y, i) => { seg(31, y - 14, 31, y + 14, { target: i, e: 0.5 }); seg(417, y - 14, 417, y + 14, { target: 4 + i, e: 0.5 }); });
+  // A target pad is a flat face with its two ends sloped back towards the wall. With plain straight ends, a ball rolling down the wall
+  // (its centre exactly on the pad's face line) could land on the top end exactly above its centre and balance there, stuck for good.
+  // Sloped ends always push such a ball away from the wall, so nothing can rest on a point.
+  const pad = (face, back, y, id) => { const o = { target: id, e: 0.5 }; seg(back, y - 15, face, y - 10, o); seg(face, y - 10, face, y + 10, o); seg(face, y + 10, back, y + 15, o); };
+  TARGET_Y.forEach((y, i) => { pad(31, 22, y, i); pad(417, 426, y, 4 + i); });
   const bumpers = [{ x: 165, y: 255, r: 24, t: 0 }, { x: 285, y: 255, r: 24, t: 0 }, { x: 225, y: 345, r: 24, t: 0 }];
   bumpers.forEach(b => circles.push(b));
   circles.push({ x: 428, y: 215, r: 3 });

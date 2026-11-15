@@ -57,7 +57,7 @@ func TestDocsListEverySettingAndFlag(t *testing.T) {
 func TestDocsListEveryEndpoint(t *testing.T) {
 	doc := readDoc(t, "docs/server.md")
 	n := 0
-	for _, file := range []string{"main.go", "diag.go", "facts.go", "hold.go"} {
+	for _, file := range []string{"main.go", "diag.go", "facts.go", "hold.go", "desktop.go"} {
 		for _, m := range regexp.MustCompile(`HandleFunc\("(?:GET|POST) (/[^"]*)"`).FindAllStringSubmatch(readDoc(t, file), -1) {
 			n++
 			if m[1] == "/" {

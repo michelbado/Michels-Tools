@@ -2,7 +2,7 @@
 
 Everything opens from nine folders on the desktop (or from the **Michel's Tools** menu at the bottom left). Each tool has an **id**;
 that is the name you use in [`tools.conf`](configuration.md#choosing-which-tools-to-offer-toolsconf) to switch it off. The folder ids are
-`network`, `pdf`, `trouble`, `certs`, `engineering`, `builders`, `images`, `reference` and `games`.
+`network`, `pdf`, `trouble`, `certs`, `engineering`, `builders`, `images`, `regs`, `reference` and `games`.
 
 **Finding a tool.** Open the Start menu and type in the search box (or press `Ctrl+K`): it matches tool names, folder names and everyday words such as "wifi", "checksum" or "compress image", and forgives small typos. Enter opens the best match.
 
@@ -127,6 +127,14 @@ Tools for pictures. All of them run in the browser: the picture is read from the
 | `imgfavicon` | Favicon & Icon Generator | Makes a website's icons from one picture: `favicon.ico` (16, 32 and 48 pixels), PNGs of 16, 32, 48, 180 (Apple touch icon), 192 and 512 pixels, `site.webmanifest` and the HTML lines to paste, in one ZIP (or just the .ico). The picture can fill the square (cutting the long sides) or be shown whole with space around it; square, rounded or circle outline; transparent or coloured background. A preview shows every size. |
 | `imgannotate` | Screenshot Annotator | Marks up a screenshot: arrows, boxes, ellipses, lines, pen, text (plain or on a coloured label), numbered steps, highlights, and areas that are hidden by solid black, pixelating or blurring (really changed in the saved pixels, not covered by a layer, and checked before saving). Open a file, drop one, or paste one from the clipboard (Ctrl+V). Items can be selected, moved, resized, recoloured and deleted; undo and redo; the arrow keys nudge. Save as PNG, JPEG or WebP, or copy to the clipboard. The saved picture has no metadata, and the original file is never changed. |
 
+## Regulations (`regs`)
+
+Tools that help with rules and reporting duties. They run in the browser: nothing typed is sent anywhere or stored, and they only help you reason; they do not file anything and are not legal advice.
+
+| Id | Title | What it does |
+|---|---|---|
+| `doraincident` | DORA Incident Classification | A three-step decision aid: is an ICT-related incident a **major incident** under DORA, and when are the reports due. **Step 1:** when it started, when you became aware, when it was resolved (all optional), and whether critical services are affected (the three conditions of Article 6 of Delegated Regulation 2024/1772). **Step 2:** the six materiality thresholds of Article 9 (clients, counterparts and transactions; reputation; duration and downtime; geographical spread, read with Article 4; data; costs and losses) with numbers worked out as you type; fields left empty mean "not known". **Step 3:** the result (*Meets the criteria*, *Does not meet the criteria* or *Cannot rule out yet*), the reasons, what would settle an open result, your facts against the limits, and the timetable from Article 5 of Delegated Regulation 2025/301 (initial notification, intermediate report, final report, late classification, weekend and holiday extension by entity type, missed-deadline notice). The result downloads as one standalone HTML file or copies as text. It always says that it is a decision aid based on the author's reading of the rules, that this may be incomplete or wrong, and that the official texts and the competent authority decide. The figures are kept in one table at the top of `web/lib/doraclass.js`. |
+
 ## Reference (`reference`)
 
 Look-up tables with a search box. They are static pages: they run in the browser, need nothing from the server and cost it nothing. On a phone each row becomes a labelled card.
@@ -142,6 +150,8 @@ Look-up tables with a search box. They are static pages: they run in the browser
 | `ipsecref` | IPsec Reference | Diffie-Hellman groups 1 to 32 with type, size, approximate strength and advice; **matching strengths** (which DH group, encryption and hash belong together, for example AES-256 with SHA-384 and group 20); encryption and integrity algorithms with the bytes they add to each packet; the ports and protocols; and the main terms (phase 1 and 2, PFS, NAT-T). |
 
 ## Games (`games`)
+
+The last seven games, **Shape Friends, Count and Pop, Memory Pairs, Robot Path, Colour Mixing, Odd One Out and Maze Walk**, are for small children (ages 3 and up). They are built to be gentle: **no timers, no losing and no game over**; a wrong try simply slides back or turns over again, and progress is shown as stars kept in the visitor's own browser. After 15 minutes of play a friendly "time for a break" card appears; a grown-up can allow five more minutes. They draw every picture themselves and keep their own sound setting (off until a grown-up taps **Sound**).
 
 Small games for a short break. They run in the browser, need nothing from the server after the page has loaded, and use no pictures or
 libraries from anywhere else: everything on screen is drawn by the game itself. **Sound is off** when a game opens; the **Sound** button
@@ -159,3 +169,10 @@ folder out, set `games = false`; to keep them visible but behind the access code
 | `birdhunt` | Bird Hunt | Birds burst out of the grass at a moment and a place you cannot predict. Three shots for each flight, ten birds a round, and a number of hits needed to reach the next, faster round. Click or tap to shoot. |
 | `stunt` | Stunt Track | 3D stunt driving against the clock, drawn with flat-coloured shapes: hills, banked corners, a chicane, a tunnel, ramps to jump a gap, raised road, a loop and a corkscrew. One lap; the best time for each track is kept, and a faint second car shows your best lap of this visit. Five tracks, and a **track editor**: place and turn pieces on a 14 x 14 map, drive the result, and copy it as a short code that anyone can paste in. Arrow keys (or W A S D) drive, V changes the view (behind the car or from the driver's seat), R restarts. Needs WebGL, which every current browser has; "My track" is kept in the visitor's own browser. |
 | `gemmaze` | Gem Maze | A puzzle in 20 levels. Guide a small robot through a maze seen from above: collect every gem to open the exit before the time runs out. Coloured keys and doors, water, fire, ice and conveyors (each with boots that make them safe), crates to push (into water they become a bridge), bombs, buttons that flip switch walls, teleports, a thief who takes your boots, and creatures that each move by a fixed rule. Every level has a four-letter code to return to it, and the browser remembers how far you got. Arrow keys (or W A S D) move; on a touch screen there are arrow buttons. |
+| `kidshapes` | Shape Friends | Ages 3 and up. Drag each shape to the hole of the same shape, or each ball to the basket of the same colour (or tap a piece, then tap its place). Rounds grow from 3 to 6 pieces. |
+| `kidcount` | Count and Pop | Ages 3 to 5. Tap the things one by one to count them (each shows its number, and the number and dots grow), or tap the group that has more. The numbers grow with the stars won. |
+| `kidmemory` | Memory Pairs | Ages 4 to 7. Turn over two cards at a time and find the matching pictures. Sizes of 6, 8, 12 and 16 cards; it moves up on its own after two wins. Mistakes are not counted. |
+| `kidrobot` | Robot Path | Ages 6 and up. Tap arrow tiles (forward, turn left, turn right) to write a short program, press the green button, and watch the robot walk to the star around rocks. 12 levels, every one proven solvable; a "show me a way" button is there for grown-ups. |
+| `kidmix` | Colour Mixing | Ages 3 to 6. Tap or drag two paints (red, yellow, blue, white) into the bowl and see the colour they make (orange, green, purple, pink, cream, sky blue). *Mix* is free play: every new colour found earns a star and fills a collection. *Make it* shows a colour to match; a wrong mix just empties the bowl. |
+| `kidodd` | Odd One Out | Ages 4 to 7. Four to six pictures, one of them does not belong: a different shape, a different colour, or a different kind of thing, harder as stars are won. A wrong tap shakes gently, and after two the right one pulses. |
+| `kidmaze` | Maze Walk | Ages 5 and up. Drag a little robot along the paths of a maze to the star; walls simply stop it and a trail shows where it has been (arrow keys work too). The maze grows from 5 x 5 to 10 x 10 as stars are won; a "show me the way" button is there for grown-ups. |

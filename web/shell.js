@@ -12,7 +12,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "68"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "73"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -30,6 +30,7 @@
     { id: "certdecode", title: "Certificate Decoder", base: "apps/certdecode/", folder: "certs", deps: ["lib/tk.js", "lib/ipv6.js", "vendor/pkijs.bundle.js", "lib/softcrypto.js", "lib/certinfo.js"], size: { w: 980, h: 760 } },
     { id: "opensslhelp", title: "OpenSSL Command Helper", base: "apps/opensslhelp/", folder: "certs", deps: ["lib/tk.js", "lib/sslcmds.js"], size: { w: 980, h: 720 } },
     { id: "sshkey", title: "SSH Key Inspector", base: "apps/sshkey/", folder: "certs", deps: ["lib/tk.js", "lib/softcrypto.js", "lib/hashcalc.js", "lib/sshkey.js"], size: { w: 980, h: 780 } },
+    { id: "doraincident", title: "DORA Incident Classification", base: "apps/doraincident/", folder: "regs", deps: ["lib/tk.js", "lib/doraclass.js"], size: { w: 1040, h: 840 } },
     { id: "mailhdr", title: "Email Header Analyser", base: "apps/mailhdr/", folder: "network", deps: ["lib/tk.js", "lib/mailhdr.js"], size: { w: 1000, h: 760 } },
     { id: "mailauth", title: "SPF, DKIM & DMARC Reader", base: "apps/mailauth/", folder: "network", deps: ["lib/tk.js", "lib/mailauth.js"], size: { w: 1000, h: 760 } },
     { id: "mtucalc", title: "MTU & MSS Calculator", base: "apps/mtucalc/", folder: "network", deps: ["lib/tk.js", "lib/mtucalc.js"], size: { w: 960, h: 760 } },
@@ -85,6 +86,13 @@
     { id: "tcpref", title: "TCP Reference", base: "apps/tcpref/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-tcp.js"], size: { w: 1000, h: 720 } },
     { id: "ipsecref", title: "IPsec Reference", base: "apps/ipsecref/", folder: "reference", deps: ["lib/refkit.js", "lib/ref-ipsec.js"], size: { w: 1000, h: 720 } },
     { id: "blocks", title: "Blocks", base: "apps/blocks/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 600, h: 800 } },
+    { id: "kidshapes", title: "Shape Friends", base: "apps/kidshapes/", folder: "games", deps: ["lib/kidskit.js"], size: { w: 900, h: 720 } },
+    { id: "kidcount", title: "Count and Pop", base: "apps/kidcount/", folder: "games", deps: ["lib/kidskit.js"], size: { w: 900, h: 720 } },
+    { id: "kidmemory", title: "Memory Pairs", base: "apps/kidmemory/", folder: "games", deps: ["lib/kidskit.js"], size: { w: 820, h: 760 } },
+    { id: "kidrobot", title: "Robot Path", base: "apps/kidrobot/", folder: "games", deps: ["lib/kidskit.js", "lib/kidrobot.js"], size: { w: 980, h: 780 } },
+    { id: "kidmix", title: "Colour Mixing", base: "apps/kidmix/", folder: "games", deps: ["lib/kidskit.js"], size: { w: 860, h: 780 } },
+    { id: "kidodd", title: "Odd One Out", base: "apps/kidodd/", folder: "games", deps: ["lib/kidskit.js"], size: { w: 900, h: 640 } },
+    { id: "kidmaze", title: "Maze Walk", base: "apps/kidmaze/", folder: "games", deps: ["lib/kidskit.js", "lib/kidmaze.js"], size: { w: 840, h: 800 } },
     { id: "mines", title: "Mines", base: "apps/mines/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 860, h: 720 } },
     { id: "pinball", title: "Pinball", base: "apps/pinball/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 720, h: 940 } },
     { id: "racer", title: "Road Racer", base: "apps/racer/", folder: "games", deps: ["lib/gamekit.js"], size: { w: 1040, h: 740 } },
@@ -111,6 +119,7 @@
     { id: "engineering", title: "Engineering Tools", size: { w: 640, h: 440 } },
     { id: "builders", title: "Command Builders", size: { w: 640, h: 440 } },
     { id: "images", title: "Image Tools", size: { w: 640, h: 440 } },
+    { id: "regs", title: "Regulations", size: { w: 640, h: 440 } },
     { id: "reference", title: "Reference", size: { w: 640, h: 440 } },
     { id: "games", title: "Games", size: { w: 640, h: 440 } },
   ];
@@ -225,7 +234,7 @@
     if (app.locked && !unlocked && !(await askCode(app))) return;
     pending.add(id);
     try {
-      if (app.kind !== "folder") await loadApp(app);
+      if (app.kind !== "folder" && app.kind !== "custom") await loadApp(app);
     } catch (e) {
       pending.delete(id);
       if (app.locked && await lockExpired()) { if (await askCode(app)) openApp(id); return; }   // the code's time ran out while the page was open
@@ -385,6 +394,7 @@
 
     const body = el("div", "win-body");
     if (app.kind === "folder") buildFolderView(app, body);
+    else if (app.kind === "custom") { try { app.build(body, shell); } catch (e) { console.error(e); body.textContent = "This could not be shown."; } }
     else body.innerHTML = app.html;
     root.append(bar, body);
     win.el = root;
@@ -412,7 +422,7 @@
     bar.addEventListener("dblclick", e => { if (!e.target.closest("button")) toggleMax(win); });
     enableDrag(win, bar);
 
-    const mod = app.kind === "folder" ? null : window.DesktopApps[app.id];
+    const mod = app.kind === "folder" || app.kind === "custom" ? null : window.DesktopApps[app.id];
     try {
       win.instance = mod && mod.init ? mod.init(body, shell) : null;
     } catch (e) {
@@ -534,7 +544,7 @@
   /* ---------- desktop icons ---------- */
 
   const iconsEl = $("icons");
-  FOLDER_ITEMS.concat(APPS.filter(a => !a.folder)).forEach(app => {
+  function addDesktopIcon(app) {
     const b = el("button", "icon", { type: "button", title: app.title });
     const img = el("img", "", { src: app.icon, alt: "" });
     const label = el("span");
@@ -546,7 +556,16 @@
       openApp(app.id);
     });
     iconsEl.append(b);
-  });
+    return b;
+  }
+  FOLDER_ITEMS.concat(APPS.filter(a => !a.folder)).forEach(addDesktopIcon);
+  // The person's own files: the server's desktop folder (see desktopfiles.js) hands over items { id, title, icon, size, build(body, shell) }.
+  // They appear after the built-in icons, and the whole set is replaced each time (a file that was removed disappears; windows already open stay).
+  const customIcons = [];
+  shell.setDesktopItems = items => {
+    for (const c of customIcons.splice(0)) { c.button.remove(); const k = ALL.indexOf(c.item); if (k >= 0) ALL.splice(k, 1); }
+    for (const it of items) { it.kind = "custom"; ALL.push(it); customIcons.push({ item: it, button: addDesktopIcon(it) }); }
+  };
   ws.addEventListener("pointerdown", e => {
     if (e.target === ws || e.target === iconsEl) {
       iconsEl.querySelectorAll(".icon").forEach(i => i.classList.remove("selected"));

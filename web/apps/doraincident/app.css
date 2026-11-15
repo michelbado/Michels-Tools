@@ -1,0 +1,140 @@
+/* DORA Incident Classification (a three-step decision aid). Shared look is in xp.css (.tk); everything here is .dora-*. */
+.dora .tk-body { scroll-padding-top: 52px; }
+.dora .dora-head { margin-bottom: 8px; }
+.dora .dora-ttl { font-size: 20px; font-weight: 700; color: #0B2F8A; line-height: 1.25; }
+.dora .dora-sub { color: var(--muted); margin: 2px 0 8px; line-height: 1.4; }
+.dora .dora-warn { background: #FFF6DC; border: 1px solid #8A6D00; border-left-width: 5px; border-radius: 8px; padding: 8px 12px; color: #4A3A00; line-height: 1.45; font-size: 13px; }
+.dora .dora-warn summary { cursor: pointer; margin-top: 4px; color: #0B2F8A; }
+.dora .dora-warn p { margin: 6px 0 0; }
+
+.dora .dora-steps { display: flex; gap: 6px; margin: 10px 0 0; }
+.dora .dora-tab { flex: 1 1 0; display: flex; align-items: center; gap: 8px; justify-content: center; font: inherit; padding: 8px 10px; min-height: 40px; background: #F3F6FC; border: 1px solid #7F9DB9; border-radius: 10px 10px 0 0; cursor: pointer; color: #333; }
+.dora .dora-tab:hover { background: #E5EDFB; }
+.dora .dora-tab.on { background: #fff; border-bottom-color: #fff; font-weight: 700; color: #0B2F8A; box-shadow: inset 0 3px 0 #2F6BD8; }
+.dora .dora-tab:focus-visible { outline: 2px solid #0055E5; outline-offset: -3px; }
+.dora .dora-n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: #5A6B8C; color: #fff; font-size: 12px; flex: 0 0 auto; }
+.dora .dora-tab.on .dora-n { background: #2F6BD8; }
+
+/* the one slim line that stays on top; the big verdict card lives on step 3 and scrolls away like everything else */
+.dora .dora-strip { position: sticky; top: -12px; z-index: 3; display: flex; align-items: center; gap: 10px; margin: 0 -14px 10px; padding: 8px 14px; min-height: 38px; border-bottom: 2px solid; border-top: 1px solid #7F9DB9; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
+.dora .dora-strip.open { background: #FFF6DC; border-bottom-color: #8A6D00; color: #4A3A00; }
+.dora .dora-strip.major { background: #FFF1EC; border-bottom-color: #C23A14; color: #6B1A05; }
+.dora .dora-strip.notmajor { background: #EEF8EA; border-bottom-color: #3F7A2E; color: #173F0E; }
+.dora .dora-sdot { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; color: #fff; background: #8A6D00; }
+.dora .major .dora-sdot { background: #C23A14; } .dora .notmajor .dora-sdot { background: #3F7A2E; }
+.dora .dora-stext { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+
+.dora .dora-panel[hidden] { display: none; }
+.dora .dora-box { background: #fff; border: 1px solid #C9D3E6; border-radius: 12px; padding: 10px 14px 12px; margin-bottom: 12px; }
+.dora .dora-box h3 { margin: 0 0 4px; font-size: 15px; color: #0B2F8A; }
+.dora .dora-opt { font-weight: 400; font-size: 12px; color: var(--muted); margin-left: 6px; }
+.dora .dora-lead { line-height: 1.5; margin: 0 0 8px; }
+.dora .dora-list { margin: 4px 0 0; padding-left: 20px; line-height: 1.5; }
+.dora .dora-list li { margin: 3px 0; overflow-wrap: anywhere; }
+.dora .dora-trust { background: #F7F8FB; }
+.dora .dora-nav { display: flex; gap: 10px; justify-content: space-between; align-items: center; flex-wrap: wrap; margin: 6px 0 4px; }
+
+.dora .dora-times { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px 16px; margin-top: 6px; }
+.dora .dora-tpair { display: flex; gap: 6px; align-items: center; }
+.dora .dora-tpair .xp-field { flex: 1 1 auto; min-width: 0; width: auto; }
+.dora .tk-row > .tk-fld { max-width: 100%; min-width: 0; }
+.dora .dora-entity { width: 100%; max-width: 36rem; }
+.dora .dora-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.dora .dora-chip { display: inline-flex; align-items: center; gap: 6px; background: #E8EEFB; border: 1px solid #7F9DB9; border-radius: 99px; padding: 1px 4px 1px 10px; font-size: 12px; }
+.dora .dora-chip button { border: 0; background: transparent; cursor: pointer; font-size: 14px; line-height: 1; padding: 2px 6px; color: #003C74; }
+
+/* questions with Yes / No / Not sure */
+.dora .dora-item { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; justify-content: space-between; padding: 8px 0; border-top: 1px solid #EEF1F6; }
+.dora .dora-item:first-child { border-top: 0; }
+.dora .dora-itext { flex: 1 1 320px; min-width: 0; line-height: 1.4; overflow-wrap: anywhere; }
+.dora .dora-hint { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.dora .dora-seg { position: relative; display: inline-flex; border: 1px solid #7F9DB9; border-radius: 8px; overflow: hidden; flex: 0 0 auto; }
+.dora .dora-seg input { position: absolute; left: 0; top: 0; margin: 0; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.dora .dora-seg label { padding: 6px 12px; cursor: pointer; background: #F7F8FB; border-left: 1px solid #7F9DB9; font-size: 13px; min-height: 32px; display: grid; place-items: center; }
+.dora .dora-seg label:first-of-type { border-left: 0; }
+.dora .dora-seg input:checked + label { color: #fff; font-weight: 700; }
+.dora .dora-seg input[value="yes"]:checked + label { background: #C23A14; }
+.dora .dora-seg input[value="no"]:checked + label { background: #3F7A2E; }
+.dora .dora-seg input[value="unk"]:checked + label { background: #6B7690; }
+.dora .dora-seg input:focus-visible + label { outline: 2px solid #0055E5; outline-offset: -3px; }
+
+/* threshold cards */
+.dora .dora-cards { display: grid; gap: 10px; }
+.dora .dora-q { background: #fff; border: 1px solid #C9D3E6; border-left: 5px solid #9AA6BD; border-radius: 10px; padding: 8px 12px 10px; }
+.dora .dora-q.yes { border-left-color: #C23A14; background: #FFFAF8; }
+.dora .dora-q.no { border-left-color: #3F7A2E; }
+.dora .dora-qhead { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; justify-content: space-between; }
+.dora .dora-qtitle { font-weight: 700; }
+.dora .dora-art { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+.dora .dora-badge { font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 99px; }
+.dora .dora-badge.yes, .dora .dora-lpill.yes { background: #FBE0D8; color: #8A230A; }
+.dora .dora-badge.no, .dora .dora-lpill.no { background: #DDF0D6; color: #1F4A12; }
+.dora .dora-badge.unk, .dora .dora-lpill.unk { background: #E8EBF2; color: #4D5870; }
+.dora .dora-cnote { margin: 4px 0 2px; line-height: 1.4; }
+.dora .dora-nums { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 6px 0 2px; padding: 6px 8px; background: #F3F6FC; border-radius: 8px; }
+.dora .dora-nums .xp-field { width: 10rem; }
+.dora .dora-nums .tk-fld span { font-size: 12px; color: var(--muted); }
+.dora .dora-limits { margin: 4px 0; }
+.dora .dora-limit { display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: center; padding: 3px 0; font-size: 13px; }
+.dora .dora-ltxt { flex: 1 1 260px; min-width: 0; }
+.dora .dora-lpill { font-size: 12px; font-weight: 700; padding: 1px 10px; border-radius: 99px; }
+.dora .dora-ldet { font-size: 12px; color: #173C9E; flex: 1 1 100%; }
+.dora .dora-lpill + .dora-ldet { flex: 0 1 auto; }
+.dora .dora-ticks { display: grid; gap: 2px; margin: 4px 0; }
+.dora .dora-tick { display: flex; gap: 8px; align-items: flex-start; padding: 5px 2px; cursor: pointer; line-height: 1.35; }
+.dora .dora-tick input { margin-top: 3px; width: 16px; height: 16px; flex: 0 0 auto; }
+.dora .dora-none { border-top: 1px dashed #C9D3E6; margin-top: 6px; padding-top: 8px; color: #333; }
+.dora .dora-more { margin-top: 6px; border-top: 1px dashed #C9D3E6; padding-top: 6px; }
+.dora .dora-more summary { cursor: pointer; color: #0B2F8A; }
+.dora .dora-tally { font-weight: 700; padding: 8px 12px; border-radius: 8px; margin: 0 0 10px; border: 1px solid; overflow-wrap: anywhere; }
+.dora .dora-tally.open { background: #FFF6DC; border-color: #8A6D00; color: #4A3A00; }
+.dora .dora-tally.major { background: #FFF1EC; border-color: #C23A14; color: #6B1A05; }
+.dora .dora-tally.notmajor { background: #EEF8EA; border-color: #3F7A2E; color: #173F0E; }
+
+/* decision */
+.dora .dora-verdict { display: flex; gap: 16px; align-items: center; border: 1px solid; border-radius: 14px; padding: 16px 20px; margin-bottom: 12px; }
+.dora .dora-verdict.open { background: #FFF6DC; border-color: #8A6D00; color: #4A3A00; }
+.dora .dora-verdict.major { background: #FFF1EC; border-color: #C23A14; color: #6B1A05; }
+.dora .dora-verdict.notmajor { background: #EEF8EA; border-color: #3F7A2E; color: #173F0E; }
+.dora .dora-vicon { flex: 0 0 auto; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 32px; font-weight: 700; color: #fff; background: #8A6D00; }
+.dora .major .dora-vicon { background: #C23A14; } .dora .notmajor .dora-vicon { background: #3F7A2E; }
+.dora .dora-vmain { min-width: 0; flex: 1 1 auto; }
+.dora .dora-vkicker { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.dora .dora-vtitle { font-size: 23px; font-weight: 700; line-height: 1.2; }
+.dora .dora-meter { height: 8px; background: rgba(0,0,0,.12); border-radius: 99px; margin-top: 8px; overflow: hidden; }
+.dora .dora-meter span { display: block; height: 100%; background: currentColor; border-radius: 99px; transition: width .25s; }
+.dora .dora-vmeta { font-size: 12px; margin-top: 4px; opacity: .85; }
+.dora .dora-lrow { display: grid; grid-template-columns: 1.1fr 1.4fr 1fr; gap: 4px 12px; padding: 7px 0; border-top: 1px solid #EEF1F6; align-items: start; }
+.dora .dora-lrow:first-child { border-top: 0; }
+.dora .dora-lname { font-weight: 700; overflow-wrap: anywhere; }
+.dora .dora-llimit { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.dora .dora-lstate { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; }
+
+.dora .dora-timeline { list-style: none; margin: 12px 0 4px; padding: 0; position: relative; }
+.dora .dora-timeline.dim { opacity: .55; }
+.dora .dora-timeline::before { content: ""; position: absolute; left: 17px; top: 18px; bottom: 18px; width: 3px; background: #C9D3E6; border-radius: 2px; }
+.dora .dora-step { position: relative; display: flex; gap: 14px; padding: 6px 0 14px; }
+.dora .dora-mark { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; background: #5A6B8C; border: 3px solid #fff; z-index: 1; }
+.dora .dora-step.ok .dora-mark { background: #2F6BD8; }
+.dora .dora-step.soon .dora-mark { background: #C77A00; }
+.dora .dora-step.late .dora-mark { background: #C23A14; }
+.dora .dora-step.done .dora-mark, .dora .dora-step.sentlate .dora-mark { background: #3F7A2E; }
+.dora .dora-card { flex: 1 1 auto; min-width: 0; background: #fff; border: 1px solid #C9D3E6; border-radius: 10px; padding: 8px 12px; }
+.dora .dora-step.late .dora-card { border-color: #C23A14; background: #FFF7F4; }
+.dora .dora-step.soon .dora-card { border-color: #C77A00; }
+.dora .dora-sttitle { font-weight: 700; }
+.dora .dora-due { font-size: 18px; font-weight: 700; margin: 2px 0; overflow-wrap: anywhere; }
+.dora .dora-pill { display: inline-block; margin-left: 8px; font-size: 12px; font-weight: 700; padding: 1px 10px; border-radius: 99px; background: #E8EEFB; color: #173C9E; vertical-align: middle; }
+.dora .late .dora-pill { background: #FBE0D8; color: #8A230A; }
+.dora .soon .dora-pill { background: #FFEBC2; color: #6B4300; }
+.dora .done .dora-pill, .dora .sentlate .dora-pill { background: #DDF0D6; color: #1F4A12; }
+.dora .dora-basis { font-size: 12px; color: var(--muted); line-height: 1.4; overflow-wrap: anywhere; }
+.dora .dora-was { font-size: 12px; color: #6B4300; }
+
+@media (max-width: 699px) {
+  .dora .dora-tab { padding: 6px 4px; font-size: 12px; gap: 4px; } .dora .dora-n { width: 18px; height: 18px; font-size: 11px; }
+  .dora .dora-verdict { padding: 12px; gap: 10px; } .dora .dora-vicon { width: 42px; height: 42px; font-size: 24px; } .dora .dora-vtitle { font-size: 18px; }
+  .dora .dora-seg { width: 100%; } .dora .dora-seg label { flex: 1 1 0; }
+  .dora .dora-nums .xp-field { width: 100%; } .dora .dora-nums .tk-fld { flex: 1 1 100%; }
+  .dora .dora-lrow { grid-template-columns: 1fr; }
+}
