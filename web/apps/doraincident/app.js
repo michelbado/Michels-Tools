@@ -15,6 +15,8 @@
     const ITEM = {};
     for (const g of D.GATE) ITEM[g.id] = g;
     for (const t of D.THRESHOLDS) for (const i of t.items) ITEM[i.id] = i;
+    // not part of the classification: it only decides whether the data protection clock is shown beside the DORA reports
+    ITEM.pd = { id: "pd", text: "Does the incident involve personal data (a personal data breach)?", hint: "Customer, staff or other people's data that was lost, altered, disclosed or reached by someone who should not have it. If yes, a data protection notice may be due at the same time as the DORA reports." };
     // short labels for the rows that show a limit
     const LIM = {
       c_pct: "Share of the service's clients (limit: over 10 %)", c_abs: "Number of clients (limit: over 100,000)", p_pct: "Share of the service's counterparts (limit: over 30 %)",
@@ -62,7 +64,9 @@
       const box = el("div", "dora-nums");
       for (const [id, lab] of list) {
         const f = el("label", "tk-fld"), s = el("span", null, lab), inp = document.createElement("input"); inp.type = "text"; inp.inputMode = "decimal"; inp.maxLength = 18; inp.className = "xp-field"; inp.id = "doraincident-n-" + id; inp.autocomplete = "off";
-        f.htmlFor = inp.id; f.append(s, inp); box.append(f); ui.num[id] = inp; inp.addEventListener("input", again);
+        const er = el("span", "dora-numerr"); er.setAttribute("role", "status");
+        f.htmlFor = inp.id; f.append(s, inp, er); box.append(f); ui.num[id] = inp; inp.placeholder = "e.g. 12000"; inp.addEventListener("input", again);
+        inp.addEventListener("input", () => { const bad = inp.value.trim() !== "" && D.num(inp.value) == null; inp.classList.toggle("dora-bad", bad); inp.setAttribute("aria-invalid", bad ? "true" : "false"); er.textContent = bad ? "Digits only, please (a decimal point is fine; commas and spaces are ignored)." : ""; });
       }
       return box;
     }
@@ -94,6 +98,7 @@
     }
     function build() {
       $("disc").textContent = D.DISCLAIMER;
+      $("pdbox").append(buildTri("pd"));
       for (const g of D.GATE) $("gate").append(buildTri(g.id));
       for (const c of CARDS) $("cards").append(buildCard(c));
       for (const e of D.ENTITIES) { const o = document.createElement("option"); o.value = e.id; o.textContent = e.title; $("entity").append(o); }
@@ -145,14 +150,26 @@
       t.className = "dora-tally " + (r.code === "major" ? "major" : r.code === "notmajor" ? "notmajor" : "open");
     }
     function showVerdict(r) {
-      const vt = D.VERDICT_TEXT[r.code], mark = r.code === "major" ? "!" : r.code === "notmajor" ? "✓" : "?", title = vt[0] + (r.viaRecurring ? " (recurring incidents)" : "");
+      const vt = D.VERDICT_TEXT[r.code], mark = r.code === "major" ? "!" : r.code === "notmajor" ? "–" : "?", title = vt[0] + (r.viaRecurring ? " (recurring incidents)" : "");
       $("verdict").className = "dora-verdict " + r.code; $("vicon").textContent = mark; $("vtitle").textContent = title;
       $("strip").className = "dora-strip " + r.code; $("sdot").textContent = mark; $("stext").textContent = title + "  ·  " + r.metOthers + " of 6 thresholds crossed";
-      const pct = r.code === "major" ? 100 : r.gate.state === "no" ? 0 : Math.min(100, Math.round(r.metOthers / r.othersNeeded * 100));
-      $("meterfill").style.width = pct + "%";
+      $("vcaution").textContent = vt[1];
+      $("markclass").hidden = !(r.code === "major" && !$("classified").value);
       const g = { yes: "yes", no: "no", unk: "not known yet" };
       $("vmeta").textContent = "Critical services: " + g[r.gate.state] + "  ·  Other thresholds crossed: " + r.metOthers + " (two needed)  ·  Malicious access with data loss: " + g[r.strongState];
       const why = $("why"); why.textContent = ""; for (const x of r.reasons) why.append(el("li", null, x));
+    }
+    function showPar(rows) {
+      const list = $("par"); list.textContent = ""; $("parh").hidden = $("par").hidden = !rows.length;
+      let n = 0;
+      for (const x of rows) {
+        n++;
+        const li = el("li", "dora-step " + (x.state === "late" ? "late" : x.state === "soon" ? "soon" : "ok")), mark = el("div", "dora-mark", String(n)), card = el("div", "dora-card");
+        const title = el("div", "dora-sttitle", x.title), pill = el("span", "dora-pill", x.maybe ? "if it applies" : x.state === "late" ? "overdue by " + D.fmtSpan(-x.left) : x.left != null ? "in " + D.fmtSpan(x.left) : "");
+        title.append(pill);
+        card.append(title, el("div", "dora-due", x.due != null ? "Within 72 hours: " + D.fmtDate(x.due) : x.dueText || ""), el("div", "dora-basis", x.basis));
+        li.append(mark, card); list.append(li);
+      }
     }
     function showFlip(r) {
       const box = $("flipbox"), list = $("flip"); list.textContent = "";
@@ -162,6 +179,7 @@
         box.hidden = !r.flip.length;
       } else if (r.code === "notmajor") {
         $("fliptitle").textContent = "Look again if the facts change";
+        list.append(el("li", null, "Not major does not mean nothing to do: record and manage the incident, and consider notifying your authority of a significant cyber threat (voluntary)."));
         const below = r.thresholds.filter(t => t.state === "no" && !t.strong);
         if (r.gate.state === "no") list.append(el("li", null, "A critical or important function, or a licensed service, is affected after all, or someone gains malicious access."));
         else for (const t of below) list.append(el("li", null, t.title + ": " + THR_LIMIT[t.id] + "."));
@@ -211,8 +229,13 @@
       const times = readTimes(), nums = readNums(), answers = readAnswers(), entity = $("entity").value || "ext", now = Date.now();
       const result = D.classify({ answers, nums, times, entity, now });
       const cl = D.clock({ detected: times.detected, started: times.started, classified: times.classified, initialSent: times.initialSent, interimSent: times.interimSent, resolved: times.resolved, now, entity, holidays });
+      const par = D.parallel({ aware: cl.ok ? cl.aware : (times.detected != null ? times.detected : times.started), now, personal: triVal("pd"), major: result.code });
+      const skip2 = result.gate.state === "no";
+      $("tab2").disabled = skip2; $("tab2").title = skip2 ? "Not needed: no critical service is affected" : "";
+      root.querySelector('#doraincident-p1 [data-go="2"]').textContent = skip2 ? "Next: decision" : "Next: thresholds";
+      showPar(par);
       showLimits(result); showCards(result); showGate(result); showTally(result); showVerdict(result); showFlip(result); showLimitTable(result); showClock(cl, result);
-      last = { result, cl, times, now };
+      last = { result, cl, times, now, par };
       return last;
     }
     const again = TK.debounce(update, 120);
@@ -242,22 +265,69 @@
     });
     $("download").addEventListener("click", () => {
       const s = update(), ref = $("ref").value.trim();
-      const html = D.reportHtml({ result: s.result, clock: s.cl, times: s.times, title: ref, now: s.now });
+      const html = D.reportHtml({ result: s.result, clock: s.cl, times: s.times, title: ref, now: s.now, parallel: s.par });
       const d = new Date(s.now), p = n => String(n).padStart(2, "0");
       const safe = ref.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
       const name = "dora-classification-" + (safe ? safe + "-" : "") + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes()) + ".html";
       const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 10000);
       setStatus("Report saved as " + name + ".");
     });
-    $("copy").addEventListener("click", () => { const s = update(); TK.copy(D.summaryText({ result: s.result, clock: s.cl, title: $("ref").value.trim() }), setStatus); });
-    $("reset").addEventListener("click", () => {
+    $("copy").addEventListener("click", () => { const s = update(); TK.copy(D.summaryText({ result: s.result, clock: s.cl, title: $("ref").value.trim(), parallel: s.par }), setStatus); });
+    function clearAll() {
       for (const k of TIMES) $(k).value = "";
-      for (const i of Object.values(ui.num)) i.value = "";
+      for (const i of Object.values(ui.num)) { i.value = ""; i.classList.remove("dora-bad"); i.setAttribute("aria-invalid", "false"); if (i.nextSibling) i.nextSibling.textContent = ""; }
       for (const i of Object.values(ui.tick)) i.checked = false;
       for (const i of Object.values(ui.none)) i.checked = false;
       for (const r of Object.values(ui.tri)) r.unk.checked = true;
-      $("ref").value = ""; $("entity").value = "ext"; holidays.length = 0; drawChips(); go(1); setStatus("Cleared.");
+      $("ref").value = ""; $("entity").value = "ext"; holidays.length = 0; drawChips();
+    }
+    $("reset").addEventListener("click", () => { clearAll(); go(1); setStatus("Cleared."); });
+
+    // ---- save / load the answers as a file on the visitor's own computer ---------------------------------------------------
+    const FORMAT = "michels-tools-dora-answers";
+    function collect() {
+      const o = { format: FORMAT, version: 1, saved: new Date().toISOString(), ref: $("ref").value.trim(), entity: $("entity").value, holidays: holidays.slice(), times: {}, nums: {}, ticks: [], none: [], tri: {} };
+      for (const k of TIMES) if ($(k).value) o.times[k] = $(k).value;
+      for (const [id, i] of Object.entries(ui.num)) if (i.value.trim()) o.nums[id] = i.value.trim();
+      for (const [id, i] of Object.entries(ui.tick)) if (i.checked) o.ticks.push(id);
+      for (const [k, i] of Object.entries(ui.none)) if (i.checked) o.none.push(k);
+      for (const id of Object.keys(ui.tri)) o.tri[id] = triVal(id);
+      return o;
+    }
+    // everything read from the file is checked against what the page knows; unknown names and odd values are ignored
+    function apply(o) {
+      if (!o || typeof o !== "object" || o.format !== FORMAT || o.version !== 1) throw new Error("This is not a file saved by this tool.");
+      const isStr = (v, n) => typeof v === "string" && v.length <= n, own = (obj, k) => Object.prototype.hasOwnProperty.call(obj, k);
+      clearAll();
+      if (isStr(o.ref, 80)) $("ref").value = o.ref;
+      if (isStr(o.entity, 20) && D.ENTITIES.some(e => e.id === o.entity)) $("entity").value = o.entity;
+      if (Array.isArray(o.holidays)) for (const d of o.holidays.slice(0, 100)) if (isStr(d, 10) && /^\d{4}-\d{2}-\d{2}$/.test(d) && !holidays.includes(d)) holidays.push(d);
+      holidays.sort(); drawChips();
+      if (o.times && typeof o.times === "object") for (const k of TIMES) if (own(o.times, k) && isStr(o.times[k], 16) && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(o.times[k])) $(k).value = o.times[k];
+      if (o.nums && typeof o.nums === "object") for (const id of Object.keys(ui.num)) if (own(o.nums, id) && isStr(o.nums[id], 18)) { ui.num[id].value = o.nums[id]; ui.num[id].dispatchEvent(new Event("input")); }
+      if (Array.isArray(o.ticks)) for (const id of o.ticks) if (typeof id === "string" && own(ui.tick, id)) ui.tick[id].checked = true;
+      if (Array.isArray(o.none)) for (const k of o.none) if (typeof k === "string" && own(ui.none, k)) ui.none[k].checked = true;
+      if (o.tri && typeof o.tri === "object") for (const id of Object.keys(ui.tri)) if (own(o.tri, id) && ["yes", "no", "unk"].includes(o.tri[id])) ui.tri[id][o.tri[id]].checked = true;
+      // a "none of these" box wins over ticks that contradict it, as on screen
+      for (const c of CARDS) if (ui.none[c.key] && ui.none[c.key].checked) for (const [id] of (c.ticks || [])) ui.tick[id].checked = false;
+    }
+    $("saveans").addEventListener("click", () => {
+      const o = collect(), d = new Date(), p = n => String(n).padStart(2, "0");
+      const safe = o.ref.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+      const name = "dora-answers-" + (safe ? safe + "-" : "") + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + "-" + p(d.getHours()) + p(d.getMinutes()) + ".json";
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(o, null, 1)], { type: "application/json" })); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+      setStatus("Answers saved as " + name + ".");
     });
+    $("loadans").addEventListener("click", () => $("loadfile").click());
+    $("loadfile").addEventListener("change", () => {
+      const file = $("loadfile").files[0]; $("loadfile").value = ""; if (!file) return;
+      if (file.size > 200000) { setStatus("That file is too large to be a saved answer file."); return; }
+      const rd = new FileReader();
+      rd.onerror = () => setStatus("The file could not be read.");
+      rd.onload = () => { try { apply(JSON.parse(String(rd.result))); go(1); setStatus("Answers loaded from " + file.name + "."); } catch (e) { setStatus("Not loaded: " + (e instanceof SyntaxError ? "the file is not valid JSON." : e && e.message ? e.message : "the file is not valid.")); } };
+      rd.readAsText(file);
+    });
+    $("markclass").addEventListener("click", () => { $("classified").value = D.toLocalInput(Date.now()); update(); setStatus("Classification time set to now."); });
 
     build(); update();
     const timer = setInterval(() => { if (root.isConnected) update(); }, 30000);

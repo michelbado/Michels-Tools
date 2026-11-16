@@ -486,3 +486,7 @@ body {
 .dmd table { border-collapse: collapse; margin: .8em 0; display: block; overflow-x: auto; max-width: 100%; }
 .dmd th, .dmd td { border: 1px solid #CBD5E8; padding: 5px 10px; text-align: left; } .dmd th { background: #EEF2FA; }
 .dmd .dmd-right { text-align: right; } .dmd .dmd-center { text-align: center; }
+.faddr .dup { margin-left: 6px; flex: 0 0 auto; }
+.dwhere { overflow-wrap: anywhere; }
+.drow.dfld { width: 100%; background: transparent; border: 0; border-bottom: 1px solid #F0EEE4; font: inherit; text-align: left; border-radius: 0; }
+.drow.dfld .dname { font-weight: 700; }

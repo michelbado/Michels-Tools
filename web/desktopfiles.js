@@ -41,21 +41,40 @@
     } };
   }
 
+  // A folder from the desktop folder: the desktop icon is the shared folder (a hand under it), the window and the folders inside it use the plain folder.
+  // Folders open in the same window (the address bar shows where you are, Up goes back); clicking a file downloads it.
   function folderItem(it) {
-    return { id: "dfolder-" + it.name, title: it.title, icon: "icons/folder.svg", size: { w: 680, h: 480 }, build(body) {
-      const root = el("div", "fwin"), addr = el("div", "faddr"), field = el("div", "faddr-field"), list = el("div", "dlist"), status = el("div", "statusbar"), cell = el("span", "cell msg", "Loading...");
-      const fi = el("img"); fi.src = "icons/folder.svg"; fi.alt = ""; field.append(fi, el("span", null, it.title)); addr.append(el("span", "faddr-label", "Address"), field);
+    return { id: "dfolder-" + it.name, title: it.title, icon: "icons/folder-shared.svg", winIcon: "icons/folder.svg", size: { w: 700, h: 500 }, build(body) {
+      const root = el("div", "fwin"), addr = el("div", "faddr"), field = el("div", "faddr-field"), where = el("span", "dwhere"), up = el("button", "xp-btn small dup", "Up"), list = el("div", "dlist"), status = el("div", "statusbar"), cell = el("span", "cell msg", "Loading...");
+      const fi = el("img"); fi.src = "icons/folder.svg"; fi.alt = ""; up.type = "button"; up.title = "Go up one folder"; up.hidden = true;
+      field.append(fi, where); addr.append(el("span", "faddr-label", "Address"), field, up);
       status.append(cell); root.append(addr, list, status); body.append(root);
-      getJSON("api/desktop/folder?name=" + encodeURIComponent(it.name)).then(j => {
-        for (const f of j.files) {
-          const a = el("a", "drow");
-          a.href = "desktop-files/" + encodeURIComponent(it.name) + "/" + encodeURIComponent(f.name); a.setAttribute("download", f.name); a.title = "Download " + f.name;
-          const img = el("img"); img.src = fileIcon(f.name); img.alt = "";
-          a.append(img, el("span", "dname", f.name), el("span", "dsize", fmtSize(f.size)), el("span", "ddate", f.mtime ? fmtDate(f.mtime) : ""));
-          list.append(a);
-        }
-        cell.textContent = j.files.length + " file" + (j.files.length === 1 ? "" : "s") + "  ·  click a file to download it";
-      }).catch(() => { list.append(el("p", "dfile-err", "This folder is empty or no longer available.")); cell.textContent = "Not available"; });
+      let path = [it.name], token = 0;
+      const href = (p, name) => "desktop-files/" + p.concat(name).map(encodeURIComponent).join("/");
+      function show(p) {
+        const mine = ++token; path = p; list.textContent = ""; cell.textContent = "Loading..."; where.textContent = p.join("  \u203A  "); up.hidden = p.length < 2;
+        getJSON("api/desktop/folder?path=" + encodeURIComponent(p.join("/"))).then(j => {
+          if (mine !== token) return; // a newer click came first
+          for (const f of j.folders || []) {
+            const b = el("button", "drow dfld"); b.type = "button"; b.title = "Open " + f.name;
+            const img = el("img"); img.src = "icons/folder.svg"; img.alt = "";
+            b.append(img, el("span", "dname", f.name), el("span", "dsize", "Folder"), el("span", "ddate"));
+            b.addEventListener("click", () => show(p.concat(f.name)));
+            list.append(b);
+          }
+          for (const f of j.files || []) {
+            const a = el("a", "drow");
+            a.href = href(p, f.name); a.setAttribute("download", f.name); a.title = "Download " + f.name;
+            const img = el("img"); img.src = fileIcon(f.name); img.alt = "";
+            a.append(img, el("span", "dname", f.name), el("span", "dsize", fmtSize(f.size)), el("span", "ddate", f.mtime ? fmtDate(f.mtime) : ""));
+            list.append(a);
+          }
+          const nf = (j.folders || []).length, nm = (j.files || []).length;
+          cell.textContent = (nf ? nf + " folder" + (nf === 1 ? "" : "s") + ", " : "") + nm + " file" + (nm === 1 ? "" : "s") + "  \u00B7  click a file to download it";
+        }).catch(() => { if (mine !== token) return; list.append(el("p", "dfile-err", "This folder is empty or no longer available.")); cell.textContent = "Not available"; });
+      }
+      up.addEventListener("click", () => { if (path.length > 1) show(path.slice(0, -1)); });
+      show(path);
     } };
   }
 

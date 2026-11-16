@@ -141,15 +141,25 @@
       const d = auto[def.id], state = d ? d.state : isAns(answers[def.id]) ? answers[def.id] : "unk";
       return { id: def.id, text: def.text, art: def.art || art, state, auto: !!d, detail: d ? d.detail : "" };
     };
-    const gate = GATE.map(g => item(g));
+    // Malicious access that may cause data loss (Art. 9(5)(b)) is by definition a successful malicious unauthorised access (Art. 6(c)):
+    // one "yes" answers both, so the gate follows it even when the visitor left the Art. 6(c) line on "not sure" or "no".
+    const impliedGm = answers.l_mal === "yes";
+    const gate = GATE.map(g => {
+      const i = item(g);
+      if (g.id === "gm" && impliedGm && i.state !== "yes") return { ...i, state: "yes", auto: true, detail: "Follows from your answer on step 2: malicious access that may cause data loss is also a successful malicious unauthorised access." };
+      return i;
+    });
     const gateState = groupState(gate.map(i => i.state));
     const thresholds = THRESHOLDS.map(t => { const items = t.items.map(i => item(i, t.art)); return { id: t.id, card: t.card, art: t.art, title: t.title, strong: !!t.strong, items, state: groupState(items.map(i => i.state)) }; });
     const strong = thresholds.find(t => t.strong), others = thresholds.filter(t => !t.strong);
     const metOthers = others.filter(t => t.state === "yes").length, possibleOthers = others.filter(t => t.state !== "no").length;
 
+    // Someone who says "no" to all three critical-services lines (so also "no" to a breach) and left the malicious-access line open has not
+    // described a breach: that line counts as "no". A "yes" on it always wins and makes the gate "yes" (see impliedGm above).
+    const strongState = gate.every(i => i.state === "no") && strong.state === "unk" ? "no" : strong.state;
     const major = (assumeUnknown) => {
       const yes = s => s === "yes" || (assumeUnknown && s === "unk");
-      return yes(gateState) && (yes(strong.state) || others.filter(t => yes(t.state)).length >= LIMITS.othersNeeded);
+      return yes(gateState) && (yes(strongState) || others.filter(t => yes(t.state)).length >= LIMITS.othersNeeded);
     };
     // recurring incidents: only for incidents that are not major one by one; microenterprises and Art. 16(1) entities are outside this rule
     // The question is only raised once the visitor says "yes" to one of its lines; left untouched it does not keep a verdict open.
@@ -163,7 +173,7 @@
     const reasons = [], unknown = [];
     const names = list => list.map(t => t.title.replace(/ \(any one is enough\)/, "")).join("; ");
     if (code === "major" && !viaRecurring) {
-      reasons.push("Critical services are affected (Art. 6), and " + (strong.state === "yes" ? "a successful, malicious, unauthorised access that may result in data losses is present (Art. 9(5)(b)), which is enough on its own" : metOthers + " materiality thresholds are met (two are needed): " + names(others.filter(t => t.state === "yes"))) + ".");
+      reasons.push("Critical services are affected (Art. 6), and " + (strongState === "yes" ? "a successful, malicious, unauthorised access that may result in data losses is present (Art. 9(5)(b)), which is enough on its own" : metOthers + " materiality thresholds are met (two are needed): " + names(others.filter(t => t.state === "yes"))) + ".");
     } else if (viaRecurring) {
       reasons.push("Individually these incidents may not be major, but at least two with the same apparent root cause within " + LIMITS.recurringMonths + " months that together meet the major-incident conditions count as one major incident (Art. 8(2)).");
     } else if (code === "notmajor") {
@@ -182,7 +192,7 @@
       ...(gateState === "unk" ? [{ id: "gate", title: "Critical services (Art. 6)" }] : []),
       ...(gateState !== "no" ? thresholds.filter(t => t.state === "unk").map(t => ({ id: t.id, title: t.title, art: t.art })) : []),
     ];
-    return { code, viaRecurring, reasons, unknown, flip, gate: { state: gateState, items: gate }, thresholds, metOthers, possibleOthers, othersNeeded: LIMITS.othersNeeded, strongState: strong.state,
+    return { code, viaRecurring, reasons, unknown, flip, gate: { state: gateState, items: gate }, thresholds, metOthers, possibleOthers, othersNeeded: LIMITS.othersNeeded, strongState,
       recurring: { state: recState, items: rec, applies: !ent.micro }, entity: ent };
   }
 
@@ -268,13 +278,32 @@
     return { ok: true, rows, notes, warnings, aware, entity: ent };
   }
 
+  // ---- Other duties that may run at the same time -------------------------------------------------------------------------
+  // o: { aware (ms or null), now, personal: "yes"|"no"|"unk", major: classify().code }
+  // GDPR Art. 33: 72 hours from becoming aware of a personal data breach (unless it is unlikely to result in a risk). DORA Art. 19(3): clients
+  // whose financial interests are affected are told without undue delay. Shown for orientation only; neither is part of the DORA reports.
+  function parallel(o) {
+    const now = o.now != null ? o.now : Date.now(), rows = [];
+    if (o.personal !== "no") {
+      const due = o.aware != null ? o.aware + 72 * H : null;
+      rows.push({ id: "gdpr", title: "Personal data breach notice to the data protection authority (GDPR Art. 33)", due,
+        state: due == null ? "waiting" : now > due ? "late" : due - now <= 12 * H ? "soon" : "ok", left: due == null ? null : due - now, maybe: o.personal !== "yes",
+        basis: (o.personal === "yes" ? "Personal data is involved. " : "Only if personal data is involved. ") + "Due within 72 hours of becoming aware, unless the breach is unlikely to result in a risk to people. This is a separate duty with its own recipient; it does not replace the DORA reports." });
+    }
+    if (o.major !== "notmajor") {
+      rows.push({ id: "clients", title: "Tell affected clients (DORA Art. 19(3))", due: null, state: "waiting", dueText: "Without undue delay", maybe: o.major === "open",
+        basis: "When a major incident affects the financial interests of your clients, tell them without undue delay, say what they can do to limit the effects, and do it as soon as you are aware." });
+    }
+    return rows;
+  }
+
   // ---- The report as one standalone HTML file ---------------------------------------------------------------------------
   const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const DISCLAIMER = "This is a decision aid, not a ruling. The questions, limits and deadlines follow Commission Delegated Regulations (EU) 2024/1772 and 2025/301 as the tool's author understands them. That reading may be incomplete, out of date or simply wrong, and your incident may have facts the tool cannot see, so the result is not a 100 % conclusion. Use it to organise your thinking, then check the official texts, your competent authority's instructions and your own compliance or legal advisers before you decide whether, and when, to report.";
   const STATE_WORD = { yes: "Yes", no: "No", unk: "Don't know" };
   const VERDICT_TEXT = {
     major: ["Meets the criteria for a major incident", "Based on your answers this meets the criteria for a major incident: report it to your competent authority within the time limits below."],
-    notmajor: ["Does not meet the criteria for a major incident", "Based on your inputs this does not meet the criteria for a major incident. Check again whenever the facts change."],
+    notmajor: ["Does not meet the criteria for a major incident", "Based on your inputs this does not meet the criteria for a major incident, and only for the facts entered: check again when the duration, the number of clients or the costs change. It is still an incident to record and manage, and a significant cyber threat can be notified to your authority voluntarily."],
     open: ["Cannot rule out a major incident yet", "Treat as possibly major until the open points are answered."],
   };
   // input: the same object classify() takes plus { title, times, clockInput, now }. result = classify(...), cl = clock(...)
@@ -307,6 +336,7 @@
       for (const n of cl.notes) h += "<p class=\"m\">" + esc(n) + "</p>";
       h += "<p class=\"m\">Entity type: " + esc(r.entity.title) + ". Deadlines are local time of the browser that made this report" + (tz ? " (" + esc(tz) + ")" : "") + ".</p>";
     }
+    if (o.parallel && o.parallel.length) h += "<h2>Other duties that may run at the same time</h2><div class=\"card\"><table><tbody>" + o.parallel.map(x => "<tr><td><b>" + esc(x.title) + "</b>" + (x.maybe ? ' <span class="m">(only if it applies)</span>' : "") + '</td><td class="due">' + (x.due != null ? esc(fmtDate(x.due)) : esc(x.dueText || "")) + "</td><td>" + esc(x.basis) + "</td></tr>").join("") + "</tbody></table></div>";
     h += "<h2>Step 1: are critical services affected?</h2><div class=\"card\"><p><b>Outcome: " + esc(r.gate.state === "yes" ? "yes (at least one condition applies)" : r.gate.state === "no" ? "no (none applies)" : "not yet known") + "</b></p>" + items(r.gate.items) + "</div>";
     h += "<h2>Step 2: materiality thresholds</h2><p class=\"m\">The incident is major when critical services are affected and either the malicious-access data-loss threshold (Art. 9(5)(b)) is met or at least " + r.othersNeeded + " of the other thresholds are met. Met so far: " + r.metOthers + " of the other thresholds (up to " + r.possibleOthers + " possible).</p>";
     for (const th of r.thresholds) h += '<div class="card"><h3>' + esc(th.title) + " " + badge(th.state) + '</h3><div class="a">' + esc(th.art) + "</div>" + items(th.items) + "</div>";
@@ -322,10 +352,11 @@
     for (const t of r.thresholds) L.push("- " + t.title + " (" + t.art + "): " + ({ yes: "crossed", no: "below", unk: "not known" })[t.state]);
     if (r.unknown.length) { L.push("Still to find out:"); for (const u of r.unknown) L.push("- " + u.text); }
     if (cl && cl.ok) { L.push("Reporting timetable:"); for (const x of cl.rows) L.push("- " + x.title + ": " + (x.due != null ? fmtDate(x.due) : x.special ? "without undue delay" : (x.dueText || "see basis"))); }
+    if (o.parallel && o.parallel.length) { L.push("Other duties that may run at the same time:"); for (const x of o.parallel) L.push("- " + x.title + ": " + (x.due != null ? fmtDate(x.due) : x.dueText || "see basis") + (x.maybe ? " (only if it applies)" : "")); }
     L.push("", "Decision aid only; it may be incomplete or wrong. Check the official texts and your competent authority before deciding.");
     return L.join("\n");
   }
-  const api = { DISCLAIMER, summaryText, LIMITS, REPORTING, GATE, THRESHOLDS, RECURRING, ENTITIES, num, fmtDate, fmtSpan, parseLocal, toLocalInput, derive, classify, clock, addMonths, nextWorkingNoon, reportHtml, esc, VERDICT_TEXT, STATE_WORD };
+  const api = { parallel, DISCLAIMER, summaryText, LIMITS, REPORTING, GATE, THRESHOLDS, RECURRING, ENTITIES, num, fmtDate, fmtSpan, parseLocal, toLocalInput, derive, classify, clock, addMonths, nextWorkingNoon, reportHtml, esc, VERDICT_TEXT, STATE_WORD };
   if (typeof window !== "undefined") window.DoraClass = api;
   if (typeof module !== "undefined") module.exports = api;
 })();

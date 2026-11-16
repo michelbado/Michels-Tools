@@ -16,25 +16,28 @@ import (
 // The desktop folder: files and folders the person running this installation puts next to the program (default: "desktop") appear on the web desktop.
 //
 //   - A .md or .txt file directly inside it becomes an icon that opens in a reader window (Markdown is shown formatted; the page never runs HTML).
-//   - A folder directly inside it becomes a folder icon, but only when it holds at least one visible file. Opening it lists the files; clicking one
-//     always downloads it (it is never shown in the browser).
-//   - Names starting with "." or "_" are not listed. Files inside a folder can still be downloaded by anyone who knows the exact address.
+//   - A folder directly inside it becomes a folder icon, but only when it holds at least one visible file, directly or in a folder inside it.
+//     Opening it lists its folders and files; folders open in the same window, and clicking a file always downloads it (it is never shown in the browser).
+//   - Names starting with "." or "_" are not listed. Files can still be downloaded by anyone who knows the exact address.
 //
-// Nothing outside the folder can be reached (os.Root refuses ".." and links that lead out), links are never followed, and there is no upload:
-// files are added on the server only. Every download is written to the visit log with the time, the address, the browser and the file.
+// Nothing outside the folder can be reached (os.Root refuses ".." and links that lead out; links are not followed at all), folders are read at most
+// desktopMaxDepth levels deep, and there is no upload: files are added on the server only. Every download is written to the visit log with the time,
+// the address, the browser and the file.
 const (
 	desktopMaxItems       = 300
 	desktopMaxFolderFiles = 1000
 	desktopMaxTextBytes   = 1 << 20
+	desktopMaxDepth       = 8     // folders inside folders: this many levels, counting the folder on the desktop as the first
+	desktopScanBudget     = 20000 // directory entries looked at to decide which folders hold files, per request
 )
 
 type deskItem struct {
-	Kind  string `json:"kind"` // "text" or "folder"
+	Kind  string `json:"kind"` // "text", "folder" or "file"
 	Name  string `json:"name"` // the real name on disk
 	Title string `json:"title"`
 	Ext   string `json:"ext,omitempty"` // "md" or "txt"
 	Size  int64  `json:"size,omitempty"`
-	Count int    `json:"count,omitempty"` // files in a folder
+	Count int    `json:"count,omitempty"` // files directly in a folder
 	Mtime int64  `json:"mtime,omitempty"`
 }
 
@@ -53,6 +56,23 @@ func deskValidName(n string) bool {
 	return true
 }
 
+// deskSegments splits an address inside the desktop folder into names, or says it is not one (empty parts, "..", too deep, bad names).
+func deskSegments(p string, maxSegs int, allowHidden bool) ([]string, bool) {
+	if p == "" || strings.HasPrefix(p, "/") || strings.HasSuffix(p, "/") {
+		return nil, false
+	}
+	segs := strings.Split(p, "/")
+	if len(segs) > maxSegs {
+		return nil, false
+	}
+	for _, s := range segs {
+		if !deskValidName(s) || (!allowHidden && deskHidden(s)) {
+			return nil, false
+		}
+	}
+	return segs, true
+}
+
 func deskTextKind(n string) string {
 	switch strings.ToLower(path.Ext(n)) {
 	case ".md", ".markdown":
@@ -68,6 +88,11 @@ func deskVisible(e fs.DirEntry) bool {
 	return e.Type().IsRegular() && deskValidName(e.Name()) && !deskHidden(e.Name())
 }
 
+// deskVisibleDir: a real folder (not a link) with an ordinary name.
+func deskVisibleDir(e fs.DirEntry) bool {
+	return e.IsDir() && deskValidName(e.Name()) && !deskHidden(e.Name())
+}
+
 type desktopStore struct{ dir string }
 
 // open gives the folder as a root that cannot be left (nil when it is missing).
@@ -77,6 +102,29 @@ func (d *desktopStore) open() *os.Root {
 		return nil
 	}
 	return r
+}
+
+// hasFiles: does this folder hold a visible file, directly or in a folder that does? depth is 1 for a folder on the desktop.
+func deskHasFiles(fsys fs.FS, rel string, depth int, budget *int) bool {
+	if depth > desktopMaxDepth || *budget <= 0 {
+		return false
+	}
+	entries, err := fs.ReadDir(fsys, rel)
+	if err != nil {
+		return false
+	}
+	*budget -= len(entries)
+	for _, e := range entries {
+		if deskVisible(e) {
+			return true
+		}
+	}
+	for _, e := range entries {
+		if deskVisibleDir(e) && deskHasFiles(fsys, rel+"/"+e.Name(), depth+1, budget) {
+			return true
+		}
+	}
+	return false
 }
 
 func deskSort(items []deskItem) {
@@ -96,10 +144,12 @@ func (d *desktopStore) list() []deskItem {
 		return items
 	}
 	defer root.Close()
-	entries, err := fs.ReadDir(root.FS(), ".")
+	fsys := root.FS()
+	entries, err := fs.ReadDir(fsys, ".")
 	if err != nil {
 		return items
 	}
+	budget := desktopScanBudget
 	for _, e := range entries {
 		n := e.Name()
 		if !deskValidName(n) || deskHidden(n) {
@@ -113,8 +163,8 @@ func (d *desktopStore) list() []deskItem {
 			}
 			items = append(items, it)
 		case e.IsDir(): // a link to a folder has Type ModeSymlink, so it is not taken here
-			if files := d.files(root, n); len(files) > 0 {
-				items = append(items, deskItem{Kind: "folder", Name: n, Title: n, Count: len(files)})
+			if deskHasFiles(fsys, n, 1, &budget) {
+				items = append(items, deskItem{Kind: "folder", Name: n, Title: n})
 			}
 		}
 		if len(items) >= desktopMaxItems {
@@ -125,47 +175,70 @@ func (d *desktopStore) list() []deskItem {
 	return items
 }
 
-// files: the visible files of one folder, in name order.
-func (d *desktopStore) files(root *os.Root, folder string) []deskItem {
-	entries, err := fs.ReadDir(root.FS(), folder)
+// contents: the visible folders (that hold files) and files of one folder, each in name order.
+func deskContents(fsys fs.FS, rel string, depth int) (folders, files []deskItem) {
+	entries, err := fs.ReadDir(fsys, rel)
 	if err != nil {
-		return nil
+		return nil, nil
 	}
-	var out []deskItem
+	budget := desktopScanBudget
 	for _, e := range entries {
-		if !deskVisible(e) {
-			continue
-		}
-		it := deskItem{Kind: "file", Name: e.Name(), Title: e.Name()}
-		if info, err := e.Info(); err == nil {
-			it.Size, it.Mtime = info.Size(), info.ModTime().Unix()
-		}
-		out = append(out, it)
-		if len(out) >= desktopMaxFolderFiles {
-			break
+		switch {
+		case deskVisible(e):
+			it := deskItem{Kind: "file", Name: e.Name(), Title: e.Name()}
+			if info, err := e.Info(); err == nil {
+				it.Size, it.Mtime = info.Size(), info.ModTime().Unix()
+			}
+			if len(files) < desktopMaxFolderFiles {
+				files = append(files, it)
+			}
+		case deskVisibleDir(e):
+			if deskHasFiles(fsys, rel+"/"+e.Name(), depth+1, &budget) && len(folders) < desktopMaxFolderFiles {
+				folders = append(folders, deskItem{Kind: "folder", Name: e.Name(), Title: e.Name()})
+			}
 		}
 	}
-	sort.SliceStable(out, func(i, j int) bool { return strings.ToLower(out[i].Name) < strings.ToLower(out[j].Name) })
-	return out
+	byName := func(s []deskItem) {
+		sort.SliceStable(s, func(i, j int) bool { return strings.ToLower(s[i].Name) < strings.ToLower(s[j].Name) })
+	}
+	byName(folders)
+	byName(files)
+	return folders, files
 }
 
-// openFile opens folder/file for download. Links are refused, and the root keeps everything inside the desktop folder.
-func (d *desktopStore) openFile(folder, file string) (*os.File, os.FileInfo, bool) {
-	if !deskValidName(folder) || !deskValidName(file) {
-		return nil, nil, false
+// realPath checks every part of an address inside the desktop folder: each must exist and be a real folder (a link is refused), and the last part is
+// a real folder (wantDir) or a real file.
+func deskRealPath(root *os.Root, segs []string, wantDir bool) bool {
+	for i := range segs {
+		fi, err := root.Lstat(strings.Join(segs[:i+1], "/"))
+		if err != nil || fi.Mode()&fs.ModeSymlink != 0 {
+			return false
+		}
+		last := i == len(segs)-1
+		if !last && !fi.IsDir() {
+			return false
+		}
+		if last && wantDir && !fi.IsDir() {
+			return false
+		}
+		if last && !wantDir && !fi.Mode().IsRegular() {
+			return false
+		}
 	}
+	return true
+}
+
+// openFile opens a file for download. Links are refused, and the root keeps everything inside the desktop folder.
+func (d *desktopStore) openFile(segs []string) (*os.File, os.FileInfo, bool) {
 	root := d.open()
 	if root == nil {
 		return nil, nil, false
 	}
 	defer root.Close()
-	if fi, err := root.Lstat(folder); err != nil || !fi.IsDir() {
+	if !deskRealPath(root, segs, false) {
 		return nil, nil, false
 	}
-	if fi, err := root.Lstat(folder + "/" + file); err != nil || !fi.Mode().IsRegular() {
-		return nil, nil, false
-	}
-	f, err := root.Open(folder + "/" + file)
+	f, err := root.Open(strings.Join(segs, "/"))
 	if err != nil {
 		return nil, nil, false
 	}
@@ -199,9 +272,10 @@ func registerDesktop(mux *http.ServeMux, cfg config) {
 		writeJSON(w, http.StatusOK, map[string]any{"items": d.list()})
 	})
 	mux.HandleFunc("GET /api/desktop/folder", func(w http.ResponseWriter, r *http.Request) {
-		name := r.URL.Query().Get("name")
+		p := r.URL.Query().Get("path")
+		segs, ok := deskSegments(p, desktopMaxDepth, false)
 		root := d.open()
-		if root == nil || !deskValidName(name) || deskHidden(name) {
+		if !ok || root == nil {
 			if root != nil {
 				root.Close()
 			}
@@ -209,16 +283,16 @@ func registerDesktop(mux *http.ServeMux, cfg config) {
 			return
 		}
 		defer root.Close()
-		if fi, err := root.Lstat(name); err != nil || !fi.IsDir() {
+		if !deskRealPath(root, segs, true) {
 			http.NotFound(w, r)
 			return
 		}
-		files := d.files(root, name)
-		if len(files) == 0 {
+		folders, files := deskContents(root.FS(), strings.Join(segs, "/"), len(segs))
+		if len(folders) == 0 && len(files) == 0 {
 			http.NotFound(w, r)
 			return
 		}
-		writeJSON(w, http.StatusOK, map[string]any{"name": name, "files": files})
+		writeJSON(w, http.StatusOK, map[string]any{"path": segs, "folders": folders, "files": files})
 	})
 	mux.HandleFunc("GET /api/desktop/text", func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
@@ -255,16 +329,21 @@ func registerDesktop(mux *http.ServeMux, cfg config) {
 		writeJSON(w, http.StatusOK, map[string]any{"name": name, "kind": kind, "size": len(b), "text": strings.ToValidUTF8(string(b), "�")})
 	})
 	// The download. Always an attachment of an unknown type: the browser saves the file and never shows it, whatever it is.
-	mux.HandleFunc("GET /desktop-files/{folder}/{file}", func(w http.ResponseWriter, r *http.Request) {
-		folder, file := r.PathValue("folder"), r.PathValue("file")
-		f, fi, ok := d.openFile(folder, file)
+	mux.HandleFunc("GET /desktop-files/{path...}", func(w http.ResponseWriter, r *http.Request) {
+		segs, ok := deskSegments(r.PathValue("path"), desktopMaxDepth+1, true)
+		if !ok || len(segs) < 2 { // a file on the desktop itself has no download address: it is shown, not downloaded
+			http.NotFound(w, r)
+			return
+		}
+		f, fi, ok := d.openFile(segs)
 		if !ok {
 			http.NotFound(w, r)
 			return
 		}
 		defer f.Close()
+		file := segs[len(segs)-1]
 		if cfg.Visits != nil && r.Method == http.MethodGet && rangeStartsAtZero(r) {
-			cfg.Visits.recordFile(r, "download", folder+"/"+file)
+			cfg.Visits.recordFile(r, "download", strings.Join(segs, "/"))
 		}
 		h := w.Header()
 		h.Set("Content-Type", "application/octet-stream")

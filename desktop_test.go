@@ -23,6 +23,11 @@ func deskFixture(t *testing.T) string {
 			t.Fatal(err)
 		}
 	}
+	dir := func(p string) {
+		if err := os.MkdirAll(filepath.Join(d, p), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
 	w("Welcome.txt", "Hello\nworld")
 	w("Notes.md", "# Title\n\nSome **bold** text <script>alert(1)</script>")
 	w("readme.pdf", "%PDF-1.4")                  // a file type the desktop does not show
@@ -32,17 +37,24 @@ func deskFixture(t *testing.T) string {
 	w("Downloads/B.html", "<h1>not a page</h1>") // must still be a download, never shown
 	w("Downloads/.hidden.bin", "HIDDENBIN")      // not listed, but downloadable
 	w("Downloads/_x.txt", "UNDERSCORE")          // not listed, but downloadable
-	w("Downloads/sub/deep.txt", "too deep")      // folders inside folders are not listed
 	w("Downloads/Ünï cödé.pdf", "UNICODE")
-	w("Empty/.keep", "x") // only a hidden file: the folder does not appear
-	if err := os.MkdirAll(filepath.Join(d, "Nothing"), 0o755); err != nil {
-		t.Fatal(err)
-	}
+	w("Downloads/sub/deep.txt", "too deep") // a folder inside a folder
+	w("Downloads/sub/deeper/x.bin", "XBIN") // and one more level
+	w("Downloads/.hiddendir/z.txt", "HIDDENDIR")
+	dir("Downloads/emptydir")        // holds nothing: not listed
+	dir("Downloads/onlyempty/inner") // holds only an empty folder: not listed
+	w("Empty/.keep", "x")            // only a hidden file: the folder does not appear
+	dir("Nothing")
+	w("OnlyNested/inner/file.txt", "NESTED")  // no file of its own, but one inside: it appears
+	dir("EmptyTree/a/b")                      // only empty folders: it does not appear
+	w("Depth8/1/2/3/4/5/6/7/f.txt", "DEEP8")  // the file sits in a folder at the eighth level: still fine
+	w("TooDeep/1/2/3/4/5/6/7/8/9/f.txt", "X") // beyond the eighth level: not shown
 	// links are never followed
 	_ = os.Symlink(filepath.Join(d, "Welcome.txt"), filepath.Join(d, "link.txt"))
 	_ = os.Symlink(filepath.Join(d, "Downloads"), filepath.Join(d, "linkdir"))
 	_ = os.Symlink("/etc/passwd", filepath.Join(d, "Downloads", "pw"))
 	_ = os.Symlink(filepath.Join(d, "Welcome.txt"), filepath.Join(d, "Downloads", "inside"))
+	_ = os.Symlink(filepath.Join(d, "Downloads", "sub"), filepath.Join(d, "Downloads", "linkd"))
 	return d
 }
 
@@ -80,13 +92,9 @@ func titles(items []deskItem) string {
 func TestDesktopListRules(t *testing.T) {
 	d := deskFixture(t)
 	got := titles((&desktopStore{dir: d}).list())
-	want := "folder:Downloads,text:Notes,text:Welcome"
+	want := "folder:Depth8,folder:Downloads,folder:OnlyNested,text:Notes,text:Welcome"
 	if got != want {
-		t.Fatalf("list = %s, want %s (folders first; no hidden, empty, pdf or linked items)", got, want)
-	}
-	items := (&desktopStore{dir: d}).list()
-	if items[0].Count != 3 {
-		t.Errorf("Downloads counts %d visible files, want 3 (a.zip, B.html and the unicode one: no hidden files, no folder, no links)", items[0].Count)
+		t.Fatalf("list = %s, want %s (folders first; none that is empty, holds only hidden files or only empty folders, or keeps its files deeper than 8 levels; no hidden, pdf or linked items)", got, want)
 	}
 	if (&desktopStore{dir: filepath.Join(d, "missing")}).list() == nil || len((&desktopStore{dir: filepath.Join(d, "missing")}).list()) != 0 {
 		t.Error("a missing folder must give an empty list, not nil or an error")
@@ -104,16 +112,39 @@ func TestDesktopEndpoints(t *testing.T) {
 	if w.Header().Get("Cache-Control") != "no-store" {
 		t.Error("the list must never be cached")
 	}
-	// the folder window
-	w = deskGet(h, "GET", "/api/desktop/folder?name=Downloads", nil)
-	b := w.Body.String()
-	if w.Code != 200 || !strings.Contains(b, `"a.zip"`) || !strings.Contains(b, `"B.html"`) || strings.Contains(b, "hidden") || strings.Contains(b, "_x.txt") || strings.Contains(b, "deep") || strings.Contains(b, `"pw"`) || strings.Contains(b, `"inside"`) {
-		t.Fatalf("folder: %d %s", w.Code, b)
+	folder := func(p string) (int, string) {
+		w := deskGet(h, "GET", "/api/desktop/folder?path="+p, nil)
+		return w.Code, w.Body.String()
 	}
-	for _, n := range []string{"Empty", "Nothing", "nope", ".git", "_x", "..", "a/b", "linkdir", "Welcome.txt", ""} {
-		if w := deskGet(h, "GET", "/api/desktop/folder?name="+n, nil); w.Code != 404 {
-			t.Errorf("folder %q: %d, want 404", n, w.Code)
+	// a folder window: its folders first, then its files
+	code, b := folder("Downloads")
+	if code != 200 || !strings.Contains(b, `"folders":[{"kind":"folder","name":"sub","title":"sub"}]`) || !strings.Contains(b, `"a.zip"`) || !strings.Contains(b, `"B.html"`) {
+		t.Fatalf("folder: %d %s", code, b)
+	}
+	for _, no := range []string{"hidden", "_x.txt", `"deep.txt"`, `"pw"`, `"inside"`, "emptydir", "onlyempty", "linkd", ".hiddendir"} {
+		if strings.Contains(b, no) {
+			t.Errorf("the listing of Downloads must not contain %q: %s", no, b)
 		}
+	}
+	if code, b = folder("Downloads%2Fsub"); code != 200 || !strings.Contains(b, `"deeper"`) || !strings.Contains(b, `"deep.txt"`) || !strings.Contains(b, `"path":["Downloads","sub"]`) {
+		t.Errorf("a folder inside a folder: %d %s", code, b)
+	}
+	if code, b = folder("Downloads%2Fsub%2Fdeeper"); code != 200 || !strings.Contains(b, `"x.bin"`) || strings.Contains(b, `"folders":[{`) {
+		t.Errorf("the third level: %d %s", code, b)
+	}
+	if code, b = folder("OnlyNested"); code != 200 || !strings.Contains(b, `"inner"`) {
+		t.Errorf("a folder with only a folder inside: %d %s", code, b)
+	}
+	for _, p := range []string{"Empty", "Nothing", "EmptyTree", "nope", ".git", "_x", "..", "a%2Fb%2F..", "Downloads%2F..", "Downloads%2F", "%2FDownloads", "Downloads%2F%2Fsub", "linkdir", "Welcome.txt", "",
+		"Downloads%2Femptydir", "Downloads%2Fonlyempty", "Downloads%2F.hiddendir", "Downloads%2Flinkd", "Downloads%2Fsub%2Fnope", "Downloads%2Fa.zip", "Downloads%5Csub",
+		"Depth8%2F1%2F2%2F3%2F4%2F5%2F6%2F7%2F8", "TooDeep"} {
+		if code, _ := folder(p); code != 404 {
+			t.Errorf("folder path %q: %d, want 404", p, code)
+		}
+	}
+	// the eighth level can be opened, the ninth cannot
+	if code, _ := folder("Depth8%2F1%2F2%2F3%2F4%2F5%2F6%2F7"); code != 200 {
+		t.Errorf("the eighth level: %d, want 200", code)
 	}
 	// the text reader
 	w = deskGet(h, "GET", "/api/desktop/text?name=Notes.md", nil)
@@ -150,6 +181,11 @@ func TestDesktopDownloadsAreAlwaysAttachments(t *testing.T) {
 		"/desktop-files/Downloads/.hidden.bin":                        "HIDDENBIN", // hidden files can be fetched by anyone who knows the address
 		"/desktop-files/Downloads/_x.txt":                             "UNDERSCORE",
 		"/desktop-files/Downloads/%C3%9Cn%C3%AF%20c%C3%B6d%C3%A9.pdf": "UNICODE",
+		"/desktop-files/Downloads/sub/deep.txt":                       "too deep", // in a folder inside a folder
+		"/desktop-files/Downloads/sub/deeper/x.bin":                   "XBIN",
+		"/desktop-files/Downloads/.hiddendir/z.txt":                   "HIDDENDIR", // a hidden folder is not listed, its files can still be fetched
+		"/desktop-files/OnlyNested/inner/file.txt":                    "NESTED",
+		"/desktop-files/Depth8/1/2/3/4/5/6/7/f.txt":                   "DEEP8",
 	} {
 		w := deskGet(h, "GET", path, nil)
 		if w.Code != 200 || w.Body.String() != body {
@@ -167,8 +203,13 @@ func TestDesktopDownloadsAreAlwaysAttachments(t *testing.T) {
 			t.Errorf("%s: no nosniff", path)
 		}
 	}
+	// the file name in the header is the last part only
+	w := deskGet(h, "GET", "/desktop-files/Downloads/sub/deep.txt", nil)
+	if cd := w.Header().Get("Content-Disposition"); !strings.Contains(cd, `filename=deep.txt`) || strings.Contains(cd, "sub") {
+		t.Errorf("Content-Disposition %q should name only deep.txt", cd)
+	}
 	// an unusual name is carried correctly
-	w := deskGet(h, "GET", "/desktop-files/Downloads/%C3%9Cn%C3%AF%20c%C3%B6d%C3%A9.pdf", nil)
+	w = deskGet(h, "GET", "/desktop-files/Downloads/%C3%9Cn%C3%AF%20c%C3%B6d%C3%A9.pdf", nil)
 	if cd := w.Header().Get("Content-Disposition"); !strings.Contains(cd, "filename*=utf-8''") {
 		t.Errorf("unicode file name: %q", cd)
 	}
@@ -183,29 +224,34 @@ func TestDesktopCannotLeaveItsFolder(t *testing.T) {
 	d := deskFixture(t)
 	h := deskHandler(t, d, nil, nil)
 	for _, p := range []string{
-		"/desktop-files/Downloads/pw",                   // a link out of the folder
-		"/desktop-files/Downloads/inside",               // any link: links are never followed
-		"/desktop-files/linkdir/a.zip",                  // a linked folder
-		"/desktop-files/Downloads/..%2fWelcome.txt",     // up one level
-		"/desktop-files/..%2f/Welcome.txt",              //
-		"/desktop-files/%2e%2e/Welcome.txt",             //
-		"/desktop-files/Downloads/%2e%2e",               //
-		"/desktop-files/Downloads/..%5cWelcome.txt",     // a backslash
-		"/desktop-files/Downloads/%00",                  // a zero byte
-		"/desktop-files/Downloads/sub",                  // a folder is not a file
-		"/desktop-files/Downloads/",                     //
-		"/desktop-files/Downloads",                      // no file named
-		"/desktop-files/Welcome.txt",                    // a root file has no download address
-		"/desktop-files/Nothing/x",                      //
-		"/desktop-files/Downloads/nope",                 //
-		"/desktop-files/..%2f..%2f..%2f..%2fetc/passwd", //
+		"/desktop-files/Downloads/pw",                        // a link out of the folder
+		"/desktop-files/Downloads/inside",                    // any link: links are never followed
+		"/desktop-files/linkdir/a.zip",                       // a linked folder
+		"/desktop-files/Downloads/linkd/deep.txt",            // a link in the middle of the address
+		"/desktop-files/Downloads/..%2fWelcome.txt",          // up one level
+		"/desktop-files/Downloads/sub/..%2f..%2fWelcome.txt", //
+		"/desktop-files/Downloads/sub/%2e%2e/%2e%2e/Welcome.txt",
+		"/desktop-files/..%2f/Welcome.txt",
+		"/desktop-files/%2e%2e/Welcome.txt",
+		"/desktop-files/Downloads/%2e%2e",
+		"/desktop-files/Downloads/..%5cWelcome.txt",      // a backslash
+		"/desktop-files/Downloads/%00",                   // a zero byte
+		"/desktop-files/Downloads/sub",                   // a folder is not a file
+		"/desktop-files/Downloads/",                      //
+		"/desktop-files/Downloads",                       // no file named
+		"/desktop-files/Welcome.txt",                     // a file on the desktop has no download address
+		"/desktop-files/Nothing/x",                       //
+		"/desktop-files/Downloads/nope",                  //
+		"/desktop-files/Downloads//a.zip",                // an empty part
+		"/desktop-files/TooDeep/1/2/3/4/5/6/7/8/9/f.txt", // more than 8 folders deep
+		"/desktop-files/..%2f..%2f..%2f..%2fetc/passwd",
 		"/desktop-files/Downloads/%2e%2e%2f%2e%2e%2fetc%2fpasswd",
 	} {
 		w := deskGet(h, "GET", p, nil)
 		if w.Code == 200 {
 			t.Errorf("%s: answered 200 with %q", p, w.Body.String())
 		}
-		if strings.Contains(w.Body.String(), "root:") || strings.Contains(w.Body.String(), "hello") {
+		if strings.Contains(w.Body.String(), "root:") || strings.Contains(w.Body.String(), "Hello") {
 			t.Errorf("%s: leaked %q", p, w.Body.String())
 		}
 	}
@@ -218,7 +264,7 @@ func TestDesktopOffMeansNotFound(t *testing.T) {
 		t.Fatal(err)
 	}
 	for name, h := range map[string]http.Handler{"switched off": deskHandler(t, d, off, nil), "no folder given": deskHandler(t, "", nil, nil)} {
-		for _, p := range []string{"/api/desktop", "/api/desktop/folder?name=Downloads", "/api/desktop/text?name=Notes.md", "/desktop-files/Downloads/a.zip"} {
+		for _, p := range []string{"/api/desktop", "/api/desktop/folder?path=Downloads", "/api/desktop/text?name=Notes.md", "/desktop-files/Downloads/a.zip"} {
 			if w := deskGet(h, "GET", p, nil); w.Code != 404 {
 				t.Errorf("%s: %s answered %d, want 404", name, p, w.Code)
 			}
@@ -239,12 +285,27 @@ func TestDesktopListIsCapped(t *testing.T) {
 	}
 }
 
+// a huge tree of folders must not make a request slow: the scan stops at its budget and the answer is still produced
+func TestDesktopScanIsBounded(t *testing.T) {
+	d := t.TempDir()
+	for i := 0; i < 60; i++ {
+		for j := 0; j < 60; j++ {
+			os.MkdirAll(filepath.Join(d, fmt.Sprintf("F%02d", i), fmt.Sprintf("G%02d", j), "H"), 0o755)
+		}
+	}
+	items := (&desktopStore{dir: d}).list() // 60 x 60 empty folders: nothing holds a file, so nothing is listed, and it must return
+	if len(items) != 0 {
+		t.Errorf("%d items listed from a tree with no files", len(items))
+	}
+}
+
 func TestDesktopDownloadsAreLogged(t *testing.T) {
 	d := deskFixture(t)
 	l, dir := newTestLogger(t, "")
 	h := deskHandler(t, d, nil, l)
 	deskGet(h, "GET", "/desktop-files/Downloads/a.zip", nil)                                    // counted
 	deskGet(h, "GET", "/desktop-files/Downloads/.hidden.bin", nil)                              // counted
+	deskGet(h, "GET", "/desktop-files/Downloads/sub/deep.txt", nil)                             // counted, with its whole path
 	deskGet(h, "HEAD", "/desktop-files/Downloads/a.zip", nil)                                   // not a download
 	deskGet(h, "GET", "/desktop-files/Downloads/a.zip", map[string]string{"Range": "bytes=3-"}) // a resume: not counted again
 	deskGet(h, "GET", "/desktop-files/Downloads/nope", nil)                                     // missing: nothing was downloaded
@@ -252,10 +313,10 @@ func TestDesktopDownloadsAreLogged(t *testing.T) {
 	deskGet(h, "GET", "/api/desktop", nil)                                                      // looking is not downloading
 	l.Close()
 	raw, entries := readAll(t, dir)
-	if len(entries) != 2 {
-		t.Fatalf("want 2 download entries, got %d:\n%s", len(entries), raw)
+	if len(entries) != 3 {
+		t.Fatalf("want 3 download entries, got %d:\n%s", len(entries), raw)
 	}
-	for i, f := range []string{"Downloads/a.zip", "Downloads/.hidden.bin"} {
+	for i, f := range []string{"Downloads/a.zip", "Downloads/.hidden.bin", "Downloads/sub/deep.txt"} {
 		e := entries[i]
 		if e.Event != "download" || e.File != f || e.IP != "192.0.2.9" || e.Agent != "DeskTest/1.0" || e.Time == "" {
 			t.Errorf("entry %d = %+v", i, e)

@@ -12,7 +12,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "73"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "75"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -380,7 +380,7 @@
 
     const root = el("section", "window", { "aria-labelledby": `wt-${app.id}` });
     const bar = el("header", "titlebar");
-    const icon = el("img", "wicon", { src: app.icon, alt: "" });
+    const icon = el("img", "wicon", { src: app.winIcon || app.icon, alt: "" }); // a desktop item may show another picture on its window
     const title = el("h1", "wtitle", { id: `wt-${app.id}` });
     title.textContent = app.title;
     const caps = el("div", "caps");
@@ -402,7 +402,7 @@
 
     // taskbar button
     const btn = el("button", "task", { type: "button", title: app.title });
-    const bi = el("img", "", { src: app.icon, alt: "" });
+    const bi = el("img", "", { src: app.winIcon || app.icon, alt: "" });
     const bt = el("span");
     bt.textContent = app.title;
     btn.append(bi, bt);
