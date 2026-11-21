@@ -12,6 +12,30 @@ network tools (IP aggregation, subnet maths, IPv6, MAC lookup and more), PDF too
 troubleshooting tools, image tools (photo privacy and EXIF, blur, resize, compress, watermark, favicons), everyday engineering tools (URL, JWT, cron, chmod, colours and more) and quick reference cards. Almost everything runs **inside the visitor's browser**: PDFs and pasted text never leave it. All icons and
 artwork are original; nothing is taken from Microsoft. Not affiliated with or endorsed by Microsoft.
 
+## Screenshots
+
+The desktop, with all ten folders:
+
+![The Michel's Tools desktop with ten folders: Network Tools, PDF Tools, Troubleshooting, Certificates, Engineering Tools, Command Builders, Image Tools, Regulations, Reference and Games](docs/screenshots/desktop.png)
+
+**DORA Incident Classification** (Regulations): answer what you know, see how many thresholds are crossed, then get the verdict, the reasons and the reporting deadlines.
+
+![DORA Incident Classification, step 2: the six materiality thresholds with the figures worked out as you type](docs/screenshots/dora-thresholds.png)
+
+![DORA Incident Classification, step 3: the result "Meets the criteria for a major incident" with the reasons and the facts set against the limits](docs/screenshots/dora-decision.png)
+
+Tool folders open as windows:
+
+![The Troubleshooting folder with eight tools](docs/screenshots/troubleshooting.png)
+
+![The Image Tools folder with eight tools](docs/screenshots/imagetools.png)
+
+And there are games, all drawn in the browser with no downloads:
+
+![Pool against the computer](docs/screenshots/pool.png)
+
+![Road Racer, an arcade driving game against the clock](docs/screenshots/racer.png)
+
 ## Quick start
 
 Needs Go 1.24 or newer.
