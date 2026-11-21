@@ -25,7 +25,7 @@
       const lines = ["Email Header Analyser (Michel's Tools)", r.summary, ""];
       for (const n of r.notes) lines.push("* " + n.text);
       if (r.hops.length) {
-        const rows = r.hops.map(h => [String(h.n), (h.fromHost || "(internal step)") + (h.ips.length ? " [" + h.ips.join(", ") + "]" : ""), h.byHost, h.with || "", MH.fmt(h.when), h.delay == null ? "" : (h.delay < 0 ? "-" : "+") + MH.dur(h.delay)]);
+        const rows = r.hops.map(h => [String(h.n), (h.fromHost || "(internal step)") + (h.ips.length ? " [" + h.ips.join(", ") + "]" : ""), h.byHost, (h.with || "") + (h.tls ? " (" + [h.tls.version, h.tls.cipher].filter(Boolean).join(", ") + ")" : ""), MH.fmt(h.when), h.delay == null ? "" : (h.delay < 0 ? "-" : "+") + MH.dur(h.delay)]);
         out.append(box("Route (oldest hop first)", table(["#", "From", "By", "With", "Time", "Wait"], rows)));
         lines.push("", "Route"); for (const x of rows) lines.push("  " + x.join(" | "));
       }
@@ -39,7 +39,7 @@
         out.append(box("DKIM signatures on the message", table(["Domain", "Selector", "Algorithm"], rows)));
       }
       const sec = [{ title: "Headline headers", rows: r.keyRows }];
-      if (r.spam.length) sec.push({ title: "Spam filter marks", rows: r.spam });
+      if (r.spam.length) sec.push({ title: "Spam filter and Microsoft 365 marks", rows: r.spam });
       const holder = document.createElement("div"); TK.render(holder, sec, { copy: false }); out.append(holder);
       for (const s of sec) { lines.push("", s.title); for (const [k, v] of s.rows) lines.push("  " + k + ": " + v); }
       text = lines.join("\n");
