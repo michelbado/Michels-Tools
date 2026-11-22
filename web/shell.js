@@ -12,7 +12,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "76"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "84"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [
@@ -31,6 +31,7 @@
     { id: "opensslhelp", title: "OpenSSL Command Helper", base: "apps/opensslhelp/", folder: "certs", deps: ["lib/tk.js", "lib/sslcmds.js"], size: { w: 980, h: 720 } },
     { id: "sshkey", title: "SSH Key Inspector", base: "apps/sshkey/", folder: "certs", deps: ["lib/tk.js", "lib/softcrypto.js", "lib/hashcalc.js", "lib/sshkey.js"], size: { w: 980, h: 780 } },
     { id: "doraincident", title: "DORA Incident Classification", base: "apps/doraincident/", folder: "regs", deps: ["lib/tk.js", "lib/doraclass.js"], size: { w: 1040, h: 840 } },
+    { id: "aiassess", title: "AI Use Case Intake & Assessment", base: "apps/aiassess/", folder: "regs", deps: ["lib/tk.js", "lib/aiassess.js"], size: { w: 1040, h: 840 } },
     { id: "mailhdr", title: "Email Header Analyser", base: "apps/mailhdr/", folder: "network", deps: ["lib/tk.js", "lib/mailhdr.js"], size: { w: 1000, h: 760 } },
     { id: "mailauth", title: "SPF, DKIM & DMARC Reader", base: "apps/mailauth/", folder: "network", deps: ["lib/tk.js", "lib/mailauth.js"], size: { w: 1000, h: 760 } },
     { id: "mtucalc", title: "MTU & MSS Calculator", base: "apps/mtucalc/", folder: "network", deps: ["lib/tk.js", "lib/mtucalc.js"], size: { w: 960, h: 760 } },
@@ -119,7 +120,7 @@
     { id: "engineering", title: "Engineering Tools", size: { w: 640, h: 440 } },
     { id: "builders", title: "Command Builders", size: { w: 640, h: 440 } },
     { id: "images", title: "Image Tools", size: { w: 640, h: 440 } },
-    { id: "regs", title: "Regulations", size: { w: 640, h: 440 } },
+    { id: "regs", title: "Compliance", size: { w: 640, h: 440 } },
     { id: "reference", title: "Reference", size: { w: 640, h: 440 } },
     { id: "games", title: "Games", size: { w: 640, h: 440 } },
   ];

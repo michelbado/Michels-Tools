@@ -120,8 +120,10 @@ kidmix = true         # Colour Mixing (drop two paints in a bowl and see what th
 kidodd = true         # Odd One Out (tap the picture that does not belong; ages 4 to 7)
 kidmaze = true        # Maze Walk (drag a little robot through a maze to the star; the maze grows; ages 5 and up)
 
-# ---- Regulations ----
+# ---- Compliance ----
 doraincident = true    # DORA Incident Classification (is it a major ICT-related incident, and when are the initial, intermediate and final reports due; report as an HTML file)
+
+aiassess = true        # AI Use Case Intake & Assessment (describe an AI use case; which rules apply, the EU AI Act class, what is missing and what to do; report as an HTML file, answers as a file; nothing is sent anywhere)
 
 # ---- Command Builders (they build text such as command lines; nothing is run, and nothing is sent anywhere) ----
 tcpdump = true         # tcpdump & Wireshark Filters (build a capture filter from choices, read one in plain words, Wireshark equivalent, command lines, recipes)

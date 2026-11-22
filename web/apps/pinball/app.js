@@ -23,6 +23,11 @@
   seg(428, 215, 428, 800); seg(428, 640, 322, 702);                    // lane divider and right guide
   seg(428, 772, 460, 772, { e: 0.05, plunger: true });                 // the ball rests here before launch
   for (const x of [142, 197, 252, 307]) seg(x, 98, x, 132, { r: 3, post: true });   // posts between the top lanes
+  // One-way gate across the top of the launch lane: a ball shot up the lane lifts it and goes through; a ball that falls back onto it from the table
+  // slides off to the left, so it can no longer drop back into the lane and return to the plunger.
+  const GATE = { x1: 428, y1: 212, x2: 458, y2: 190 };
+  GATE.dx = GATE.x2 - GATE.x1; GATE.dy = GATE.y2 - GATE.y1; GATE.len2 = GATE.dx * GATE.dx + GATE.dy * GATE.dy; GATE.len = Math.sqrt(GATE.len2);
+  GATE.nx = GATE.dy / GATE.len; GATE.ny = -GATE.dx / GATE.len;      // the normal points up and to the left, towards the table
   const slings = [
     { pts: [[78, 505], [78, 600], [126, 632]], t: 0 },
     { pts: [[370, 505], [370, 600], [322, 632]], t: 0 },
@@ -52,7 +57,7 @@
     ];
     const ball = { x: 444, y: 761, vx: 0, vy: 0, held: 0, live: false, trail: [] };
     let state = "ready", score = 0, balls = 3, mult = 1, power = 0, charging = false, saveT = 0, saveUsed = false, holeCool = 0, stillT = 0, heat = 0;
-    let lanes = [false, false, false], targets = new Array(8).fill(false), msg = "", msgT = 0, lampT = 0, holeT = 0;
+    let lanes = [false, false, false], targets = new Array(8).fill(false), msg = "", msgT = 0, lampT = 0, holeT = 0, gateOpen = 0;
     const ptr = new Map();
 
     const say = (t, secs) => { msg = t; msgT = secs || 2; };
@@ -139,6 +144,16 @@
         else if (vn < -260 && !s.plunger) g.sfx.noise(0.03, { freq: 500, vol: Math.min(0.2, -vn / 6000) });
       }
     }
+    function hitGate() {
+      const rx = ball.x - GATE.x1, ry = ball.y - GATE.y1, t = (rx * GATE.dx + ry * GATE.dy) / GATE.len2;
+      if (t < 0 || t > 1) return;
+      const side = rx * GATE.nx + ry * GATE.ny, vn = ball.vx * GATE.nx + ball.vy * GATE.ny;
+      if (side < R && side > -R && vn > 120) gateOpen = 1;                 // the ball is going up through it
+      if (side > 0 && side < R && vn < 0) {                                // coming down onto it from the table side: the gate is shut
+        ball.x += GATE.nx * (R - side); ball.y += GATE.ny * (R - side);
+        ball.vx -= 1.3 * vn * GATE.nx; ball.vy -= 1.3 * vn * GATE.ny;
+      }
+    }
     function hitTarget(i) {
       add(250);
       if (!targets[i]) {
@@ -199,6 +214,7 @@
       ball.vy += GRAV * h;
       ball.x += ball.vx * h; ball.y += ball.vy * h;
       for (let i = 0; i < segs.length; i++) hitSeg(segs[i]);
+      hitGate();
       for (let i = 0; i < circles.length; i++) hitCircle(circles[i]);
       hitFlipper(flips[0]); hitFlipper(flips[1]);
       const v2 = ball.vx * ball.vx + ball.vy * ball.vy;
@@ -223,7 +239,7 @@
     function update(dt) {
       for (const b of bumpers) b.t = Math.max(0, b.t - dt);
       for (const s of slings) s.t = Math.max(0, s.t - dt);
-      msgT = Math.max(0, msgT - dt); lampT = Math.max(0, lampT - dt); holeT = Math.max(0, holeT - dt);
+      msgT = Math.max(0, msgT - dt); lampT = Math.max(0, lampT - dt); holeT = Math.max(0, holeT - dt); gateOpen = Math.max(0, gateOpen - dt * 3);
       syncInputs();
       if (state !== "play") { const n = Math.ceil(dt * 240), h = dt / n; for (let i = 0; i < n; i++) for (const f of flips) { const tgt = f.on ? f.act : f.rest, dir = Math.sign(tgt - f.a); if (dir) { f.a += dir * FLIP_UP * h; if ((tgt - f.a) * dir < 0) f.a = tgt; } } return; }
       saveT = Math.max(0, saveT - dt); holeCool = Math.max(0, holeCool - dt); heat = Math.max(0, heat - 0.8 * dt);
@@ -322,6 +338,15 @@
       }
       // ball-save lamp between the flippers
       GK.text(ctx, "BALL SAVE", MID, 778, 11, saveT > 0 && (saveT > 2 || Math.floor(saveT * 6) % 2) ? "#6CFF8A" : "#2A3A5A", "center");
+      // the one-way gate at the top of the launch lane; it lifts when the ball shoots past
+      {
+        const hx = GATE.x2, hy = GATE.y2, th = 0.6 * Math.min(1, gateOpen), c = Math.cos(th), sn = Math.sin(th), vx = GATE.x1 - hx, vy = GATE.y1 - hy;
+        const ex = hx + vx * c - vy * sn, ey = hy + vx * sn + vy * c;
+        ctx.save(); ctx.lineCap = "round";
+        ctx.strokeStyle = "#0A0C2A"; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(ex, ey); ctx.stroke();
+        ctx.strokeStyle = "#F2C94C"; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.lineTo(ex, ey); ctx.stroke();
+        ctx.fillStyle = "#C8D3F2"; ctx.beginPath(); ctx.arc(hx, hy, 3.5, 0, 6.283); ctx.fill(); ctx.restore();
+      }
       // plunger
       const py = 774 + power * 18;
       ctx.fillStyle = "#8A93B8"; ctx.fillRect(441, py + 6, 6, 40);

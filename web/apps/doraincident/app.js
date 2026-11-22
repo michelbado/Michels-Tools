@@ -152,7 +152,6 @@
     function showVerdict(r) {
       const vt = D.VERDICT_TEXT[r.code], mark = r.code === "major" ? "!" : r.code === "notmajor" ? "–" : "?", title = vt[0] + (r.viaRecurring ? " (recurring incidents)" : "");
       $("verdict").className = "dora-verdict " + r.code; $("vicon").textContent = mark; $("vtitle").textContent = title;
-      $("strip").className = "dora-strip " + r.code; $("sdot").textContent = mark; $("stext").textContent = title + "  ·  " + r.metOthers + " of 6 thresholds crossed";
       $("vcaution").textContent = vt[1];
       $("markclass").hidden = !(r.code === "major" && !$("classified").value);
       const g = { yes: "yes", no: "no", unk: "not known yet" };

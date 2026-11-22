@@ -96,6 +96,7 @@
     iproute: "iproute2 ip command address route vlan bridge gre vxlan tunnel policy routing rule table neighbour arp mtu linux network builder",
     nftables: "nftables nft firewall iptables ruleset nat masquerade port forward dnat rate limit linux server router",
     doraincident: "dora digital operational resilience act major incident ict-related classification materiality thresholds critical services reporting clock initial notification intermediate final report 4 hours 72 hours deadline regulation compliance 2024/1772 2025/301 rts eu financial entity breach",
+    aiassess: "ai use case intake assessment eu ai act risk class prohibited high-risk annex iii deployer provider gdpr dpia dora nis2 iso 42001 42005 impact assessment governance artificial intelligence llm chatgpt copilot model vendor questionnaire register",
     systemdunit: "systemd service timer unit cron onboot oncalendar schedule daemon restart hardening systemctl journalctl job",
   };
   const STOP = new Set(["and", "the", "a", "an", "of", "to", "for", "in", "on", "my", "with", "or", "how", "what", "is", "do", "i", "can", "are", "me", "find", "make"]);

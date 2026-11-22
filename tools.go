@@ -33,7 +33,7 @@ var toolFolders = map[string][]string{
 	"builders":    {"tcpdump", "nmap", "sshtunnel", "curlconv", "iproute", "nftables", "systemdunit"},
 	"engineering": {"urlparse", "jwtdecode", "basicauth", "xmljson", "crontab", "chmodcalc", "colorconv", "jsonfmt", "textdiff", "encodetool", "hashcalc", "timeconv", "passgen", "regextest", "qrcode"},
 	"images":      {"imgexif", "imgresize", "imgblur", "imgconvert", "imgwatermark", "imgbatch", "imgfavicon", "imgannotate"},
-	"regs":        {"doraincident"},
+	"regs":        {"doraincident", "aiassess"},
 	"reference":   {"portref", "dscp", "httpstatus", "dnstypes", "icmptypes", "tcpref", "ipsecref"},
 	"games":       {"blocks", "mines", "pinball", "racer", "pool", "birdhunt", "stunt", "gemmaze", "kidshapes", "kidcount", "kidmemory", "kidrobot", "kidmix", "kidodd", "kidmaze"},
 }

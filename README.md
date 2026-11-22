@@ -16,9 +16,9 @@ artwork are original; nothing is taken from Microsoft. Not affiliated with or en
 
 The desktop, with all ten folders:
 
-![The Michel's Tools desktop with ten folders: Network Tools, PDF Tools, Troubleshooting, Certificates, Engineering Tools, Command Builders, Image Tools, Regulations, Reference and Games](docs/screenshots/desktop.png)
+![The Michel's Tools desktop with ten folders: Network Tools, PDF Tools, Troubleshooting, Certificates, Engineering Tools, Command Builders, Image Tools, Compliance, Reference and Games](docs/screenshots/desktop.png)
 
-**DORA Incident Classification** (Regulations): answer what you know, see how many thresholds are crossed, then get the verdict, the reasons and the reporting deadlines.
+**DORA Incident Classification** (Compliance): answer what you know, see how many thresholds are crossed, then get the verdict, the reasons and the reporting deadlines.
 
 ![DORA Incident Classification, step 2: the six materiality thresholds with the figures worked out as you type](docs/screenshots/dora-thresholds.png)
 
