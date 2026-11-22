@@ -56,13 +56,13 @@
 .aia .aia-seg input[value="unk"]:checked + label { background: #6B7690; }
 .aia .aia-seg input:focus-visible + label { outline: 2px solid #0055E5; outline-offset: -3px; }
 
-.aia .aia-verdict { display: flex; gap: 16px; align-items: center; border: 1px solid; border-radius: 14px; padding: 16px 20px; margin-bottom: 12px; }
-.aia .aia-verdict.warn { background: #FFF6DC; border-color: #8A6D00; color: #4A3A00; }
-.aia .aia-verdict.bad { background: #FFF1EC; border-color: #C23A14; color: #6B1A05; }
-.aia .aia-verdict.good { background: #EEF8EA; border-color: #3F7A2E; color: #1F4A12; }
-.aia .aia-vicon { flex: 0 0 auto; width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 30px; font-weight: 700; color: #fff; background: #8A6D00; }
+.aia .aia-verdict { display: flex; gap: 18px; align-items: center; border: 1px solid; border-radius: 14px; padding: 18px 22px; margin: 16px 0 14px; box-shadow: 0 2px 10px rgba(11, 47, 138, .10); }
+.aia .aia-verdict.warn { background: linear-gradient(135deg, #FFF3CC, #FFFBEC 70%); border-color: #C9A227; color: #4A3A00; }
+.aia .aia-verdict.bad { background: linear-gradient(135deg, #FFE6DC, #FFF6F2 70%); border-color: #D9694A; color: #6B1A05; }
+.aia .aia-verdict.good { background: linear-gradient(135deg, #E1F3DA, #F4FBF1 70%); border-color: #6FA85A; color: #1F4A12; }
+.aia .aia-vicon { flex: 0 0 auto; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; font-size: 30px; font-weight: 700; color: #fff; background: #8A6D00; box-shadow: 0 0 0 5px rgba(255, 255, 255, .7); }
 .aia .bad .aia-vicon { background: #C23A14; } .aia .good .aia-vicon { background: #3F7A2E; }
-.aia .aia-vkicker { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.aia .aia-vkicker { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; opacity: .7; margin-bottom: 2px; }
 .aia .aia-vtitle { font-size: 22px; font-weight: 700; line-height: 1.2; }
 .aia .aia-vtext { margin: 6px 0 0; line-height: 1.45; }
 .aia .aia-tbl { width: 100%; border-collapse: collapse; }

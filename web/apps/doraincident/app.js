@@ -144,11 +144,6 @@
     function showGate(result) {
       $("hint1").textContent = result.gate.state === "no" ? "None applies, so on your facts it is not a major incident." : result.gate.state === "yes" ? "Critical services are affected: continue with the thresholds." : "";
     }
-    function showTally(r) {
-      const t = $("tally"), g = { yes: "yes", no: "no", unk: "not known yet" };
-      t.textContent = r.metOthers + " of 6 thresholds crossed (two are needed)  ·  malicious access with data loss: " + g[r.strongState] + (r.gate.state === "no" ? "  ·  critical services: no" : "");
-      t.className = "dora-tally " + (r.code === "major" ? "major" : r.code === "notmajor" ? "notmajor" : "open");
-    }
     function showVerdict(r) {
       const vt = D.VERDICT_TEXT[r.code], mark = r.code === "major" ? "!" : r.code === "notmajor" ? "–" : "?", title = vt[0] + (r.viaRecurring ? " (recurring incidents)" : "");
       $("verdict").className = "dora-verdict " + r.code; $("vicon").textContent = mark; $("vtitle").textContent = title;
@@ -224,16 +219,31 @@
     }
 
     let last = null;
+    // a "none of this" box cannot stand next to figures that cross a limit of the same card: it is cleared and switched off until they no longer do
+    function syncNone(result) {
+      const items = {}; for (const t of result.thresholds) for (const i of t.items) items[i.id] = i;
+      let changed = false;
+      for (const c of CARDS) {
+        const box = ui.none[c.key]; if (!box) continue;
+        const ids = (c.limits || []).concat(c.more ? c.more.limits : []);
+        const crossed = ids.some(id => items[id] && items[id].state === "yes");
+        if (crossed && box.checked) { box.checked = false; changed = true; }
+        box.disabled = crossed;
+        const sp = box.nextSibling; if (sp) { if (!sp.dataset.t) sp.dataset.t = sp.textContent; sp.textContent = crossed ? sp.dataset.t + " (not available: your figures cross a limit above)" : sp.dataset.t; }
+      }
+      return changed;
+    }
     function update() {
-      const times = readTimes(), nums = readNums(), answers = readAnswers(), entity = $("entity").value || "ext", now = Date.now();
-      const result = D.classify({ answers, nums, times, entity, now });
+      const times = readTimes(), nums = readNums(), entity = $("entity").value || "ext", now = Date.now();
+      let answers = readAnswers(), result = D.classify({ answers, nums, times, entity, now });
+      if (syncNone(result)) { answers = readAnswers(); result = D.classify({ answers, nums, times, entity, now }); }
       const cl = D.clock({ detected: times.detected, started: times.started, classified: times.classified, initialSent: times.initialSent, interimSent: times.interimSent, resolved: times.resolved, now, entity, holidays });
       const par = D.parallel({ aware: cl.ok ? cl.aware : (times.detected != null ? times.detected : times.started), now, personal: triVal("pd"), major: result.code });
       const skip2 = result.gate.state === "no";
       $("tab2").disabled = skip2; $("tab2").title = skip2 ? "Not needed: no critical service is affected" : "";
       root.querySelector('#doraincident-p1 [data-go="2"]').textContent = skip2 ? "Next: decision" : "Next: thresholds";
       showPar(par);
-      showLimits(result); showCards(result); showGate(result); showTally(result); showVerdict(result); showFlip(result); showLimitTable(result); showClock(cl, result);
+      showLimits(result); showCards(result); showGate(result); showVerdict(result); showFlip(result); showLimitTable(result); showClock(cl, result);
       last = { result, cl, times, now, par };
       return last;
     }

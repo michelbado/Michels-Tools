@@ -12,7 +12,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "84"; // bump with the cache-busting ?v= in index.html
+  const VERSION = "86"; // bump with the cache-busting ?v= in index.html
   // size: optional default window size { w, h }; omitted = as large as the desktop allows
   // deps: optional shared scripts (under web/lib/) loaded before the app's own script
   const APPS = [

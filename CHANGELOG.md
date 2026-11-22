@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.10
+
+- **DORA Incident Classification:** the "thresholds crossed" line is gone from the Thresholds step (the Decision step shows it). A "none of this" box can no longer stay ticked next to figures that cross a limit on the same card: it is cleared and switched off until they no longer do.
+- **Result view** (DORA Incident Classification and AI Use Case Intake & Assessment): the result card has room above it and a clearer look.
+
 ## 1.0.9
 
 - **Pinball: a one-way gate at the top of the launch lane.** The ball shoots up the lane, lifts the gate and goes through; after that the gate stays shut, so a ball that comes back across the top of the table can no longer drop into the lane and return to the plunger.
