@@ -20,9 +20,9 @@ The desktop, with all ten folders:
 
 **DORA Incident Classification** (Compliance): answer what you know, see how many thresholds are crossed, then get the verdict, the reasons and the reporting deadlines.
 
-![DORA Incident Classification, step 2: the six materiality thresholds with the figures worked out as you type](docs/screenshots/dora-thresholds.png)
+![DORA Incident Classification, step 2: the six materiality thresholds with the figures worked out as you type](docs/screenshots/dora-incident-thresholds.png)
 
-![DORA Incident Classification, step 3: the result "Meets the criteria for a major incident" with the reasons and the facts set against the limits](docs/screenshots/dora-decision.png)
+![DORA Incident Classification, step 3: the result "Meets the criteria for a major incident" with the reasons and the facts set against the limits](docs/screenshots/dora-incident-decision.png)
 
 Tool folders open as windows:
 
