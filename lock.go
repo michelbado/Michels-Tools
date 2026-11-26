@@ -107,12 +107,16 @@ func lockGuard(t *toolSet, next http.Handler) http.Handler {
 		return next
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if id := lockedToolFor(r.URL.Path); id != "" && t.appLocked(id) && !t.unlocked(r) {
-			w.Header().Set("Content-Type", "application/json")
-			w.Header().Set("Cache-Control", "no-store")
-			w.WriteHeader(http.StatusUnauthorized)
-			io.WriteString(w, `{"locked":true}`)
-			return
+		if id := lockedToolFor(r.URL.Path); id != "" && t.appLocked(id) {
+			w.Header().Add("Vary", "Cookie") // the answer depends on the cookie: a shared cache (a CDN) must not hand it to a visitor without one
+			if !t.unlocked(r) {
+				w.Header().Set("Content-Type", "application/json")
+				w.Header().Set("Cache-Control", "no-store")
+				w.WriteHeader(http.StatusUnauthorized)
+				io.WriteString(w, `{"locked":true}`)
+				return
+			}
+			w.Header().Set("Cache-Control", "private, no-cache") // for the visitor's own browser only, and always re-checked
 		}
 		next.ServeHTTP(w, r)
 	})

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"embed"
-	"encoding/json"
 	"errors"
 	"flag"
 	"io"
@@ -165,14 +164,11 @@ func newHandler(cfg config) (http.Handler, error) {
 			http.Error(w, "Could not read input.", http.StatusBadRequest)
 			return
 		}
-		v4, v6 := c.Result()
+		c.Merge()
 		_ = rc.SetWriteDeadline(time.Now().Add(2 * time.Minute))
 		w.Header().Set("Content-Type", "application/json")
 		w.Header().Set("Cache-Control", "no-store")
-		json.NewEncoder(w).Encode(response{
-			Found4: c.Found4, Found6: c.Found6, Invalid: c.Invalid,
-			InvalidSamples: c.InvalidSamples, Bytes: c.Bytes, V4: v4, V6: v6,
-		})
+		_ = c.WriteJSON(w) // written as it is produced: a big answer is never held in memory
 	})
 	var h http.Handler = lockGuard(tools, mux)
 	if cfg.Visits != nil {

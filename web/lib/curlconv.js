@@ -138,10 +138,14 @@
   }
 
   // ---- writing code ----
-  const js = s => JSON.stringify(String(s));
+  // JSON.stringify leaves U+2028 / U+2029 as they are; they end a line in JavaScript source, so they are written out
+  const js = s => JSON.stringify(String(s)).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
+  // text put into a one-line comment: a line break (or any control character) would end the comment and start code of the reader's file
+  const cm = s => String(s).replace(/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/g, " ");
   const py = s => { const t = String(s); return "'" + t.replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t") + "'"; };
   const goS = s => JSON.stringify(String(s)).replace(/\u2028/g, "\\u2028").replace(/\u2029/g, "\\u2029");
-  const ps = s => "'" + String(s).replace(/'/g, "''") + "'";
+  // PowerShell reads the curly single quotes (U+2018 to U+201B) as quotes too: each one is doubled like the plain one
+  const ps = s => "'" + String(s).replace(/['\u2018-\u201B]/g, m => m + m) + "'";
   const hdrNoAuto = r => r.headers;
 
   function toFetch(r) {
@@ -155,7 +159,7 @@
     if (r.timeout) o.push("  signal: AbortSignal.timeout(" + Math.round(r.timeout * 1000) + "),");
     const lines = L.length ? L.join("\n") + "\n\n" : "";
     const head = "const response = await fetch(" + js(r.url) + (o.length ? ", {\n" + o.join("\n") + "\n}" : "") + ");\n";
-    return lines + head + (r.method === "HEAD" ? "console.log(response.status, [...response.headers]);\n" : "console.log(response.status);\nconsole.log(await response.text());\n") + (r.flags.insecure ? "\n// -k (skip certificate checks): fetch has no switch for it; in Node set NODE_TLS_REJECT_UNAUTHORIZED=0 for a test, never in production.\n" : "") + (r.proxy ? "\n// -x " + r.proxy + ": fetch needs a proxy agent (for example undici's ProxyAgent) to use a proxy.\n" : "");
+    return lines + head + (r.method === "HEAD" ? "console.log(response.status, [...response.headers]);\n" : "console.log(response.status);\nconsole.log(await response.text());\n") + (r.flags.insecure ? "\n// -k (skip certificate checks): fetch has no switch for it; in Node set NODE_TLS_REJECT_UNAUTHORIZED=0 for a test, never in production.\n" : "") + (r.proxy ? "\n// -x " + cm(r.proxy) + ": fetch needs a proxy agent (for example undici's ProxyAgent) to use a proxy.\n" : "");
   }
   function toPython(r) {
     const L = ["import requests", ""], a = [];

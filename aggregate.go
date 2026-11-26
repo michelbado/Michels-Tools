@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"math/bits"
 	"net/netip"
@@ -448,12 +451,25 @@ func (c *Collector) Result() (v4, v6 []string) {
 	return c.result4(), c.result6()
 }
 
-func (c *Collector) result4() []string {
+// Merge finishes the collection: it sorts and merges what was read, so that the result can then be walked with EachV4 / EachV6 (the server does
+// this, so an answer is written as it is produced and never held as a whole) or collected with Result.
+func (c *Collector) Merge() {
 	c.v4 = mergeV4(c.v4)
+	c.v6 = mergeV6(c.v6)
+}
+
+func (c *Collector) result4() []string {
+	c.Merge()
 	if len(c.v4) == 0 {
 		return nil
 	}
 	out := make([]string, 0, len(c.v4)/2+1)
+	c.EachV4(func(s string) { out = append(out, s) })
+	return out
+}
+
+// EachV4 calls f with every IPv4 CIDR of the minimal sorted result, in order. Call Merge first.
+func (c *Collector) EachV4(f func(string)) {
 	emit := func(s, e uint32) {
 		cur := uint64(s)
 		end := uint64(e)
@@ -466,7 +482,7 @@ func (c *Collector) result4() []string {
 			if size > maxbits {
 				size = maxbits
 			}
-			out = append(out, fmtV4(uint32(cur), 32-size))
+			f(fmtV4(uint32(cur), 32-size))
 			cur += 1 << size
 			if cur > end {
 				return
@@ -476,7 +492,6 @@ func (c *Collector) result4() []string {
 	for _, v := range c.v4 { // already merged: disjoint and not touching
 		emit(uint32(v>>32), uint32(v))
 	}
-	return out
 }
 
 func fmtV4(ip uint32, plen int) string {
@@ -505,11 +520,17 @@ func appendInt(b []byte, v int) []byte {
 }
 
 func (c *Collector) result6() []string {
-	c.v6 = mergeV6(c.v6)
+	c.Merge()
 	if len(c.v6) == 0 {
 		return nil
 	}
 	var out []string
+	c.EachV6(func(s string) { out = append(out, s) })
+	return out
+}
+
+// EachV6 calls f with every IPv6 CIDR of the minimal sorted result, in order. Call Merge first.
+func (c *Collector) EachV6(f func(string)) {
 	emit := func(s, e u128) {
 		cur := s
 		for {
@@ -524,7 +545,7 @@ func (c *Collector) result6() []string {
 			if size > maxbits {
 				size = maxbits
 			}
-			out = append(out, netip.PrefixFrom(cur.addr(), 128-size).String())
+			f(netip.PrefixFrom(cur.addr(), 128-size).String())
 			next, carry := cur.addPow2(size)
 			if carry || next.cmp(e) > 0 {
 				return
@@ -535,5 +556,39 @@ func (c *Collector) result6() []string {
 	for _, r := range c.v6 { // already merged: disjoint and not touching
 		emit(r.start, r.end)
 	}
-	return out
+}
+
+// WriteJSON writes the answer of /api/aggregate (the same JSON the response struct gives) as it is produced: the address lists are never
+// built as a whole, nor copied into a second buffer, so the memory a request needs does not grow with the size of the answer.
+// Call Merge first. A list with nothing in it is null, as before.
+func (c *Collector) WriteJSON(w io.Writer) error {
+	bw := bufio.NewWriterSize(w, 64<<10)
+	samples, err := json.Marshal(c.InvalidSamples) // free text from the input: let the JSON package escape it
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(bw, `{"found4":%d,"found6":%d,"invalid":%d,"invalidSamples":%s,"bytes":%d,"v4":`, c.Found4, c.Found6, c.Invalid, samples, c.Bytes)
+	list := func(n int, each func(func(string))) {
+		if n == 0 {
+			bw.WriteString("null")
+			return
+		}
+		bw.WriteByte('[')
+		first := true
+		each(func(s string) { // a CIDR holds only digits, dots, colons, hex letters and a slash: nothing to escape
+			if !first {
+				bw.WriteByte(',')
+			}
+			first = false
+			bw.WriteByte('"')
+			bw.WriteString(s)
+			bw.WriteByte('"')
+		})
+		bw.WriteByte(']')
+	}
+	list(len(c.v4), c.EachV4)
+	bw.WriteString(`,"v6":`)
+	list(len(c.v6), c.EachV6)
+	bw.WriteString("}\n")
+	return bw.Flush()
 }

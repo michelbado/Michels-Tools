@@ -188,6 +188,28 @@ func TestLockedToolsNeedTheCode(t *testing.T) {
 	}
 }
 
+// A locked tool's files are only for visitors with the cookie. The answer to one with the cookie must not be kept by a shared cache
+// (a CDN) and given to a visitor without it: it is private, and the answers differ by cookie (Vary).
+func TestLockedAnswersAreNotForSharedCaches(t *testing.T) {
+	h := lockHandler(t, "qrcode = locked\nlock.code = open sesame\n")
+	c := lockCookieOf(lpost(h, "/api/unlock", `{"code":"open sesame"}`, nil))
+	if c == nil {
+		t.Fatal("no cookie")
+	}
+	w := lget(h, "/apps/qrcode/app.js", c)
+	if w.Code != 200 || w.Header().Get("Cache-Control") != "private, no-cache" || !strings.Contains(w.Header().Get("Vary"), "Cookie") {
+		t.Errorf("with the cookie: %d, Cache-Control %q, Vary %q", w.Code, w.Header().Get("Cache-Control"), w.Header().Get("Vary"))
+	}
+	w = lget(h, "/apps/qrcode/app.js", nil)
+	if w.Code != 401 || w.Header().Get("Cache-Control") != "no-store" || !strings.Contains(w.Header().Get("Vary"), "Cookie") {
+		t.Errorf("without the cookie: %d, Cache-Control %q, Vary %q", w.Code, w.Header().Get("Cache-Control"), w.Header().Get("Vary"))
+	}
+	// what is not locked keeps its plain headers
+	if w := lget(h, "/apps/jsonfmt/app.js", nil); w.Code != 200 || strings.Contains(w.Header().Get("Vary"), "Cookie") || w.Header().Get("Cache-Control") == "private, no-cache" {
+		t.Errorf("an open tool: %d, Cache-Control %q, Vary %q", w.Code, w.Header().Get("Cache-Control"), w.Header().Get("Vary"))
+	}
+}
+
 func TestUnlocking(t *testing.T) {
 	h := lockHandler(t, "qrcode = locked\nlock.code = open sesame\nlock.hours = 5\n")
 	if w := lpost(h, "/api/unlock", `{"code":"nope"}`, nil); w.Code != 403 || lockCookieOf(w) != nil {
