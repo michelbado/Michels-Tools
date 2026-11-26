@@ -212,7 +212,7 @@
     const isEncryptedError = e => !!e && ((window.PDFLib && PDFLib.EncryptedPDFError && e instanceof PDFLib.EncryptedPDFError) || e.name === "EncryptedPDFError" || /is encrypted/i.test(String(e.message)));
 
     async function getSrc() {
-      if (!srcDoc) srcDoc = await PDFLib.PDFDocument.load(bytes, { updateMetadata: false });
+      if (!srcDoc) { srcDoc = await PDFLib.PDFDocument.load(bytes, { updateMetadata: false }); PDFCommon.detachPageLinks(srcDoc); }
       return srcDoc;
     }
 
@@ -222,6 +222,7 @@
       copied.forEach(p => out.addPage(p));
       out.setProducer("Michel's Tools");
       out.setCreator("Michel's Tools");
+      PDFCommon.assertNoStrayPages(out);
       return out.save();
     }
 

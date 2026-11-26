@@ -283,6 +283,7 @@
       let reducedPages = 0;
       try {
         const doc = await P.PDFDocument.load(src.bytes, { updateMetadata: false });
+        window.PDFCommon.detachPageLinks(doc);
         const out = await P.PDFDocument.create({ updateMetadata: false });
         for (let i = 0; i < src.pages; i++) {
           const n = i + 1;
@@ -297,6 +298,7 @@
         out.setProducer("Michel's Tools"); out.setModificationDate(new Date());
         setStatus("Saving...");
         await tick();
+        window.PDFCommon.assertNoStrayPages(out);
         const bytes = await out.save({ updateFieldAppearances: false });
 
         // check the new file with the reader itself: a redacted page must hold no text at all

@@ -366,6 +366,7 @@
           doc.setProducer("Michel's Tools"); doc.setModificationDate(new Date());
         } else {
           const p = resizeParams(...curSize());
+          window.PDFCommon.detachPageLinks(doc);            // pages are copied: nothing may point from one page to another
           const out = await P.PDFDocument.create();
           for (let i = 0; i < doc.getPageCount(); i++) {
             if (i % 4 === 0) { setStatus(`Building page ${i + 1} of ${doc.getPageCount()}...`); await tick(); }
@@ -386,6 +387,7 @@
         }
         setStatus("Saving...");
         await tick();
+        if (result !== doc) window.PDFCommon.assertNoStrayPages(result);
         const bytes = await result.save({ updateFieldAppearances: false });
         const name = `${C.baseName(src.name)}-${suffix}.pdf`;
         C.downloadBlob(new Blob([bytes], { type: "application/pdf" }), name);

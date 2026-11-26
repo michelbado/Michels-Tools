@@ -328,8 +328,56 @@ window.PDFCommon = (() => {
     await page.render({ canvasContext: ctx, canvas, viewport: vp }).promise;
   }
 
+  /* ---------- copying pages without dragging other pages along ----------
+     pdf-lib's copyPages copies every object a page points to. A link, a bookmark-style action or a form field on a kept page
+     can point at a page the visitor removed (or redacted), and that whole page, with its original text, would then be written into
+     the new file as a page that is not in the page list. So before pages are copied, everything on them that points at other pages is
+     removed from the loaded source document (in memory only: the visitor's file is never changed). Web links (URI) are kept. */
+  function detachPageLinks(doc) {
+    const L = window.PDFLib, N = s => L.PDFName.of(s);
+    const ctx = doc.context;
+    for (const page of doc.getPages()) {
+      const node = page.node;
+      for (const k of ["AA", "B", "Dest"]) if (node.has(N(k))) node.delete(N(k));       // page actions, article beads
+      let annots = null;
+      try { annots = node.lookupMaybe(N("Annots"), L.PDFArray); } catch { node.delete(N("Annots")); continue; }   // not a list: drop it
+      if (!annots) continue;
+      const keep = [];
+      for (let i = 0; i < annots.size(); i++) {
+        const ref = annots.get(i);
+        let a = null;
+        try { a = ctx.lookupMaybe(ref, L.PDFDict); } catch { a = null; }                 // something that is not an annotation: dropped
+        if (!a) continue;
+        // a field widget belongs to a field tree that reaches widgets on other pages; the new file has no form, so only its look is kept
+        const sub = a.get(N("Subtype"));
+        if (a.has(N("Parent")) && sub !== N("Popup")) { a.delete(N("Parent")); }
+        for (const k of ["P", "Dest", "AA", "IRT", "Popup", "Next", "Prev"]) if (a.has(N(k))) a.delete(N(k));
+        const act = a.lookupMaybe(N("A"), L.PDFDict);
+        if (act) {
+          const s = act.get(N("S"));
+          if (s === N("URI")) { if (act.has(N("Next"))) act.delete(N("Next")); }
+          else a.delete(N("A"));
+        } else if (a.has(N("A"))) a.delete(N("A"));
+        keep.push(ref);
+      }
+      node.set(N("Annots"), ctx.obj(keep));
+    }
+  }
+
+  // The last safety net before a file is saved: a document built from copied pages must hold exactly as many page objects as it has
+  // pages. Anything more is a page that was left out but is still inside the file. Throws so that nothing is downloaded.
+  function assertNoStrayPages(doc) {
+    const L = window.PDFLib, N = L.PDFName.of("Type"), page = L.PDFName.of("Page");
+    let n = 0;
+    for (const [, obj] of doc.context.enumerateIndirectObjects()) {
+      if (obj instanceof L.PDFDict && obj.get(N) === page) n++;
+    }
+    if (n > doc.getPageCount()) throw new Error("A page that was left out is still tied to a page that was kept (for example by a link), so it would have stayed inside the new file. Nothing was saved.");
+  }
+
   return {
     MAX_BYTES, WARN_BYTES, MAX_FILES,
+    detachPageLinks, assertNoStrayPages,
     humanSize, baseName,
     parseRanges, parseGroups, splitPlan, runs, describePages, groupLabel,
     formatPdfDate, countBytes, scanRaw, parseXmp,

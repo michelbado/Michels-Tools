@@ -167,6 +167,7 @@
           let src;
           try { src = await PDFLib.PDFDocument.load(it.bytes, { updateMetadata: false }); }
           catch (e) { if (isEncryptedError(e)) throw Object.assign(new Error(`${it.name} ${NEEDS_UNLOCK}`), { friendly: true }); throw e; }
+          PDFCommon.detachPageLinks(src);
           const pages = pagesFor(it.spec, it.pages).pages;
           const copied = await out.copyPages(src, pages.map(p => p - 1));
           copied.forEach(p => out.addPage(p));
@@ -174,6 +175,7 @@
         out.setProducer("Michel's Tools"); out.setCreator("Michel's Tools");
         setStatus("Saving...");
         await tick();
+        PDFCommon.assertNoStrayPages(out);
         const bytes = await out.save();
         const name = `${C.baseName($("outname").value || "merged")}.pdf`;
         C.downloadBlob(new Blob([bytes], { type: "application/pdf" }), name);

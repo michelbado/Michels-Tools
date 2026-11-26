@@ -405,6 +405,7 @@
         let src;
         try { src = await PDFLib.PDFDocument.load(bytes, { updateMetadata: false }); }
         catch (e) { if (isEncryptedError(e)) throw Object.assign(new Error(NEEDS_UNLOCK), { friendly: true }); throw e; }
+        PDFCommon.detachPageLinks(src);
         const out = await PDFLib.PDFDocument.create();
         for (let i = 0; i < items.length; i++) {
           const it = items[i];
@@ -431,6 +432,7 @@
         const kw = src.getKeywords(); if (kw) out.setKeywords([kw]);
         const created = src.getCreationDate(); if (created) out.setCreationDate(created);
         out.setProducer("Michel's Tools"); out.setModificationDate(new Date());
+        PDFCommon.assertNoStrayPages(out);
         const saved = await out.save();
         const name = `${C.baseName(file.name)}-organized.pdf`;
         C.downloadBlob(new Blob([saved], { type: "application/pdf" }), name);

@@ -46,7 +46,7 @@ All of these work on the file in the visitor's browser. The original file is nev
 | `pdfimages` | Images / PDF Converter | Pictures to PDF (one per page, with page size, direction and border choices) and PDF pages to pictures (results are kept in browser memory, capped at 600 MB; saved as a ZIP). |
 | `pdfextract` | Extract Content | Take out the text, the pictures and the attached files of a PDF. |
 
-Known limits: merging, organising and resizing can drop links, bookmarks and form fields; changing a signed PDF makes its signature show as
+Known limits: merging, organising and resizing can drop links, bookmarks and form fields (when pages are copied into a new file, links that jump to other pages, page actions and form-field connections are removed on purpose, so that a page you left out or redacted can never travel along inside the new file; web links are kept, and a form field keeps its look but is no longer fillable); changing a signed PDF makes its signature show as
 changed (the tools warn about this).
 
 ## Troubleshooting (`trouble`)
