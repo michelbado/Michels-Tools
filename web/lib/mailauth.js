@@ -75,7 +75,7 @@
         count[name] = (count[name] || 0) + 1;
         const key = q + name + ":" + arg; if (seen.has(key) && name !== "all") notes.push({ level: "warn", text: "\"" + t + "\" appears more than once." }); seen.add(key);
         let plain = "";
-        if (name === "all") { allIdx = idx; plain = "every other sender: " + Q[q][1] + " (" + Q[q][0] + ")"; }
+        if (name === "all") { if (allIdx < 0) allIdx = idx; plain = "every other sender: " + Q[q][1] + " (" + Q[q][0] + ")"; }
         else if (name === "include") { lookups++; plain = arg ? "also use the SPF record of " + arg + " (" + Q[q][0] + " if it matches)" : "missing the domain after include:"; if (!arg) notes.push({ level: "bad", text: "\"" + t + "\": include needs a domain, like include:_spf.example.com." }); else if (!isDomainSpec(arg)) notes.push({ level: "bad", text: "\"" + t + "\" is not a valid domain." }); }
         else if (name === "a" || name === "mx") { lookups++; const d = arg.split("/")[0], net = m[3] === "/" ? cidr : (arg.includes("/") ? arg.slice(arg.indexOf("/") + 1) : ""); plain = "the " + (name === "a" ? "address (A/AAAA) records" : "mail servers (MX)") + " of " + (d || "this domain") + (net ? " and the networks around them (/" + net + ")" : "") + " (" + Q[q][0] + ")"; if (d && !isDomainSpec(d)) notes.push({ level: "bad", text: "\"" + t + "\" is not a valid domain." }); }
         else if (name === "ptr") { lookups++; plain = "senders whose reverse DNS name is under " + (arg || "this domain") + " (" + Q[q][0] + ")"; notes.push({ level: "warn", text: "ptr is deprecated by the SPF standard: it is slow, unreliable and many receivers ignore it. Replace it with ip4, ip6 or include." }); }
@@ -92,6 +92,7 @@
             else if (name === "ip6" && bits < 32) notes.push({ level: "warn", text: "\"" + t + "\" is a very large IPv6 network: check that you really control all of it." });
           }
         }
+        if ((name === "a" || name === "mx") && q === "+" && /\/0(?![0-9])/.test(t)) notes.push({ level: "bad", text: "\"" + t + "\" covers every address on the internet (a prefix length of 0), so any sender passes SPF." });
         if (allIdx >= 0 && idx > allIdx) notes.push({ level: "warn", text: "\"" + t + "\" comes after \"all\" and is ignored: put \"all\" last." });
         rows.push([t, name, plain]);
       } else if (mod) {
@@ -181,6 +182,10 @@
     else if (/^reject$/i.test(p)) notes.push({ level: "good", text: "p=reject: mail that fails DMARC is rejected. This is the strongest protection against forged mail." });
     const pct = getTag(t, "pct");
     if (pct !== undefined && /^\d+$/.test(pct) && +pct < 100 && p && !/^none$/i.test(p)) notes.push({ level: "warn", text: "pct=" + pct + ": only " + pct + "% of failing mail gets the " + p.toLowerCase() + " policy; the rest gets the next weaker one. Move to pct=100 when ready." });
+    const rank = x => /^reject$/i.test(x || "") ? 2 : /^quarantine$/i.test(x || "") ? 1 : /^none$/i.test(x || "") ? 0 : -1;
+    const weak = [];
+    if (sp !== undefined && rank(sp) >= 0 && rank(p) > rank(sp)) { weak.push("sp=" + sp.toLowerCase() + " for subdomains"); notes.push({ level: "warn", text: "sp=" + sp.toLowerCase() + ": mail from subdomains of your domain gets the weaker policy \"" + sp.toLowerCase() + "\" although p=" + p.toLowerCase() + ". Forged mail from a subdomain is not stopped." }); }
+    if (pct !== undefined && /^\d+$/.test(pct) && +pct < 100 && rank(p) > 0) weak.push("pct=" + pct);
     if (sp === undefined && p && !/^none$/i.test(p)) notes.push({ level: "", text: "No sp= tag: subdomains follow the main policy (p=" + p.toLowerCase() + ")." });
     if (rua === undefined) notes.push({ level: "warn", text: "There is no rua= tag, so you will receive no summary reports and cannot see who sends mail as your domain. Add rua=mailto:dmarc@yourdomain." });
     else notes.push({ level: "", text: "If a report address is on a DIFFERENT domain, that other domain must publish a permission record (yourdomain._report._dmarc.otherdomain), or receivers will not send reports there." });
@@ -189,7 +194,7 @@
     if ((a && /^s$/i.test(a)) || (s && /^s$/i.test(s))) notes.push({ level: "", text: "Strict alignment is stricter than most senders need: mail sent from a subdomain, or through a service that signs with a subdomain, will fail." });
     const l = longString(text.length), d = dnsNote(text.length); if (l) notes.push(l); if (d) notes.push(d);
     const bad = notes.filter(n => n.level === "bad").length;
-    res.summary = bad ? "DMARC record with " + bad + " problem" + (bad > 1 ? "s" : "") : p === undefined ? "DMARC record without a policy" : "DMARC policy: " + p.toLowerCase() + (/^reject$/i.test(p) ? " (strongest)" : /^quarantine$/i.test(p) ? " (good)" : " (monitoring only)");
+    res.summary = bad ? "DMARC record with " + bad + " problem" + (bad > 1 ? "s" : "") : p === undefined ? "DMARC record without a policy" : "DMARC policy: " + p.toLowerCase() + (weak.length && rank(p) > 0 ? " (weakened by " + weak.join(" and ") + ")" : /^reject$/i.test(p) ? " (strongest)" : /^quarantine$/i.test(p) ? " (good)" : " (monitoring only)");
     res.policy = p ? p.toLowerCase() : "";
     res.publish = "Publish it as a TXT record at _dmarc.<your domain>, for example _dmarc.example.com.";
     return res;

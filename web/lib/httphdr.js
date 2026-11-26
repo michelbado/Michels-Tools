@@ -64,6 +64,11 @@
       if (t.includes("'unsafe-inline'") && !nonceOrHash && !dyn) { issues.push(scriptName + " allows 'unsafe-inline': any injected inline script runs"); sev = 2; }
       if (t.includes("'unsafe-eval'")) { issues.push(scriptName + " allows 'unsafe-eval'"); sev = Math.max(sev, 1); }
       if (t.includes("*") || t.includes("https:") || t.includes("http:") || t.includes("data:")) { issues.push(scriptName + " allows scripts from " + (t.includes("*") ? "any host (*)" : t.includes("data:") ? "data: URLs" : "any " + (t.includes("http:") ? "http" : "https") + " host")); sev = Math.max(sev, t.includes("*") || t.includes("data:") ? 2 : 1); }
+      // a host source that is only a wildcard: https://* (every host) or *.com (a whole ending)
+      const hostOf = x => x.replace(/^[a-z][a-z0-9+.-]*:\/\//, "").replace(/[\/:].*$/, "");
+      const wildAll = t.filter(x => /^[a-z][a-z0-9+.-]*:\/\//.test(x) && hostOf(x) === "*"), wildEnd = t.filter(x => /^\*\.[a-z0-9-]+$/.test(hostOf(x)) && !x.startsWith("'"));
+      if (wildAll.length) { issues.push(scriptName + " allows scripts from any host (" + wildAll[0] + ")"); sev = 2; }
+      if (wildEnd.length) { issues.push(scriptName + " allows scripts from every site that ends in " + hostOf(wildEnd[0]).slice(1) + " (" + wildEnd[0] + ")"); sev = Math.max(sev, 2); }
       if (nonceOrHash || dyn) good.push("uses a nonce, hash or 'strict-dynamic'");
     }
     const info = [];
@@ -83,7 +88,15 @@
     return /nosniff/i.test(v) ? { name: "X-Content-Type-Options", level: "good", value: v, text: "Browsers will not guess content types." } : { name: "X-Content-Type-Options", level: "bad", value: v, text: "The only valid value is \"nosniff\"." };
   }
   function frame(r) {
-    const v = get(r, "x-frame-options"), c = get(r, "content-security-policy"), fa = c !== undefined && "frame-ancestors" in cspParse(c);
+    const v = get(r, "x-frame-options"), c = get(r, "content-security-policy"), cd = c !== undefined ? cspParse(c) : null, fa = !!cd && "frame-ancestors" in cd;
+    if (fa) {
+      // browsers that know frame-ancestors follow it and ignore X-Frame-Options, so what it allows is what counts
+      const t = cd["frame-ancestors"].map(x => x.toLowerCase());
+      const anyHost = t.includes("*") || t.some(x => /^[a-z][a-z0-9+.-]*:\/\/\*$/.test(x)), anyScheme = t.some(x => x === "https:" || x === "http:" || x === "data:");
+      if (!t.length) return { name: "Clickjacking protection", level: "warn", value: "CSP frame-ancestors (empty)", text: "The frame-ancestors directive has no value, so it does not say who may frame this page. Use 'none' or 'self', or list the sites." };
+      if (anyHost || anyScheme) return { name: "Clickjacking protection", level: "bad", value: "CSP frame-ancestors " + t.join(" "), text: "frame-ancestors " + (anyHost ? "* allows every site" : "allows every " + t.find(x => /^(https?|data):$/.test(x)).replace(":", "") + " site") + " to put this page in a frame, so it gives no protection. Use 'none' or 'self', or list the sites that may frame it." };
+      if (t.some(x => /^\*\.[a-z0-9-]+$/.test(x.replace(/^[a-z][a-z0-9+.-]*:\/\//, "")))) return { name: "Clickjacking protection", level: "warn", value: "CSP frame-ancestors " + t.join(" "), text: "frame-ancestors allows every site that ends in " + t.find(x => /^\*\.[a-z0-9-]+$/.test(x.replace(/^[a-z][a-z0-9+.-]*:\/\//, ""))).replace(/^[a-z][a-z0-9+.-]*:\/\//, "").slice(1) + ", which is far wider than a single site. List the sites that may frame this page." };
+    }
     if (fa) return { name: "Clickjacking protection", level: "good", value: v !== undefined ? "X-Frame-Options: " + v + "; CSP frame-ancestors" : "CSP frame-ancestors", text: "The Content-Security-Policy frame-ancestors directive controls who may put this page in a frame." };
     if (v === undefined) return { name: "Clickjacking protection", level: "missing", value: "", text: "Neither X-Frame-Options nor a CSP frame-ancestors directive: other sites can put this page in a hidden frame. Add frame-ancestors 'none' (or 'self') to the CSP." };
     if (/^\s*(deny|sameorigin)\s*$/i.test(v)) return { name: "Clickjacking protection", level: "good", value: "X-Frame-Options: " + v, text: "Framing is " + (/deny/i.test(v) ? "blocked" : "limited to the same site") + "." };

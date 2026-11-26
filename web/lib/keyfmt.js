@@ -60,7 +60,15 @@
     if (top.tag !== 0x30 || c.length < 9 || c.some(x => x.tag !== 2)) throw fail("bad", "this is not an RSA private key");
     if (d.intOf(der, c[0]) !== 0) throw fail("unsupported", "multi-prime RSA keys are not supported");
     const n = d.uintBytes(der, c[1]), e = d.uintBytes(der, c[2]);
-    return { type: "rsa", bits: bitLen(n), n, e, pkcs1: der, spki: rsaSpki(n, e), label: "RSA " + bitLen(n) + " bit" };
+    // Is it a real private key? A file can carry the public numbers of a certificate and zeros or nonsense for the secret part. The parts
+    // must fit together: p * q = n, and e * d leaves 1 when divided by p - 1 and by q - 1.
+    let consistent = false;
+    try {
+      const big = u => { let v = 0n; for (const b of u) v = (v << 8n) | BigInt(b); return v; };
+      const N = big(n), E = big(e), Dd = big(d.uintBytes(der, c[3])), p = big(d.uintBytes(der, c[4])), q = big(d.uintBytes(der, c[5]));
+      consistent = p > 1n && q > 1n && p * q === N && E > 1n && (E * Dd) % (p - 1n) === 1n && (E * Dd) % (q - 1n) === 1n;
+    } catch { consistent = false; }
+    return { type: "rsa", bits: bitLen(n), n, e, pkcs1: der, spki: rsaSpki(n, e), label: "RSA " + bitLen(n) + " bit", consistent };
   }
   // SEC1 ECPrivateKey (with or without the curve inside); curve is given when the PKCS#8 wrapper names it
   function fromSec1(der, curveFromWrapper) {

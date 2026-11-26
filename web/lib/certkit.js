@@ -169,7 +169,8 @@
   function nameMatches(host, pattern) {
     host = host.toLowerCase(); pattern = pattern.toLowerCase();
     if (host === pattern) return true;
-    if (pattern.startsWith("*.")) { const rest = pattern.slice(2); const i = host.indexOf("."); return i > 0 && host.slice(i + 1) === rest && !host.slice(0, i).includes("*"); }
+    // a wildcard is for a host name: never for an IP address, and never for a bare ending such as *.com (the part after "*." needs a dot)
+    if (pattern.startsWith("*.")) { const rest = pattern.slice(2); const i = host.indexOf("."); return i > 0 && rest.includes(".") && !/^[\d.]+$/.test(host) && !host.includes(":") && host.slice(i + 1) === rest && !host.slice(0, i).includes("*"); }
     return false;
   }
 
@@ -211,7 +212,8 @@
     for (const k of keys) {
       const hits = certs.filter(c => same(c.spki, k.key.spki)), csrHits = csrs.filter(r => same(r.spki, k.key.spki));
       const lead = k.from + " (" + k.key.label + ")";
-      if (hits.length) add("Key and certificate", "good", "The private key matches the certificate", lead + " belongs to the certificate \"" + label(hits[0]) + "\". They are a pair.", "");
+      if (k.key.type === "rsa" && k.key.consistent === false) add("Key and certificate", "bad", "The key file is not a complete private key", lead + " carries the public numbers of an RSA key but its secret part is missing or does not fit them, so it cannot sign or decrypt anything, whatever certificate it seems to match.", "Use the real key file that was made together with the request for this certificate.");
+      else if (hits.length) add("Key and certificate", "good", "The private key matches the certificate", lead + " belongs to the certificate \"" + label(hits[0]) + "\". They are a pair.", "");
       else if (certs.length && leaf) {
         const owner = csrHits.length ? " It matches the certificate request " + csrHits[0].from + " instead, so the certificate was probably issued for a different request." : "";
         add("Key and certificate", "bad", "The private key does NOT match the certificate", lead + " does not belong to \"" + label(leaf) + "\"." + owner, "Use the key that was created together with the request for this certificate. If the key is lost, make a new key and request (CSR) and get the certificate issued again.");

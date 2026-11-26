@@ -339,6 +339,7 @@ window.PDFCommon = (() => {
     for (const page of doc.getPages()) {
       const node = page.node;
       for (const k of ["AA", "B", "Dest"]) if (node.has(N(k))) node.delete(N(k));       // page actions, article beads
+      for (const k of ["Metadata", "PieceInfo"]) if (node.has(N(k))) node.delete(N(k)); // hidden details a program attached to the page (author, editing history)
       let annots = null;
       try { annots = node.lookupMaybe(N("Annots"), L.PDFArray); } catch { node.delete(N("Annots")); continue; }   // not a list: drop it
       if (!annots) continue;
