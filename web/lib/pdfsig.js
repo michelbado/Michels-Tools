@@ -322,9 +322,26 @@ window.PDFSig = (() => {
     return null;
   }
 
+  // the certificate a SignerInfo points to: by issuer + serial, or by subject key identifier; null when none matches
+  function findSignerCert(si, certs) {
+    for (const c of certs) {
+      try {
+        if (si.sid instanceof pkijs.IssuerAndSerialNumber) {
+          if (c.issuer.isEqual(si.sid.issuer) && c.serialNumber.isEqual(si.sid.serialNumber)) return c;
+        } else if (si.sid && si.sid.valueBlock && si.sid.valueBlock.valueHexView) {
+          const want = hex(new Uint8Array(si.sid.valueBlock.valueHexView));
+          for (const ext of c.extensions || []) {
+            if (ext.extnID === "2.5.29.14" && ext.parsedValue && hex(new Uint8Array(ext.parsedValue.valueBlock.valueHexView)) === want) return c;
+          }
+        }
+      } catch { /* next */ }
+    }
+    return null;
+  }
+
   // a timestamp token (a CMS ContentInfo): what time it states, who stamped it, whether it matches `expectedHashOf`
   async function readTimestamp(contentInfoSchema, expectedData) {
-    const out = { time: null, authority: "", imprintOk: null, tokenSignatureOk: null, error: null };
+    const out = { time: null, authority: "", imprintOk: null, tokenSignatureOk: null, stamperMatched: false, timeStampingUse: null, error: null };
     try {
       const ci = new pkijs.ContentInfo({ schema: contentInfoSchema });
       const sd = new pkijs.SignedData({ schema: ci.content });
@@ -335,11 +352,16 @@ window.PDFSig = (() => {
       const alg = HASH[tst.messageImprint.hashAlgorithm.algorithmId];
       const imprint = new Uint8Array(tst.messageImprint.hashedMessage.valueBlock.valueHexView);
       if (alg && alg[1] && expectedData) out.imprintOk = hex(imprint) === hex(await digestOf(alg[1], expectedData));
-      for (const c of sd.certificates || []) {
-        if (c instanceof pkijs.Certificate && sd.signerInfos[0]) {
-          out.authority = dnObject(c.subject).CN || dnObject(c.subject).O || out.authority;
-          break;
-        }
+      // the stamping authority is the certificate the token's own signer points to, not just the first one in the token
+      const tcerts = (sd.certificates || []).filter(c => c instanceof pkijs.Certificate);
+      const stamper = sd.signerInfos[0] ? findSignerCert(sd.signerInfos[0], tcerts) : null;
+      if (stamper) {
+        out.stamperMatched = true;
+        out.authority = dnObject(stamper.subject).CN || dnObject(stamper.subject).O || "";
+        try {
+          const eku = (stamper.extensions || []).find(x => x.extnID === "2.5.29.37");
+          out.timeStampingUse = eku && eku.parsedValue ? eku.parsedValue.keyPurposes.includes("1.3.6.1.5.5.7.3.8") : false;
+        } catch { out.timeStampingUse = null; }
       }
       try {
         // pkijs also wants the stamped data, to check the imprint inside the token
@@ -407,10 +429,15 @@ window.PDFSig = (() => {
         const ts = await readTimestamp(ci.toSchema ? ci.toSchema() : asn.result, signed);
         r.timestamp = ts;
         r.status = ts.imprintOk === false ? "modified" : ts.imprintOk === true && ts.tokenSignatureOk === true ? "valid" : ts.tokenSignatureOk === false ? "badsig" : "unsupported";
-        r.headline = r.status === "valid" ? "A trusted-time stamp is attached to the document, and the document has not changed since."
+        r.headline = r.status === "valid" ? "A time stamp is attached to the document, and the document has not changed since. The stamping authority was not checked against a trusted list, so the time is only as reliable as that authority."
           : r.status === "modified" ? "The document was changed after this timestamp was added." : "The timestamp could not be fully checked.";
+        if (r.status === "valid" && ts.timeStampingUse === false) r.notes.push("The stamping certificate does not say it may be used for time stamping.");
+        if (r.status === "valid" && !ts.stamperMatched) r.notes.push("The certificate of the stamping authority is not in the file, so the authority could not be named.");
+        if (r.status === "valid" && !r.coversWholeFile) r.partial = true;
+        if (r.status === "valid" && !r.coversWholeFile) r.headline += ` It covers only the first ${Math.floor(r.coverageEnd / bytes.length * 100)}% of the file: bytes added later are not covered.`;
         r.signingTime = ts.time;
-        if (certs.length) { try { r.signer = await certDetails(certs[0]); } catch { /* ignore */ } }
+        const tsCert = sd.signerInfos[0] ? findSignerCert(sd.signerInfos[0], certs) : null;
+        if (tsCert) { try { r.signer = await certDetails(tsCert); } catch { /* ignore */ } }
         return r;
       }
 
@@ -422,12 +449,7 @@ window.PDFSig = (() => {
       r.signingTime = asDate(st);
 
       // signer's certificate and the chain the file carries
-      let signerCert = null;
-      for (const c of certs) {
-        try {
-          if (si.sid instanceof pkijs.IssuerAndSerialNumber && c.issuer.isEqual(si.sid.issuer) && c.serialNumber.isEqual(si.sid.serialNumber)) { signerCert = c; break; }
-        } catch { /* next */ }
-      }
+      let signerCert = findSignerCert(si, certs);
       if (!signerCert && certs.length === 1) signerCert = certs[0];
       if (signerCert) {
         const built = await buildChain(signerCert, certs);
@@ -443,6 +465,13 @@ window.PDFSig = (() => {
         return r;
       }
       let data = signed;
+      // A signature that carries its own content is checked by the library over that content, not over the PDF's bytes,
+      // so it would say "valid" for any file. Only the old pkcs7.sha1 format legitimately holds a value there (a digest).
+      if (!/pkcs7\.sha1/i.test(r.subFilter) && sd.encapContentInfo && sd.encapContentInfo.eContent) {
+        r.status = "badsig";
+        r.headline = "This signature carries its own content instead of signing this document, so it does not protect the file.";
+        return r;
+      }
       if (/pkcs7\.sha1/i.test(r.subFilter) && sd.encapContentInfo.eContent) {
         const want = new Uint8Array(sd.encapContentInfo.eContent.getValue ? sd.encapContentInfo.eContent.getValue() : sd.encapContentInfo.eContent.valueBlock.valueHexView);
         const got = await digestOf("SHA-1", signed);
@@ -483,6 +512,12 @@ window.PDFSig = (() => {
       /* an embedded timestamp on the signature */
       const tok = attrValues(si, "unsigned", OID.attrTimestampToken)[0];
       if (tok) r.timestamp = await readTimestamp(tok, new Uint8Array(si.signature.valueBlock.valueHexView));
+
+      // a valid signature that stops short of the end of the file: say so in the headline, not only in a table row
+      if (r.status === "valid" && !r.coversWholeFile) {
+        r.partial = true;
+        r.headline = `The signature is valid for the first ${Math.floor(r.coverageEnd / bytes.length * 100)}% of the file. Anything added after it was signed is not covered.`;
+      }
 
       /* notes */
       if (hashInfo[0] === "SHA-1") r.notes.push("This signature uses SHA-1, an old algorithm that is considered weak.");

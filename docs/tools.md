@@ -34,7 +34,7 @@ All of these work on the file in the visitor's browser. The original file is nev
 | id | Tool | What it does |
 |---|---|---|
 | `pdfinfo` | PDF Info | Who made the file and with which program, when it was created and changed, whether it was edited after it was first saved, and what it contains (signatures, attachments, scripts, forms). |
-| `pdfverify` | Verify Signatures | Checks that each digital signature is mathematically valid and that the document has not changed since signing. It **does not** check whether the signer's certificate is trusted or revoked, and the page says so. |
+| `pdfverify` | Verify Signatures | Checks that each digital signature is mathematically valid and that the part of the document it covers has not changed since signing, and says how much of the file that is (a signature followed by later additions is shown with a warning). A signature that carries its own content instead of signing the PDF is rejected. A time stamp is shown as genuine only when its own signature checks out, and its authority is never treated as trusted. It **does not** check whether the signer's certificate is trusted or revoked, and the page says so. |
 | `pdfmeta` | Metadata | Read, change or remove the details stored in a PDF (title, author, program, dates, hidden properties, older saved versions). |
 | `pdfstamp` | Add Image / Signature | Places a picture (for example a scanned signature) on a page. It is a picture, **not a digital signature**, and the page says so. |
 | `pdfwatermark` | Watermark & Page Numbers | Adds a text or picture watermark, page numbers, or a header and footer (any language). |

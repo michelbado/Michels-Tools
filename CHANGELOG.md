@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.11
+
+- **Verify Signatures no longer calls a forged PDF valid.** A signature that carries its own content (an "attached" signature) was checked against that content and not against the PDF, so it could be pasted into any file and shown as "valid, the document has not been changed". Such a signature is now rejected with a plain explanation.
+- **Verify Signatures says more exactly what it knows.** A signature that covers only the first part of the file says so in its headline and is shown with a warning. A time stamp is shown as genuine only when its own signature checks out, otherwise its time and authority are not presented as facts. The word "trusted" is gone from time stamps (the stamping authority is never checked against a trusted list). The stamping authority is the one named in the stamp's own signer, and a signer found by key identifier is recognised. When the signer's certificate is not in the file, "Signed by" says so instead of repeating a name the file only claims.
+- **Certificate Package Checker: the chain verdict no longer overclaims.** "Every signature checks out" is said only when every link was actually verified; the top certificate is also checked for being a CA; a package with more than 12 certificates in one line is reported instead of passing silently; a broken link is reported even when the chain is incomplete.
+
 ## 1.0.10
 
 - **DORA Incident Classification:** the "thresholds crossed" line is gone from the Thresholds step (the Decision step shows it). A "none of this" box can no longer stay ticked next to figures that cross a limit on the same card: it is cleared and switched off until they no longer do.

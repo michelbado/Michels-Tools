@@ -35,11 +35,13 @@
       rows.push(["Time stamp", t && t.time ? fmtDate(t.time) : "", t && t.imprintOk === false ? "bad" : ""]);
       rows.push(["Stamped by", t && t.authority || (s && whoOf(s.subject)) || ""]);
       rows.push(["Matches the document", t ? (t.imprintOk === true ? "Yes" : t.imprintOk === false ? "No: the document changed after it was stamped" : "Could not be checked") : "", t && t.imprintOk === false ? "bad" : ""]);
-      rows.push(["Stamp itself is genuine", t ? (t.tokenSignatureOk === true ? "Yes" : t.tokenSignatureOk === false ? "No" : "Not checked") : ""]);
+      rows.push(["Stamp itself is genuine", t ? (t.tokenSignatureOk === true ? "Yes" : t.tokenSignatureOk === false ? "No" : "Not checked") : "", t && t.tokenSignatureOk === false ? "bad" : "",
+        "The stamping authority was not checked against a trusted list." + (t && t.timeStampingUse === false ? " Its certificate does not say it may be used for time stamping." : "")]);
       rows.push(["Covers", coverage(sig)]);
       return rows;
     }
-    rows.push(["Signed by", s ? whoOf(s.subject) : sig.name, "", s && sig.name && s.subject.CN && sig.name !== s.subject.CN ? `The signature field says: ${sig.name}` : ""]);
+    if (s) rows.push(["Signed by", whoOf(s.subject), "", sig.name && s.subject.CN && sig.name !== s.subject.CN ? `The signature field says: ${sig.name}` : ""]);
+    else rows.push(["Signed by", "Unknown: the signer's certificate was not found in the file", "warn", sig.name ? `The file only claims the name "${sig.name}". Nothing here proves it.` : ""]);
     if (s && s.subject.email) rows.push(["Email", s.subject.email]);
     if (s) rows.push(["Certificate issued by", whoOf(s.issuer) || dnLine(s.issuer)]);
     const when = sig.signingTime ? fmtDate(sig.signingTime) : (sig.pdfTime ? fmtDate(sig.pdfTime) : "");
@@ -65,7 +67,13 @@
       rows.push(["Certificates in the file", { chain: sig.chain.map((c, i) => `${i + 1}. ${whoOf(c.subject) || dnLine(c.subject)}${c.isCA ? " (certificate authority)" : ""}${c.linkOk === false && i + 1 < sig.chain.length ? "  [does not link to the next]" : ""}`) }, "", ends]);
     }
     const t = sig.timestamp;
-    rows.push(["Trusted time stamp", t ? `${t.time ? fmtDate(t.time) : "present"}${t.authority ? ` by ${t.authority}` : ""}` : "None", t && (t.imprintOk === false) ? "bad" : "", t ? (t.imprintOk === true ? "It matches this signature." : t.imprintOk === false ? "It does NOT match this signature." : "Its contents could not be checked.") + " The stamping authority itself was not checked against a trusted list." : ""]);
+    if (!t) rows.push(["Time stamp", "None"]);
+    else if (t.tokenSignatureOk !== true) {
+      // a stamp whose own signature fails (or cannot be checked) proves nothing: its time and authority are not shown as facts
+      rows.push(["Time stamp", t.tokenSignatureOk === false ? "Present, but it is not genuine: its own signature does not match" : "Present, but it could not be fully checked", t.tokenSignatureOk === false || t.imprintOk === false ? "bad" : "warn", "Do not rely on the time it claims."]);
+    } else {
+      rows.push(["Time stamp", `${t.time ? fmtDate(t.time) : "present"}${t.authority ? ` by ${t.authority}` : ""}`, t.imprintOk === false ? "bad" : "", (t.imprintOk === true ? "It matches this signature." : t.imprintOk === false ? "It does NOT match this signature." : "Its contents could not be checked.") + " The stamping authority itself was not checked against a trusted list." + (t.timeStampingUse === false ? " Its certificate does not say it may be used for time stamping." : "")]);
+    }
     rows.push(["Protects", coverage(sig)]);
     if (sig.subFilter) rows.push(["Signature format", `${sig.subFilter}${sig.filter ? `  (${sig.filter})` : ""}`]);
     return rows;
@@ -129,13 +137,14 @@
         const parts = [];
         if (sigs.length) parts.push(`${sigs.length} signature${sigs.length === 1 ? "" : "s"}`);
         if (stamps.length) parts.push(`${stamps.length} document timestamp${stamps.length === 1 ? "" : "s"}`);
-        summary.textContent = `${parts.join(" and ")} found: ${good} valid${bad ? `, ${bad} not valid` : ""}${n - good - bad ? `, ${n - good - bad} could not be fully checked` : ""}.`;
-        summary.classList.add(bad ? "bad" : n - good ? "warn" : "ok");
+        const partial = res.signatures.filter(s => s.partial).length;
+        summary.textContent = `${parts.join(" and ")} found: ${good} valid${partial ? ` (${partial} of them cover only part of the file)` : ""}${bad ? `, ${bad} not valid` : ""}${n - good - bad ? `, ${n - good - bad} could not be fully checked` : ""}.`;
+        summary.classList.add(bad ? "bad" : n - good || partial ? "warn" : "ok");
       }
       res.signatures.forEach((sig, i) => {
         const fs = document.createElement("fieldset"); fs.className = "sig";
         const lg = document.createElement("legend");
-        const tone = TONE[sig.status] || "warn";
+        const tone = sig.partial ? "warn" : (TONE[sig.status] || "warn");
         const badge = document.createElement("span"); badge.className = `badge ${tone}`;
         badge.innerHTML = ICON[ICON_OF[tone]];                                 // a constant icon, not file text
         const label = document.createElement("span");
